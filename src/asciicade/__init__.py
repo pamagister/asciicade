@@ -1,3 +1,7 @@
-"""asciicade - blank project template."""
+"""Asciicade - a modular arcade game collection for the terminal."""
 
-__all__ = ["main"]
+from __future__ import annotations
+
+__version__ = "0.1.0"
+
+__all__ = ["__version__"]

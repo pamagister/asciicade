@@ -1,4 +1,4 @@
-"""CLI entry point module for asciicade."""
+"""Executable entry point for ``python -m asciicade.cli.cli``."""
 
 from __future__ import annotations
 

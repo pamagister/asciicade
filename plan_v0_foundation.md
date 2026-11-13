@@ -399,7 +399,7 @@ Each phase must be implemented and validated before moving to the next phase.
 
 The agent should update the project documentation and implementation progress as work proceeds.
 
-### Phase 1 – Repository Assessment and Project Foundation
+### Phase 1 – Repository Assessment and Project Foundation [x]
 
 Objectives:
 
@@ -411,16 +411,16 @@ Objectives:
 
 Tasks:
 
-- [ ] Review `pyproject.toml`, README, workflows, package structure, tests, and configuration files.
-- [ ] Identify obsolete template features and dependencies.
-- [ ] Set the supported Python version to >=3.11.
-- [ ] Configure `uv` and generate/update `uv.lock`.
-- [ ] Establish Textual as the terminal UI dependency.
-- [ ] Review and configure the build backend.
-- [ ] Establish Ruff, pytest, and mypy configuration.
-- [ ] Define the initial package structure.
-- [ ] Ensure the CLI entry point is valid.
-- [ ] Update basic project metadata.
+- [x] Review `pyproject.toml`, README, workflows, package structure, tests, and configuration files.
+- [x] Identify obsolete template features and dependencies.
+- [x] Set the supported Python version to >=3.11.
+- [x] Configure `uv` and generate/update `uv.lock`.
+- [x] Establish Textual as the terminal UI dependency.
+- [x] Review and configure the build backend.
+- [x] Establish Ruff, pytest, and mypy configuration.
+- [x] Define the initial package structure.
+- [x] Ensure the CLI entry point is valid.
+- [x] Update basic project metadata.
 
 Acceptance criteria:
 

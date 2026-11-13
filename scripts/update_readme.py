@@ -1,13 +1,20 @@
-# scripts/update_readme.py
+"""Generate ``README.md`` from ``docs/index.md``."""
+
+from __future__ import annotations
+
 from pathlib import Path
 
-src = Path("docs/index.md")
-dst = Path("README.md")
+SOURCE = Path("docs/index.md")
+TARGET = Path("README.md")
+PREFIX = "<!-- This README.md is auto-generated from docs/index.md -->\n\n"
 
-# Optional: prepend a note that it's generated
-prefix = "<!-- This README.md is auto-generated from docs/index.md -->\n\n"
 
-# Lese die Quelldatei explizit mit UTF-8 Kodierung
-source_content = src.read_text(encoding="utf-8")
+def main() -> None:
+    """Write the generated README and report the result."""
+    source_content = SOURCE.read_text(encoding="utf-8")
+    TARGET.write_text(PREFIX + source_content, encoding="utf-8")
+    print(f"Generated: {TARGET} updated from {SOURCE}")
 
-print(f"Generated: {dst} updated from {src}")
+
+if __name__ == "__main__":
+    main()
