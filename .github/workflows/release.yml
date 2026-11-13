@@ -5,18 +5,14 @@ name: Release
 # Linux-only release (default):
 #   make release
 #
-# Release for Linux, Windows and macOS:
+# Release with optional Windows/macOS builds:
 #   make release ALL=1
-#   This appends `--all` to the subject of the tagged HISTORY.md commit.
-#   The `flags` job reads that subject, so the tag itself must point at the
-#   commit carrying the marker.
 #
-# Re-run the pipeline for an existing tag (for example to add the optional
-# Windows/macOS artifacts without creating a new release):
+# Re-run the pipeline for an existing tag:
 #   gh workflow run release.yml --ref <tag> -f all=true
 #
-# A tag push always runs the quality gate, creates the GitHub release,
-# publishes to PyPI and builds Linux. Windows/macOS builds are opt-in.
+# A tag push always runs the quality gate, creates the GitHub release and
+# publishes to PyPI.
 
 permissions:
   contents: write
@@ -39,8 +35,7 @@ concurrency:
 
 jobs:
   # Detects `--all` in the tagged commit subject (or the manual `all` input)
-  # and exposes it as a job output. Environment variables from $GITHUB_ENV do
-  # not cross job boundaries, so a proper output is required here.
+  # and exposes it as a job output.
   flags:
     runs-on: ubuntu-latest
     outputs:
@@ -75,10 +70,8 @@ jobs:
           python-version: '3.11'
       - name: Setup Environment # Composite Action
         uses: ./.github/actions/setup-environment
-        with:
-          python-version: '3.11'
       - name: Run quality gate (lint + tests)
-        run: make test
+        run: make lint && make test
 
   release:
     needs: quality
@@ -88,16 +81,17 @@ jobs:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - name: Generate Changelog
-        run: .github/release_message.sh > release_message.md
       - name: Release
         uses: softprops/action-gh-release@v3
         with:
-          body_path: release_message.md
+          generate_release_notes: true
 
   deploy:
     needs: quality
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
@@ -107,17 +101,12 @@ jobs:
         uses: actions/setup-python@v7
         with:
           python-version: '3.11'
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install build twine
-      - name: Build and publish
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-        run: |
-          python -m build
-          twine upload dist/*
+      - name: Install build tools
+        run: python -m pip install --upgrade build
+      - name: Build distributions
+        run: python -m build
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
 
   # The Linux build is part of every release. Build jobs upload their archive
   # to the same GitHub release, so they wait for the `release` job to finish.
