@@ -36,7 +36,6 @@ docs = [
 
 [project.scripts]
 asciicade = "asciicade.cli.cli:main"
-asciicade-gui = "asciicade.gui.gui:main"
 
 [build-system]
 requires = ["setuptools>=61.0", "wheel", "setuptools_scm[toml]>=6.2"]
