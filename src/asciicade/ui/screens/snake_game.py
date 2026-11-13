@@ -28,6 +28,10 @@ _DIRECTION_ACTIONS = {
     InputAction.RIGHT,
 }
 
+# Terminal cells are roughly twice as tall as they are wide. Rendering each
+# logical cell as two horizontal characters keeps the playfield visually square.
+_CELL_WIDTH = 2
+
 
 class SnakeGameScreen(Screen[None]):
     """Render and drive a Snake session."""
@@ -150,23 +154,27 @@ class SnakeGameScreen(Screen[None]):
             color = "green" if snake.player_index == 1 else "cyan"
             for index, position in enumerate(snake.body):
                 if index == 0:
-                    cells[position] = (str(snake.player_index), f"bold {color}")
+                    cells[position] = (
+                        str(snake.player_index) * _CELL_WIDTH,
+                        f"bold {color}",
+                    )
                 else:
                     cells[position] = (
-                        "█" if snake.player_index == 1 else "▓",
+                        ("█" if snake.player_index == 1 else "▓") * _CELL_WIDTH,
                         color,
                     )
         if snapshot.food is not None:
-            cells[snapshot.food] = ("*", "bold yellow")
+            cells[snapshot.food] = ("*" * _CELL_WIDTH, "bold yellow")
 
-        text.append("+" + "-" * snapshot.width + "+\n", style="bright_black")
+        border = "-" * (snapshot.width * _CELL_WIDTH)
+        text.append(f"+{border}+\n", style="bright_black")
         for y in range(snapshot.height):
             text.append("|", style="bright_black")
             for x in range(snapshot.width):
-                char, style = cells.get(Position(x, y), (" ", ""))
+                char, style = cells.get(Position(x, y), (" " * _CELL_WIDTH, ""))
                 text.append(char, style=style)
             text.append("|\n", style="bright_black")
-        text.append("+" + "-" * snapshot.width + "+\n", style="bright_black")
+        text.append(f"+{border}+\n", style="bright_black")
 
         if self._paused:
             text.append("\nPAUSED — Escape to resume\n", style="bold yellow")

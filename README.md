@@ -44,13 +44,14 @@ Snake arena:
 SNAKE — SINGLE-PLAYER
 Guest 1: 3
 
-+------------------------------+
-|                              |
-|          ███                 |
-|          █1█        *        |
-|          ███                 |
-|                              |
-+------------------------------+
++----------------------------------------------+
+|                                              |
+|        ██████                              |
+|        ██    ██                            |
+|        ██    ██            ****            |
+|        ██11████                            |
+|                                              |
++----------------------------------------------+
 ```
 
 ## Installation
@@ -133,9 +134,11 @@ Direction changes are buffered and applied on the next game tick. Immediate
 - The surviving snake wins.
 - If both snakes are eliminated on the same tick, the match is a draw.
 
-Player 1 is shown in green and player 2 in cyan. The head of each snake also
-uses a distinct character (`1` or `2`), so the players remain distinguishable
-without relying on color alone.
+Player 1 is shown in green and player 2 in cyan. Each logical arena cell is
+rendered as two horizontal characters, so the playfield stays visually square in
+terminals where characters are about twice as tall as they are wide. The head of
+each snake also uses a distinct two-character marker (`11` or `22`), so the
+players remain distinguishable without relying on color alone.
 
 ## Player profiles and high scores
 

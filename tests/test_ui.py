@@ -171,6 +171,39 @@ def test_snake_screen_supports_two_players(tmp_path: Path) -> None:
     asyncio.run(scenario())
 
 
+def test_arena_cells_are_two_characters_wide(tmp_path: Path) -> None:
+    async def scenario() -> None:
+        app = make_app(tmp_path)
+        async with app.run_test(size=(120, 30)) as pilot:
+            await pilot.pause()
+            registration = app.context.registry.get("snake")
+            app.push_screen(
+                SnakeGameScreen(
+                    app.context,
+                    registration,
+                    GameMode.SINGLE_PLAYER,
+                    (GuestPlayer(1),),
+                )
+            )
+            await pilot.pause()
+            screen = app.screen
+            assert isinstance(screen, SnakeGameScreen)
+            screen._timer.stop()
+
+            rendered = str(screen.render_arena())
+            lines = rendered.splitlines()
+            border = next(line for line in lines if line.startswith("+"))
+            row = next(line for line in lines if line.startswith("|"))
+
+            assert len(border) == screen._game.snapshot.width * 2 + 2
+            assert len(row) == screen._game.snapshot.width * 2 + 2
+            assert "11" in rendered
+            assert "██" in rendered
+            assert "**" in rendered
+
+    asyncio.run(scenario())
+
+
 def test_game_over_records_result_and_restarts(tmp_path: Path) -> None:
     async def scenario() -> None:
         app = make_app(tmp_path)
