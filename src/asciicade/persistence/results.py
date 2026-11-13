@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from uuid import UUID
 
+from asciicade.core.game import GameMode
 from asciicade.core.results import GameResult, MatchOutcome, PlayerResult
 from asciicade.persistence.database import Database
 
@@ -68,25 +69,39 @@ class ResultRepository:
                 )
         return result_id
 
-    def leaderboard(self, game_id: str, *, limit: int = 10) -> list[LeaderboardEntry]:
+    def leaderboard(
+        self,
+        game_id: str,
+        *,
+        limit: int = 10,
+        mode: GameMode | None = GameMode.SINGLE_PLAYER,
+    ) -> list[LeaderboardEntry]:
         """Return the highest scores for a game.
 
         Args:
             game_id: The registered game identifier.
             limit: Maximum number of entries to return.
+            mode: Optional game mode filter. Defaults to single-player scores.
 
         Returns:
             Entries ordered by score descending, then by finish time ascending.
         """
+        where = "gr.game_id = ?"
+        parameters: list[object] = [game_id]
+        if mode is not None:
+            where += " AND gr.mode = ?"
+            parameters.append(mode.value)
+        parameters.append(limit)
+
         with self._database.connection() as connection:
             rows = connection.execute(
                 "SELECT pr.player_id, pr.player_name, pr.score, gr.finished_at "
                 "FROM player_results AS pr "
                 "JOIN game_results AS gr ON gr.id = pr.result_id "
-                "WHERE gr.game_id = ? "
+                f"WHERE {where} "
                 "ORDER BY pr.score DESC, gr.finished_at ASC, pr.id ASC "
                 "LIMIT ?",
-                (game_id, limit),
+                tuple(parameters),
             ).fetchall()
         return [
             LeaderboardEntry(
@@ -98,21 +113,35 @@ class ResultRepository:
             for row in rows
         ]
 
-    def match_history(self, game_id: str, *, limit: int = 20) -> list[MatchRecord]:
+    def match_history(
+        self,
+        game_id: str,
+        *,
+        limit: int = 20,
+        mode: GameMode | None = GameMode.MULTIPLAYER,
+    ) -> list[MatchRecord]:
         """Return the most recent matches for a game.
 
         Args:
             game_id: The registered game identifier.
             limit: Maximum number of matches to return.
+            mode: Optional game mode filter. Defaults to multiplayer matches.
 
         Returns:
             Matches ordered from newest to oldest.
         """
+        where = "game_id = ?"
+        parameters: list[object] = [game_id]
+        if mode is not None:
+            where += " AND mode = ?"
+            parameters.append(mode.value)
+        parameters.append(limit)
+
         with self._database.connection() as connection:
             result_rows = connection.execute(
                 "SELECT id, finished_at FROM game_results "
-                "WHERE game_id = ? ORDER BY finished_at DESC, id DESC LIMIT ?",
-                (game_id, limit),
+                f"WHERE {where} ORDER BY finished_at DESC, id DESC LIMIT ?",
+                tuple(parameters),
             ).fetchall()
             records: list[MatchRecord] = []
             for result_row in result_rows:

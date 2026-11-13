@@ -92,9 +92,4 @@ def player_identity(player: PlayerProfile | GuestPlayer) -> str:
     return f"guest:{player.slot}"
 
 
-def player_name(player: PlayerProfile | GuestPlayer) -> str:
-    """Return the display name of a player."""
-    return player.name
-
-
 Player = PlayerProfile | GuestPlayer

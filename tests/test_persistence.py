@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import sqlite3
 from pathlib import Path
+from uuid import UUID
 
 import pytest
 
@@ -228,8 +229,12 @@ def test_match_history_keeps_guest_names_after_profile_deletion(
     results.record(
         make_game_result(
             "snake",
-            GameMode.SINGLE_PLAYER,
-            (make_player_result(paul, 4, MatchOutcome.LOSS),),
+            GameMode.MULTIPLAYER,
+            (
+                make_player_result(paul, 4, MatchOutcome.LOSS),
+                make_player_result(GuestPlayer(2), 6, MatchOutcome.WIN),
+            ),
+            winner_name="Guest 2",
         )
     )
     with database.connection() as connection:
@@ -248,11 +253,88 @@ def test_match_history_returns_newest_first(database: Database) -> None:
         results.record(
             make_game_result(
                 "snake",
-                GameMode.SINGLE_PLAYER,
-                (make_player_result(GuestPlayer(1), score, MatchOutcome.LOSS),),
+                GameMode.MULTIPLAYER,
+                (
+                    make_player_result(GuestPlayer(1), score, MatchOutcome.LOSS),
+                    make_player_result(GuestPlayer(2), score, MatchOutcome.WIN),
+                ),
+                winner_name="Guest 2",
             )
         )
 
     history = results.match_history("snake")
 
     assert [record.players[0].score for record in history] == [3, 2, 1]
+
+
+def test_leaderboard_excludes_multiplayer_scores(database: Database) -> None:
+    results = ResultRepository(database)
+    results.record(
+        make_game_result(
+            "snake",
+            GameMode.SINGLE_PLAYER,
+            (make_player_result(GuestPlayer(1), 5, MatchOutcome.LOSS),),
+        )
+    )
+    results.record(
+        make_game_result(
+            "snake",
+            GameMode.MULTIPLAYER,
+            (
+                make_player_result(GuestPlayer(1), 99, MatchOutcome.WIN),
+                make_player_result(GuestPlayer(2), 1, MatchOutcome.LOSS),
+            ),
+            winner_name="Guest 1",
+        )
+    )
+
+    entries = results.leaderboard("snake")
+    all_entries = results.leaderboard("snake", mode=None)
+
+    assert [entry.score for entry in entries] == [5]
+    assert len(all_entries) == 3
+
+
+def test_match_history_excludes_single_player_results(database: Database) -> None:
+    results = ResultRepository(database)
+    results.record(
+        make_game_result(
+            "snake",
+            GameMode.SINGLE_PLAYER,
+            (make_player_result(GuestPlayer(1), 5, MatchOutcome.LOSS),),
+        )
+    )
+
+    assert results.match_history("snake") == []
+    assert len(results.match_history("snake", mode=None)) == 1
+
+
+def test_failed_transaction_rolls_back(database: Database) -> None:
+    repository = PlayerRepository(database)
+
+    with pytest.raises(RuntimeError, match="boom"):
+        with database.connection() as connection:
+            connection.execute(
+                "INSERT INTO players (id, name, created_at) VALUES (?, ?, ?)",
+                ("rollback-id", "Ghost", "2026-01-01T00:00:00+00:00"),
+            )
+            raise RuntimeError("boom")
+
+    assert repository.count() == 0
+    assert repository.get(UUID(int=0)) is None
+
+
+def test_deleting_result_cascades_player_results(database: Database) -> None:
+    results = ResultRepository(database)
+    result_id = results.record(
+        make_game_result(
+            "snake",
+            GameMode.SINGLE_PLAYER,
+            (make_player_result(GuestPlayer(1), 5, MatchOutcome.LOSS),),
+        )
+    )
+
+    with database.connection() as connection:
+        connection.execute("DELETE FROM game_results WHERE id = ?", (result_id,))
+
+    assert results.match_history("snake", mode=None) == []

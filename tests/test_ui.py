@@ -200,7 +200,7 @@ def test_game_over_records_result_and_restarts(tmp_path: Path) -> None:
             await pilot.pause()
 
             assert isinstance(app.screen, GameOverScreen)
-            assert len(app.context.results.match_history("snake")) == 1
+            assert len(app.context.results.match_history("snake", mode=None)) == 1
 
             await pilot.press("enter")
             await pilot.pause()
@@ -313,6 +313,92 @@ def test_create_player_dialog_creates_profile(tmp_path: Path) -> None:
             assert isinstance(app.screen, PlayerSelectScreen)
             assert [player.name for player in app.screen._selected] == ["Paul"]
             assert [profile.name for profile in app.context.players.list()] == ["Paul"]
+
+    asyncio.run(scenario())
+
+
+def test_main_menu_high_scores_navigation(tmp_path: Path) -> None:
+    async def scenario() -> None:
+        app = make_app(tmp_path)
+        async with app.run_test(size=(100, 30)) as pilot:
+            await pilot.pause()
+            await pilot.press("down")
+            await pilot.press("enter")
+            await pilot.pause()
+            assert isinstance(app.screen, GameSelectScreen)
+
+            await pilot.press("enter")
+            await pilot.pause()
+            assert isinstance(app.screen, LeaderboardScreen)
+
+    asyncio.run(scenario())
+
+
+def test_main_menu_match_history_navigation(tmp_path: Path) -> None:
+    async def scenario() -> None:
+        app = make_app(tmp_path)
+        async with app.run_test(size=(100, 30)) as pilot:
+            await pilot.pause()
+            await pilot.press("down")
+            await pilot.press("down")
+            await pilot.press("enter")
+            await pilot.pause()
+            assert isinstance(app.screen, GameSelectScreen)
+
+            await pilot.press("enter")
+            await pilot.pause()
+            assert isinstance(app.screen, MatchHistoryScreen)
+
+    asyncio.run(scenario())
+
+
+def test_main_menu_instructions_navigation(tmp_path: Path) -> None:
+    async def scenario() -> None:
+        app = make_app(tmp_path)
+        async with app.run_test(size=(100, 30)) as pilot:
+            await pilot.pause()
+            await pilot.press("down")
+            await pilot.press("down")
+            await pilot.press("down")
+            await pilot.press("enter")
+            await pilot.pause()
+            assert isinstance(app.screen, GameSelectScreen)
+
+            await pilot.press("enter")
+            await pilot.pause()
+            assert isinstance(app.screen, InstructionsScreen)
+
+    asyncio.run(scenario())
+
+
+def test_typing_q_in_player_name_does_not_quit(tmp_path: Path) -> None:
+    async def scenario() -> None:
+        app = make_app(tmp_path)
+        async with app.run_test(size=(100, 30)) as pilot:
+            await pilot.pause()
+            registration = app.context.registry.get("snake")
+            app.push_screen(PlayerSelectScreen(app.context, registration, GameMode.SINGLE_PLAYER))
+            await pilot.pause()
+            await pilot.press("enter")
+            await pilot.pause()
+            assert isinstance(app.screen, CreatePlayerScreen)
+
+            await pilot.press("q")
+            await pilot.pause()
+
+            assert isinstance(app.screen, CreatePlayerScreen)
+            assert app.screen.query_one(Input).value == "q"
+
+    asyncio.run(scenario())
+
+
+def test_app_renders_at_multiple_terminal_sizes(tmp_path: Path) -> None:
+    async def scenario() -> None:
+        for size in ((80, 24), (120, 40)):
+            app = make_app(tmp_path)
+            async with app.run_test(size=size) as pilot:
+                await pilot.pause()
+                assert isinstance(app.screen, MainMenuScreen)
 
     asyncio.run(scenario())
 

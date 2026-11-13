@@ -597,7 +597,7 @@ Acceptance criteria:
 - Results survive application restarts.
 - The UI handles empty result sets and guest players correctly.
 
-### Phase 8 – Quality Assurance and User Experience
+### Phase 8 – Quality Assurance and User Experience [x]
 
 Objectives:
 
@@ -605,16 +605,16 @@ Polish the initial release and validate the complete application.
 
 Tasks:
 
-- [ ] Review all navigation flows.
-- [ ] Test gameplay in supported terminal environments.
-- [ ] Check keyboard handling and responsiveness.
-- [ ] Review visual consistency.
-- [ ] Check terminal resizing behavior.
-- [ ] Validate error handling and database recovery behavior.
-- [ ] Review accessibility and readability.
-- [ ] Remove dead code and unnecessary dependencies.
-- [ ] Review type hints and documentation.
-- [ ] Run the complete test and quality-check suite.
+- [x] Review all navigation flows.
+- [x] Test gameplay in supported terminal environments (headless Textual pilot at 80x24 and 120x40; no interactive terminal available in this environment).
+- [x] Check keyboard handling and responsiveness.
+- [x] Review visual consistency.
+- [x] Check terminal resizing behavior.
+- [x] Validate error handling and database recovery behavior.
+- [x] Review accessibility and readability.
+- [x] Remove dead code and unnecessary dependencies.
+- [x] Review type hints and documentation.
+- [x] Run the complete test and quality-check suite.
 
 Acceptance criteria:
 
