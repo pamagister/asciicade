@@ -2,7 +2,7 @@ from pathlib import Path
 
 from config_cli_gui.docs import DocumentationGenerator
 
-from python_template_project.config.config import ConfigParameterManager
+from asciicade.config.config import ConfigParameterManager
 
 """function to generate config file and documentation."""
 

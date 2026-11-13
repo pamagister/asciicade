@@ -1,6 +1,6 @@
 # Plan: CI/CD-Refactor für ähnliche Python-Repositories
 
-**Referenz:** `pamagister/python-template-project`, Änderungen seit
+**Referenz:** `pamagister/asciicade`, Änderungen seit
 `a756eecc83ca29b6b5f9f05bc5412687d761c469`  
 **Zielgruppe:** Repositories mit GitHub Actions, Tests auf mehreren
 Betriebssystemen und getaggten Releases  
@@ -216,7 +216,7 @@ Bei einer Portierung Statusmarker erst nach Verifikation ändern.
 
 #### 4.2 Lokal und auf GitHub verifiziert [x]
 - config-cli-gui: CI-Lauf für Commit 2beda5c grün (success).
-- python-template-project: CI-Lauf für Commit e5e1347 grün (success).
+- asciicade: CI-Lauf für Commit e5e1347 grün (success).
 - gpx-kml-converter, image-triage, Photo-Composition-Designer, fs-tool:
   bereits konform, keine Änderungen nötig, keine neuen Commits erforderlich.
 - Release-DAG nicht durch echten Tag-Push verifiziert (würde einen echten

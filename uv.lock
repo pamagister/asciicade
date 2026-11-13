@@ -801,7 +801,7 @@ wheels = [
 ]
 
 [[package]]
-name = "python-template-project"
+name = "asciicade"
 source = { editable = "." }
 dependencies = [
     { name = "config-cli-gui" },

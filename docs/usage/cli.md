@@ -1,15 +1,15 @@
 # Command Line Interface
 
-Command line options for python_template_project
+Command line options for asciicade
 
 ```bash
-python-template-project [OPTIONS] <input>
+asciicade [OPTIONS] <input>
 ```
 
 For development from a source checkout, the equivalent module invocation is:
 
 ```bash
-python -m python_template_project [OPTIONS] <input>
+python -m asciicade [OPTIONS] <input>
 ```
 
 ## Options
@@ -32,46 +32,46 @@ python -m python_template_project [OPTIONS] <input>
 ### 1. Basic usage
 
 ```bash
-python-template-project input
+asciicade input
 ```
 
 ### 2. With verbose logging
 
 ```bash
-python-template-project -v input
-python-template-project --verbose input
+asciicade -v input
+asciicade --verbose input
 ```
 
 ### 3. With quiet mode
 
 ```bash
-python-template-project -q input
-python-template-project --quiet input
+asciicade -q input
+asciicade --quiet input
 ```
 
 ### 4. With output parameter
 
 ```bash
-python-template-project --output  input
+asciicade --output  input
 ```
 
 ### 5. With min_dist parameter
 
 ```bash
-python-template-project --min_dist 25 input
+asciicade --min_dist 25 input
 ```
 
 ### 6. With extract_waypoints parameter
 
 ```bash
-python-template-project --extract_waypoints True input
+asciicade --extract_waypoints True input
 ```
 
 ### Developer usage
 
 ```bash
-python -m python_template_project --help
-python -m python_template_project input
+python -m asciicade --help
+python -m asciicade input
 ```
 
 # More parameter
