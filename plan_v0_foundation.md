@@ -431,7 +431,7 @@ Acceptance criteria:
 - Static checks and an initial test suite run successfully.
 - No obsolete template-specific behavior remains unintentionally exposed.
 
-### Phase 2 – Core Architecture and Data Models
+### Phase 2 – Core Architecture and Data Models [x]
 
 Objectives:
 
@@ -439,15 +439,15 @@ Establish the minimal application architecture and shared interfaces.
 
 Tasks:
 
-- [ ] Implement the application layer.
-- [ ] Define player and game session models.
-- [ ] Define game mode abstractions.
-- [ ] Define the game interface.
-- [ ] Implement the internal game registry.
-- [ ] Implement normalized input events and player input mappings.
-- [ ] Define structured game results.
-- [ ] Establish clear boundaries between application, UI, core, games, and persistence.
-- [ ] Add unit tests for the shared models and interfaces.
+- [x] Implement the application layer.
+- [x] Define player and game session models.
+- [x] Define game mode abstractions.
+- [x] Define the game interface.
+- [x] Implement the internal game registry.
+- [x] Implement normalized input events and player input mappings.
+- [x] Define structured game results.
+- [x] Establish clear boundaries between application, UI, core, games, and persistence.
+- [x] Add unit tests for the shared models and interfaces.
 
 Acceptance criteria:
 
