@@ -512,7 +512,7 @@ Acceptance criteria:
 - Global controls behave consistently.
 - The UI does not contain game-specific business logic.
 
-### Phase 5 – Snake Game Engine
+### Phase 5 – Snake Game Engine [x]
 
 Objectives:
 
@@ -520,17 +520,17 @@ Implement the complete Snake game logic independently of the UI.
 
 Tasks:
 
-- [ ] Implement the arena model.
-- [ ] Implement snake state and movement.
-- [ ] Implement direction changes and input buffering.
-- [ ] Implement food placement.
-- [ ] Implement scoring and growth.
-- [ ] Implement wall and self-collision detection.
-- [ ] Implement competitive multiplayer state.
-- [ ] Implement collisions between both snakes.
-- [ ] Implement deterministic simultaneous collision resolution.
-- [ ] Implement win, loss, and draw conditions.
-- [ ] Add comprehensive unit tests.
+- [x] Implement the arena model.
+- [x] Implement snake state and movement.
+- [x] Implement direction changes and input buffering.
+- [x] Implement food placement.
+- [x] Implement scoring and growth.
+- [x] Implement wall and self-collision detection.
+- [x] Implement competitive multiplayer state.
+- [x] Implement collisions between both snakes.
+- [x] Implement deterministic simultaneous collision resolution.
+- [x] Implement win, loss, and draw conditions.
+- [x] Add comprehensive unit tests.
 
 Acceptance criteria:
 
