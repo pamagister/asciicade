@@ -457,7 +457,7 @@ Acceptance criteria:
 - Player input can be normalized independently of game logic.
 - The architecture contains no unnecessary Snake-specific dependencies.
 
-### Phase 3 – Persistence and Player Management
+### Phase 3 – Persistence and Player Management [x]
 
 Objectives:
 
@@ -465,16 +465,16 @@ Implement persistent player profiles and game result storage.
 
 Tasks:
 
-- [ ] Initialize the SQLite database.
-- [ ] Define the database schema.
-- [ ] Implement schema versioning or migrations.
-- [ ] Implement player repositories.
-- [ ] Implement game result repositories.
-- [ ] Implement player creation and retrieval.
-- [ ] Implement guest-player handling.
-- [ ] Implement player selection for one- and two-player sessions.
-- [ ] Prevent selecting the same profile twice in multiplayer.
-- [ ] Add persistence tests.
+- [x] Initialize the SQLite database.
+- [x] Define the database schema.
+- [x] Implement schema versioning or migrations.
+- [x] Implement player repositories.
+- [x] Implement game result repositories.
+- [x] Implement player creation and retrieval.
+- [x] Implement guest-player handling.
+- [x] Implement player selection for one- and two-player sessions.
+- [x] Prevent selecting the same profile twice in multiplayer.
+- [x] Add persistence tests.
 
 Acceptance criteria:
 
