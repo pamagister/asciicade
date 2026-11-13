@@ -625,7 +625,7 @@ Acceptance criteria:
 - Static checks pass.
 - The implementation remains appropriately simple.
 
-### Phase 9 – CI/CD and PyPI Release Preparation [-]
+### Phase 9 – CI/CD and PyPI Release Preparation [x]
 
 Objectives:
 
