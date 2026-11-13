@@ -818,3 +818,19 @@ The initial release is complete when:
 
 The result should be a small, polished, reliable first release with a sound foundation for future games.
 
+
+## Progress / Handoff
+
+**2026-11-13** — All phases 1–10 are implemented, committed and pushed to `main`.
+
+- Commits: `3f22382`, `ca32e3f`, `c613898`, `f42042e`, `a9d8f46`, `5a66aa5`, `f0a1b13`, `a3bc78b`, `67a8539`.
+- CI: run `43484452650` passed on Python 3.11, 3.12, 3.13 and 3.14, including the build/validate/wheel-install job.
+- Local checks: 99 tests passed, Ruff clean, mypy clean, sdist/wheel built and `twine check` passed.
+- Issues #3–#12 were created for the phases and closed after verification.
+
+Known limitations:
+
+- Visual validation was performed with Textual's headless pilot at 80x24 and 120x40. No interactive terminal was available in this environment.
+- No release tag or PyPI publish was performed. Configure a PyPI pending publisher for `pamagister/asciicade` and the `release.yml` workflow before running `make release`.
+- `GameSession` is modeled and tested but is not yet used by the runtime UI.
+- The commit subjects for the Snake engine and the combined UI/QA batches contain incorrect issue references. The correct mapping is recorded in comments on issues #7, #8, #9 and #10; the issues themselves are correct and closed.
