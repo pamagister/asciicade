@@ -167,7 +167,6 @@ release:          ## Create a new tag for release. Use ALL=1 to also build Windo
 .PHONY: syncdocs
 syncdocs:         ## Sync the documentation.
 	@echo "sync documentation ..."
-	@uv run ./scripts/generate_config_docs.py
 	@uv run ./scripts/update_readme.py
 	@uv run ./.github/update_funding.py
 
