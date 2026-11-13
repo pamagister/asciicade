@@ -411,16 +411,16 @@ Objectives:
 
 Tasks:
 
-1. Review `pyproject.toml`, README, workflows, package structure, tests, and configuration files.
-2. Identify obsolete template features and dependencies.
-3. Set the supported Python version to >=3.11.
-4. Configure `uv` and generate/update `uv.lock`.
-5. Establish Textual as the terminal UI dependency.
-6. Review and configure the build backend.
-7. Establish Ruff, pytest, and mypy configuration.
-8. Define the initial package structure.
-9. Ensure the CLI entry point is valid.
-10. Update basic project metadata.
+- [ ] Review `pyproject.toml`, README, workflows, package structure, tests, and configuration files.
+- [ ] Identify obsolete template features and dependencies.
+- [ ] Set the supported Python version to >=3.11.
+- [ ] Configure `uv` and generate/update `uv.lock`.
+- [ ] Establish Textual as the terminal UI dependency.
+- [ ] Review and configure the build backend.
+- [ ] Establish Ruff, pytest, and mypy configuration.
+- [ ] Define the initial package structure.
+- [ ] Ensure the CLI entry point is valid.
+- [ ] Update basic project metadata.
 
 Acceptance criteria:
 
@@ -439,15 +439,15 @@ Establish the minimal application architecture and shared interfaces.
 
 Tasks:
 
-1. Implement the application layer.
-2. Define player and game session models.
-3. Define game mode abstractions.
-4. Define the game interface.
-5. Implement the internal game registry.
-6. Implement normalized input events and player input mappings.
-7. Define structured game results.
-8. Establish clear boundaries between application, UI, core, games, and persistence.
-9. Add unit tests for the shared models and interfaces.
+- [ ] Implement the application layer.
+- [ ] Define player and game session models.
+- [ ] Define game mode abstractions.
+- [ ] Define the game interface.
+- [ ] Implement the internal game registry.
+- [ ] Implement normalized input events and player input mappings.
+- [ ] Define structured game results.
+- [ ] Establish clear boundaries between application, UI, core, games, and persistence.
+- [ ] Add unit tests for the shared models and interfaces.
 
 Acceptance criteria:
 
@@ -465,16 +465,16 @@ Implement persistent player profiles and game result storage.
 
 Tasks:
 
-1. Initialize the SQLite database.
-2. Define the database schema.
-3. Implement schema versioning or migrations.
-4. Implement player repositories.
-5. Implement game result repositories.
-6. Implement player creation and retrieval.
-7. Implement guest-player handling.
-8. Implement player selection for one- and two-player sessions.
-9. Prevent selecting the same profile twice in multiplayer.
-10. Add persistence tests.
+- [ ] Initialize the SQLite database.
+- [ ] Define the database schema.
+- [ ] Implement schema versioning or migrations.
+- [ ] Implement player repositories.
+- [ ] Implement game result repositories.
+- [ ] Implement player creation and retrieval.
+- [ ] Implement guest-player handling.
+- [ ] Implement player selection for one- and two-player sessions.
+- [ ] Prevent selecting the same profile twice in multiplayer.
+- [ ] Add persistence tests.
 
 Acceptance criteria:
 
@@ -493,15 +493,15 @@ Build the common Textual interface.
 
 Tasks:
 
-1. Implement the application entry point.
-2. Implement the main menu.
-3. Implement navigation between screens.
-4. Implement game and mode selection based on the registry.
-5. Implement player selection screens.
-6. Implement common dialogs and notifications.
-7. Implement global keyboard controls.
-8. Establish reusable screen and widget styling.
-9. Implement the initial retro/neon visual theme.
+- [ ] Implement the application entry point.
+- [ ] Implement the main menu.
+- [ ] Implement navigation between screens.
+- [ ] Implement game and mode selection based on the registry.
+- [ ] Implement player selection screens.
+- [ ] Implement common dialogs and notifications.
+- [ ] Implement global keyboard controls.
+- [ ] Establish reusable screen and widget styling.
+- [ ] Implement the initial retro/neon visual theme.
 
 Acceptance criteria:
 
@@ -520,17 +520,17 @@ Implement the complete Snake game logic independently of the UI.
 
 Tasks:
 
-1. Implement the arena model.
-2. Implement snake state and movement.
-3. Implement direction changes and input buffering.
-4. Implement food placement.
-5. Implement scoring and growth.
-6. Implement wall and self-collision detection.
-7. Implement competitive multiplayer state.
-8. Implement collisions between both snakes.
-9. Implement deterministic simultaneous collision resolution.
-10. Implement win, loss, and draw conditions.
-11. Add comprehensive unit tests.
+- [ ] Implement the arena model.
+- [ ] Implement snake state and movement.
+- [ ] Implement direction changes and input buffering.
+- [ ] Implement food placement.
+- [ ] Implement scoring and growth.
+- [ ] Implement wall and self-collision detection.
+- [ ] Implement competitive multiplayer state.
+- [ ] Implement collisions between both snakes.
+- [ ] Implement deterministic simultaneous collision resolution.
+- [ ] Implement win, loss, and draw conditions.
+- [ ] Add comprehensive unit tests.
 
 Acceptance criteria:
 
@@ -551,17 +551,17 @@ Connect the Snake engine to the common terminal interface.
 
 Tasks:
 
-1. Register Snake in the game registry.
-2. Implement the Snake game screen.
-3. Render the arena and both snakes.
-4. Render food and game information.
-5. Connect keyboard events to normalized player input.
-6. Implement the game tick using Textual timers.
-7. Implement pause and resume.
-8. Implement game-over screens.
-9. Display scores and match outcomes.
-10. Provide in-application instructions.
-11. Validate the visual experience in a real terminal.
+- [ ] Register Snake in the game registry.
+- [ ] Implement the Snake game screen.
+- [ ] Render the arena and both snakes.
+- [ ] Render food and game information.
+- [ ] Connect keyboard events to normalized player input.
+- [ ] Implement the game tick using Textual timers.
+- [ ] Implement pause and resume.
+- [ ] Implement game-over screens.
+- [ ] Display scores and match outcomes.
+- [ ] Provide in-application instructions.
+- [ ] Validate the visual experience in a real terminal.
 
 Acceptance criteria:
 
@@ -581,13 +581,13 @@ Make persistent results accessible through the application.
 
 Tasks:
 
-1. Save completed game results.
-2. Implement the single-player leaderboard.
-3. Implement multiplayer match history.
-4. Display player names and individual scores.
-5. Display winners and draws.
-6. Implement sorting and basic filtering where useful.
-7. Handle missing or deleted player profiles gracefully.
+- [ ] Save completed game results.
+- [ ] Implement the single-player leaderboard.
+- [ ] Implement multiplayer match history.
+- [ ] Display player names and individual scores.
+- [ ] Display winners and draws.
+- [ ] Implement sorting and basic filtering where useful.
+- [ ] Handle missing or deleted player profiles gracefully.
 
 Acceptance criteria:
 
@@ -605,16 +605,16 @@ Polish the initial release and validate the complete application.
 
 Tasks:
 
-1. Review all navigation flows.
-2. Test gameplay in supported terminal environments.
-3. Check keyboard handling and responsiveness.
-4. Review visual consistency.
-5. Check terminal resizing behavior.
-6. Validate error handling and database recovery behavior.
-7. Review accessibility and readability.
-8. Remove dead code and unnecessary dependencies.
-9. Review type hints and documentation.
-10. Run the complete test and quality-check suite.
+- [ ] Review all navigation flows.
+- [ ] Test gameplay in supported terminal environments.
+- [ ] Check keyboard handling and responsiveness.
+- [ ] Review visual consistency.
+- [ ] Check terminal resizing behavior.
+- [ ] Validate error handling and database recovery behavior.
+- [ ] Review accessibility and readability.
+- [ ] Remove dead code and unnecessary dependencies.
+- [ ] Review type hints and documentation.
+- [ ] Run the complete test and quality-check suite.
 
 Acceptance criteria:
 
@@ -633,17 +633,17 @@ Establish reliable automated validation and publishing.
 
 Tasks:
 
-1. Review and simplify the existing GitHub Actions workflows.
-2. Run CI on pushes and pull requests.
-3. Test supported Python versions starting at 3.11 and including current stable versions.
-4. Run Ruff checks.
-5. Run mypy.
-6. Run pytest.
-7. Build source and wheel distributions.
-8. Validate distribution contents.
-9. Test installation from the built wheel.
-10. Configure PyPI publishing through GitHub Actions using Trusted Publishing/OIDC where supported.
-11. Restrict publishing to intentional release events or version tags.
+- [ ] Review and simplify the existing GitHub Actions workflows.
+- [ ] Run CI on pushes and pull requests.
+- [ ] Test supported Python versions starting at 3.11 and including current stable versions.
+- [ ] Run Ruff checks.
+- [ ] Run mypy.
+- [ ] Run pytest.
+- [ ] Build source and wheel distributions.
+- [ ] Validate distribution contents.
+- [ ] Test installation from the built wheel.
+- [ ] Configure PyPI publishing through GitHub Actions using Trusted Publishing/OIDC where supported.
+- [ ] Restrict publishing to intentional release events or version tags.
 
 Acceptance criteria:
 
@@ -661,16 +661,16 @@ Prepare Asciicade for public use.
 
 Tasks:
 
-1. Replace the template README with project documentation.
-2. Document installation through PyPI.
-3. Document development setup using uv.
-4. Document supported Python versions.
-5. Document controls and gameplay.
-6. Document player profiles and high scores.
-7. Add screenshots or terminal demonstrations where useful.
-8. Document the architecture and extension points.
-9. Add license and release metadata.
-10. Prepare version 0.1.0.
+- [ ] Replace the template README with project documentation.
+- [ ] Document installation through PyPI.
+- [ ] Document development setup using uv.
+- [ ] Document supported Python versions.
+- [ ] Document controls and gameplay.
+- [ ] Document player profiles and high scores.
+- [ ] Add screenshots or terminal demonstrations where useful.
+- [ ] Document the architecture and extension points.
+- [ ] Add license and release metadata.
+- [ ] Prepare version 0.1.0.
 
 Acceptance criteria:
 
