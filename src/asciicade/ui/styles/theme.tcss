@@ -1,0 +1,121 @@
+/* Asciicade retro-neon theme. */
+
+Screen {
+    background: #05070d;
+    color: #d8fff4;
+}
+
+#app-title {
+    width: 100%;
+    height: 3;
+    color: #39ff14;
+    text-style: bold;
+    content-align: center middle;
+}
+
+#app-subtitle {
+    width: 100%;
+    height: 1;
+    color: #4dd0e1;
+    content-align: center middle;
+}
+
+#screen-title {
+    width: 100%;
+    height: 1;
+    color: #39ff14;
+    text-style: bold;
+    content-align: center middle;
+}
+
+.menu-screen {
+    width: 100%;
+    height: 100%;
+    align: center middle;
+}
+
+.game-screen {
+    width: 100%;
+    height: 100%;
+    align: center middle;
+}
+
+OptionList {
+    width: 60;
+    height: auto;
+    max-height: 20;
+    border: round #39ff14;
+    background: #0b1220;
+    color: #d8fff4;
+    padding: 1 2;
+}
+
+OptionList:focus {
+    border: round #4dd0e1;
+}
+
+DataTable {
+    width: 90;
+    height: 16;
+    border: round #39ff14;
+    background: #0b1220;
+    color: #d8fff4;
+}
+
+#arena {
+    width: auto;
+    height: auto;
+    background: #05070d;
+    color: #d8fff4;
+}
+
+#player-selection-status,
+#game-over-summary,
+#instructions-body {
+    width: 80;
+    height: auto;
+    color: #d8fff4;
+    content-align: center middle;
+}
+
+#instructions-body {
+    width: 90;
+    height: 16;
+    border: round #4dd0e1;
+    padding: 1 2;
+}
+
+Button {
+    min-width: 16;
+    margin: 1 1;
+}
+
+.modal-screen {
+    width: 100%;
+    height: 100%;
+    align: center middle;
+    background: #05070d;
+}
+
+#game-over-title,
+#confirm-title {
+    width: 100%;
+    height: 1;
+    color: #ff3864;
+    text-style: bold;
+    content-align: center middle;
+}
+
+#game-over-actions,
+#confirm-actions,
+#create-actions {
+    height: auto;
+    align: center middle;
+}
+
+Input {
+    width: 50;
+    border: round #4dd0e1;
+    background: #0b1220;
+    color: #d8fff4;
+}

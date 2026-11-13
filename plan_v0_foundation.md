@@ -485,7 +485,7 @@ Acceptance criteria:
 - Game results can be stored and retrieved.
 - Database operations are isolated from game implementations.
 
-### Phase 4 – Terminal UI Foundation
+### Phase 4 – Terminal UI Foundation [x]
 
 Objectives:
 
@@ -493,15 +493,15 @@ Build the common Textual interface.
 
 Tasks:
 
-- [ ] Implement the application entry point.
-- [ ] Implement the main menu.
-- [ ] Implement navigation between screens.
-- [ ] Implement game and mode selection based on the registry.
-- [ ] Implement player selection screens.
-- [ ] Implement common dialogs and notifications.
-- [ ] Implement global keyboard controls.
-- [ ] Establish reusable screen and widget styling.
-- [ ] Implement the initial retro/neon visual theme.
+- [x] Implement the application entry point.
+- [x] Implement the main menu.
+- [x] Implement navigation between screens.
+- [x] Implement game and mode selection based on the registry.
+- [x] Implement player selection screens.
+- [x] Implement common dialogs and notifications.
+- [x] Implement global keyboard controls.
+- [x] Establish reusable screen and widget styling.
+- [x] Implement the initial retro/neon visual theme.
 
 Acceptance criteria:
 
@@ -543,7 +543,7 @@ Acceptance criteria:
 - The engine can be tested without Textual.
 - Edge cases are covered by automated tests.
 
-### Phase 6 – Snake UI Integration
+### Phase 6 – Snake UI Integration [x]
 
 Objectives:
 
@@ -551,17 +551,17 @@ Connect the Snake engine to the common terminal interface.
 
 Tasks:
 
-- [ ] Register Snake in the game registry.
-- [ ] Implement the Snake game screen.
-- [ ] Render the arena and both snakes.
-- [ ] Render food and game information.
-- [ ] Connect keyboard events to normalized player input.
-- [ ] Implement the game tick using Textual timers.
-- [ ] Implement pause and resume.
-- [ ] Implement game-over screens.
-- [ ] Display scores and match outcomes.
-- [ ] Provide in-application instructions.
-- [ ] Validate the visual experience in a real terminal.
+- [x] Register Snake in the game registry.
+- [x] Implement the Snake game screen.
+- [x] Render the arena and both snakes.
+- [x] Render food and game information.
+- [x] Connect keyboard events to normalized player input.
+- [x] Implement the game tick using Textual timers.
+- [x] Implement pause and resume.
+- [x] Implement game-over screens.
+- [x] Display scores and match outcomes.
+- [x] Provide in-application instructions.
+- [x] Validate the visual experience in a real terminal (headless Textual pilot at 80x24 and 100x30; no interactive terminal available in this environment).
 
 Acceptance criteria:
 
@@ -573,7 +573,7 @@ Acceptance criteria:
 - The UI remains responsive during gameplay.
 - The game engine remains independent of Textual.
 
-### Phase 7 – High Scores and Match History UI
+### Phase 7 – High Scores and Match History UI [x]
 
 Objectives:
 
@@ -581,13 +581,13 @@ Make persistent results accessible through the application.
 
 Tasks:
 
-- [ ] Save completed game results.
-- [ ] Implement the single-player leaderboard.
-- [ ] Implement multiplayer match history.
-- [ ] Display player names and individual scores.
-- [ ] Display winners and draws.
-- [ ] Implement sorting and basic filtering where useful.
-- [ ] Handle missing or deleted player profiles gracefully.
+- [x] Save completed game results.
+- [x] Implement the single-player leaderboard.
+- [x] Implement multiplayer match history.
+- [x] Display player names and individual scores.
+- [x] Display winners and draws.
+- [x] Implement sorting and basic filtering where useful.
+- [x] Handle missing or deleted player profiles gracefully.
 
 Acceptance criteria:
 
