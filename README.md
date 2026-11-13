@@ -1,171 +1,242 @@
 <!-- This README.md is auto-generated from docs/index.md -->
 
-# Welcome to asciicade
+# Asciicade
 
-A feature-rich Python project template with auto-generated CLI, GUI and parameterized configuration.
+Asciicade is a polished, extensible arcade game collection for Linux terminals.
 
-[![Github CI Status](https://github.com/pamagister/asciicade/actions/workflows/main.yml/badge.svg)](https://github.com/pamagister/asciicade/actions)
-[![GitHub release](https://img.shields.io/github/v/release/pamagister/asciicade)](https://github.com/pamagister/asciicade/releases)
-[![Read the Docs](https://readthedocs.org/projects/asciicade/badge/?version=stable)](https://asciicade.readthedocs.io/en/stable/)
-[![License](https://img.shields.io/github/license/pamagister/asciicade)](https://github.com/pamagister/asciicade/blob/main/LICENSE)
-[![GitHub issues](https://img.shields.io/github/issues/pamagister/asciicade)](https://github.com/pamagister/asciicade/issues)
-[![PyPI](https://img.shields.io/pypi/v/asciicade)](https://pypi.org/project/asciicade/)
-[![Downloads](https://pepy.tech/badge/asciicade)](https://pepy.tech/project/asciicade/)
+The initial release, **v0.1.0**, focuses on Snake and provides a unified terminal
+interface, persistent player profiles, local two-player matches, high scores and
+match history.
 
+## Features
 
-This template provides a solid foundation for your next Python project, incorporating best practices for testing, automation, and distribution. It streamlines the development process with a comprehensive set of pre-configured tools and workflows, allowing you to focus on writing code.
+- Unified retro/neon terminal interface built with [Textual](https://textual.textualize.io/).
+- Persistent player profiles stored in SQLite.
+- Snake single-player mode.
+- Snake competitive local two-player mode on one keyboard.
+- Persistent high scores and match history.
+- Short in-application instructions.
+- Consistent keyboard controls with normalized player input.
+- PyPI-compatible package with the `asciicade` command.
 
----
+## Terminal preview
 
-## How to use this template
+Main menu:
 
-Getting started on developing your own project based on this template
+```text
++--------------------------------------------------+
+|                    ASCIICADE                     |
+|             A modular terminal arcade            |
+|                                                  |
+|  +------------------------------+                |
+|  | > Play                       |                |
+|  |   High Scores                |                |
+|  |   Match History              |                |
+|  |   Instructions               |                |
+|  |   Quit                       |                |
+|  +------------------------------+                |
++--------------------------------------------------+
+```
 
-> **DO NOT FORK** 
-> This project is meant to be used from **[Use this template](https://github.com/pamagister/asciicade/generate)** feature.
+Snake arena:
 
----
+```text
+SNAKE — SINGLE-PLAYER
+Guest 1: 3
 
-1. **Create a new repository using GitHub template**  
-   Click on **[Use this template](https://github.com/pamagister/asciicade/generate)**.
-
-2. **Give a name to your project**  
-   For example: `my-python-project`  
-   *(Hyphens may be used as project name; they are converted during renaming internally to underscores for packages.)*
-
-3. **Set write permissions**  
-   Go to: `Repository -> Settings -> Actions -> General -> Workflow permissions`  
-   Select: `Read and write permissions`, then click **Save**.
-
-4. **Trigger rename workflow**  
-   Navigate to `Actions` tab → Select **Rename Action** → Run workflow on the `main` branch.
-
-5. **Wait for the workflow to finish**
-
-6. **Clone the repository**  
-   Run:  
-   ```bash
-   git clone [your-github-url]
-   ```
-
-7. **Open the project in your IDE**
-
-8. **Install dependencies and create virtual environment**
-   Run:
-
-   ```bash
-   make install
-   ```
-
-9. **Configure your IDE**
-   Set `.venv` as the local Python virtual environment.
-
-10. **Adjust project metadata**
-    Modify `pyproject.toml` (e.g., project description, authors, license, etc.)
-
-11. **Clean up template scripts**
-    Delete the files:
-
-    * `rename_project.yml`
-    * `rename_project.sh`
-
-12. **Format your codebase**
-    Run:
-
-    ```bash
-    make fmt
-    ```
-
-    This will auto-format your files and reorder imports (based on any name changes).
-
-13. **Enable pre-commit hooks**
-    Run:
-
-    ```bash
-    uv run pre-commit install
-    ```
-
-14. **Add repository to ReadTheDocs**
-    Visit: [https://app.readthedocs.org/dashboard/import/](https://app.readthedocs.org/dashboard/import/)
-
-15. **Configure PyPI publishing**
-
-    * Generate a **PyPI API token** from your PyPI account.
-    * Go to **GitHub → Settings → Secrets and variables → Actions**.
-    * Add the secret as `PYPI_API_TOKEN`.
-
-16. **Release your first version**
-    Run:
-
-    ```bash
-    make release
-    ```
-    
----
-
-## Feature overview
-
-* 📦 **Package Management:** Utilizes [uv](https://docs.astral.sh/uv/getting-started/), an extremely fast Python package manager, with dependencies managed in `pyproject.toml`.
-* ✅ **Code Formatting and Linting:** Pre-commit hook with the [RUFF auto-formatter](https://docs.astral.sh/ruff/) to ensure consistent code style.
-* 🧪 **Testing:** Unit testing framework with [pytest](https://docs.pytest.org/en/latest/).
-* 📊 **Code coverage reports** using [codecov](https://about.codecov.io/sign-up/)
-* 🔄 **CI/CD:**  [GitHub Actions](https://github.com/features/actions) for Linux checks on every push, with opt-in Windows and macOS runs via `--all`.
-* 💾 **Automated Builds:** GitHub pipeline for a Linux executable, plus opt-in Windows and macOS builds via `--all`.
-* 💬 **Parameter-Driven Automation:**
-    * Automatic generation of a configuration file from parameter definitions.
-    * Automatic generation of a Command-Line Interface (CLI) from the same parameters.
-    * Automatic generation of CLI API documentation.
-    * Automatic generation of change log using **gitchangelog** to keep a HISTORY.md file up to date.
-* 📃 **Documentation:** Configuration for publishing documentation on [Read the Docs](https://about.readthedocs.com/) using [mkdocs](https://www.mkdocs.org/) .
-* 🖼️ **Minimalist GUI:** Comes with a basic GUI based on [tkinker](https://tkdocs.com/tutorial/index.html) that includes an auto-generated settings menu based on your defined parameters.
-* 🖥️ **Workflow Automation:** A `Makefile` is included to simplify and automate common development tasks.
-* 🛳️ **Release pipeline:** Automated releases unsing the Makefile `make release` command, which creates a new tag and pushes it to the remote repo. The `release` pipeline will automatically create a new release on GitHub and trigger a release on  [PyPI](https://pypi.org.
-    * **[setuptools](https://pypi.org/project/setuptools/)** is used to package the project and manage dependencies.
-    * **[setuptools-scm](https://pypi.org/project/setuptools-scm/)** is used to automatically generate the `_version.py` file from the `pyproject.toml` file.
-
----
++------------------------------+
+|                              |
+|          ███                 |
+|          █1█        *        |
+|          ███                 |
+|                              |
++------------------------------+
+```
 
 ## Installation
 
-Get an impression of how your own project could be installed and look like.
-
-Download from [PyPI](https://pypi.org/).
-
-💾 For more installation options see [install](docs/getting-started/install.md).
+### From PyPI
 
 ```bash
 pip install asciicade
+asciicade
 ```
 
-Run GUI from command line
+`pipx` and `uv` work as well:
 
 ```bash
-asciicade-gui
+pipx install asciicade
+# or
+uv tool install asciicade
 ```
 
-Run application from command line using CLI
+### From source
+
+Requirements: Python 3.11 or newer and [uv](https://docs.astral.sh/uv/).
 
 ```bash
-python -m asciicade.cli [OPTIONS] path/to/file
+git clone https://github.com/pamagister/asciicade.git
+cd asciicade
+uv sync --all-groups
+uv run asciicade
 ```
+
+Supported Python versions are 3.11 and newer. CI tests 3.11, 3.12, 3.13 and
+3.14 on Linux.
+
+## Usage
 
 ```bash
-asciicade-cli [OPTIONS] path/to/file
+asciicade [--data-dir PATH] [--version]
 ```
 
----
+- `--data-dir PATH` overrides the directory used for persistent game data.
+- `--version` prints the installed version.
 
-## Troubleshooting
+The application starts in the main menu. Use the arrow keys and Enter to
+navigate, or select an entry directly.
 
-### Problems with release pipeline
+## Controls
 
-If you get this error below:
+| Action | Player 1 | Player 2 |
+|---|---|---|
+| Up | Arrow Up | W |
+| Down | Arrow Down | S |
+| Left | Arrow Left | A |
+| Right | Arrow Right | D |
+
+Global controls:
+
+| Action | Key |
+|---|---|
+| Pause / resume or go back | Escape |
+| Quit or leave the current game | Q |
+
+In single-player mode, WASD is accepted as an alternative to the arrow keys.
+Direction changes are buffered and applied on the next game tick. Immediate
+180-degree reversals are rejected.
+
+## Gameplay
+
+### Snake single-player
+
+- Eat food to increase your score and length.
+- The snake moves continuously on the grid.
+- Hitting a wall or your own body ends the game.
+- Your score is stored in the single-player leaderboard.
+
+### Snake two-player
+
+- Both players start at the same time on a shared arena.
+- Both snakes compete for the same food.
+- Hitting a wall, yourself or the other snake eliminates you.
+- The surviving snake wins.
+- If both snakes are eliminated on the same tick, the match is a draw.
+
+Player 1 is shown in green and player 2 in cyan. The head of each snake also
+uses a distinct character (`1` or `2`), so the players remain distinguishable
+without relying on color alone.
+
+## Player profiles and high scores
+
+- Player profiles are persistent and can be created from the player-selection
+  screen.
+- A guest option is available for quick sessions without creating a profile.
+- A profile cannot occupy both player slots in a two-player match.
+- Single-player scores appear in the leaderboard.
+- Multiplayer results appear in the match history with both participants,
+  scores and the winner or draw.
+- Guest results are stored without a permanent profile.
+
+Application data is stored in the XDG data directory, normally:
+
+```text
+~/.local/share/asciicade/asciicade.db
+```
+
+Set `XDG_DATA_HOME` to change the base directory.
+
+## Architecture
+
+Asciicade separates game logic, persistence and the terminal UI.
+
+```text
+src/asciicade/
+├── cli/           Command-line entry point
+├── core/          Player, game, input, session and result contracts
+├── games/
+│   └── snake/     UI-independent Snake engine and registration
+├── persistence/   SQLite schema, migrations and repositories
+└── ui/            Textual application, screens and theme
+```
+
+Key boundaries:
+
+- The core has no Textual dependency and can be tested without a terminal.
+- Games implement the `Game` protocol and do not execute SQL.
+- Persistence is accessed through repositories.
+- The application layer and UI do not contain game-specific rules.
+
+### Extension points
+
+To add a game:
+
+1. Implement the `Game` protocol from `asciicade.core.game`.
+2. Declare a `GameMetadata` instance with an identifier, name, description,
+   supported modes and instructions.
+3. Register the game in `asciicade.games.build_default_registry`.
+4. Add a game-specific Textual screen for rendering and input.
+
+The registry drives the game and mode menus, so no menu changes are required.
+Third-party plugin discovery is intentionally not implemented yet.
+
+## Development
+
+Requirements: Python 3.11+ and [uv](https://docs.astral.sh/uv/).
+
 ```bash
-/home/runner/work/_temp/xxxx_xxx.sh: line 1: .github/release_message.sh: Permission denied
+uv sync --all-groups   # install all dependency groups
+make test              # Ruff, mypy, pytest and coverage
+make lint              # Ruff and mypy only
+make fmt               # format and apply safe lint fixes
+make build             # build sdist and wheel
+make validate          # build and run twine check
+make precommit         # format, lint and test
 ```
 
-You have to run these commands in your IDE Terminal or the git bash and then push the changes.
+Run a single test file:
+
 ```bash
-git update-index --chmod=+x ./.github/release_message.sh
+uv run pytest tests/test_snake_engine.py -v
 ```
 
+`docs/index.md` is the source for `README.md`. After editing it, run:
+
+```bash
+make syncdocs
+```
+
+MkDocs documentation can be built with `make docs`.
+
+## Release
+
+The project version is `0.1.0`. Releases are created by tagging a commit:
+
+```bash
+make release
+```
+
+Pushing a tag triggers the release workflow, which:
+
+1. Runs the full quality gate.
+2. Builds and validates the source and wheel distributions.
+3. Creates a GitHub release with the distributions.
+4. Publishes to PyPI using Trusted Publishing (OIDC).
+
+Trusted Publishing does not require a long-lived PyPI API token. Configure a
+pending publisher for this repository and the `release.yml` workflow in the PyPI
+project settings.
+
+## License
+
+Asciicade is released under the Unlicense (public domain). See [LICENSE](https://github.com/pamagister/asciicade/blob/main/LICENSE).

@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-Currently, only the latest release of the template is supported. Older
+Currently, only the latest release of Asciicade is supported. Older
 releases no longer receive security updates.
 
 ## Reporting Vulnerabilities
@@ -28,4 +28,4 @@ You will receive an acknowledgment and be kept informed about the progress.
 * If a fix is ​​developed: publication alongside a new release and
 (where appropriate) a CVE.
 
-Thank you for helping to keep this template secure.
+Thank you for helping to keep Asciicade secure.

@@ -653,7 +653,7 @@ Acceptance criteria:
 - Publishing is not triggered by ordinary pushes or pull requests.
 - Release publishing does not require a long-lived PyPI API token when Trusted Publishing is available.
 
-### Phase 10 – Documentation and Initial Release
+### Phase 10 – Documentation and Initial Release [x]
 
 Objectives:
 
@@ -661,16 +661,16 @@ Prepare Asciicade for public use.
 
 Tasks:
 
-- [ ] Replace the template README with project documentation.
-- [ ] Document installation through PyPI.
-- [ ] Document development setup using uv.
-- [ ] Document supported Python versions.
-- [ ] Document controls and gameplay.
-- [ ] Document player profiles and high scores.
-- [ ] Add screenshots or terminal demonstrations where useful.
-- [ ] Document the architecture and extension points.
-- [ ] Add license and release metadata.
-- [ ] Prepare version 0.1.0.
+- [x] Replace the template README with project documentation.
+- [x] Document installation through PyPI.
+- [x] Document development setup using uv.
+- [x] Document supported Python versions.
+- [x] Document controls and gameplay.
+- [x] Document player profiles and high scores.
+- [x] Add screenshots or terminal demonstrations where useful.
+- [x] Document the architecture and extension points.
+- [x] Add license and release metadata.
+- [x] Prepare version 0.1.0.
 
 Acceptance criteria:
 
