@@ -25,5 +25,5 @@ runs:
     - name: Install dependencies
       # Only the dev group is needed for lint/tests/builds; the docs group
       # (mkdocs) is installed by Read the Docs separately.
-      run: uv sync --all-groups
+      run: uv sync --group dev
       shell: bash

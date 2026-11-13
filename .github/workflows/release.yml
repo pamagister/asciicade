@@ -1,205 +1,98 @@
 name: Release
 
-# Triggered by a tag push, normally created by `make release`.
-#
-# Linux-only release (default):
-#   make release
-#
-# Release with optional Windows/macOS builds:
-#   make release ALL=1
-#
-# Re-run the pipeline for an existing tag:
-#   gh workflow run release.yml --ref <tag> -f all=true
-#
-# A tag push always runs the quality gate, creates the GitHub release and
-# publishes to PyPI.
-
-permissions:
-  contents: write
+# Triggered only by a tag push, normally created by `make release`.
+# The quality gate must pass before any artifact is built. The same validated
+# distributions are published to GitHub Releases and PyPI. PyPI publishing uses
+# Trusted Publishing (OIDC) and does not require a long-lived API token.
 
 on:
   push:
     tags:
       - '*'
-  workflow_dispatch:
-    inputs:
-      all:
-        description: 'Also build Windows and macOS'
-        required: false
-        type: boolean
-        default: false
+
+permissions:
+  contents: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  cancel-in-progress: false
 
 jobs:
-  # Detects `--all` in the tagged commit subject (or the manual `all` input)
-  # and exposes it as a job output.
-  flags:
-    runs-on: ubuntu-latest
-    outputs:
-      build_all: ${{ steps.detect.outputs.build_all }}
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-      - id: detect
-        shell: bash
-        env:
-          INPUT_ALL: ${{ github.event.inputs.all }}
-        run: |
-          COMMIT_SUBJECT="$(git log -1 --format=%s)"
-          if [[ "$COMMIT_SUBJECT" == *"--all"* || "$INPUT_ALL" == "true" ]]; then
-            echo "build_all=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "build_all=false" >> "$GITHUB_OUTPUT"
-          fi
-
-  # Quality gate: lint + unit tests before any release artifact is created.
   quality:
-    needs: flags
+    name: Quality gate
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
       - uses: actions/setup-python@v6
         with:
           python-version: '3.11'
-      - name: Setup Environment # Composite Action
+      - name: Setup Environment
         uses: ./.github/actions/setup-environment
-      - name: Run quality gate (lint + tests)
-        run: make lint && make test
+        with:
+          python-version: '3.11'
+      - name: Run lint and tests
+        run: make test
 
-  release:
+  build:
+    name: Build distributions
     needs: quality
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-      - name: Release
-        uses: softprops/action-gh-release@v3
-        with:
-          generate_release_notes: true
-
-  deploy:
-    needs: quality
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-      - name: Set up Python
-        uses: actions/setup-python@v7
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.11'
-      - name: Install build tools
-        run: python -m pip install --upgrade build
+      - name: Setup Environment
+        uses: ./.github/actions/setup-environment
+        with:
+          python-version: '3.11'
       - name: Build distributions
-        run: python -m build
+        run: make build
+      - name: Validate distributions
+        run: make validate
+      - name: Upload distributions
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  github-release:
+    name: Create GitHub release
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      - name: Download distributions
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v3
+        with:
+          files: dist/*
+          generate_release_notes: true
+
+  publish:
+    name: Publish to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Download distributions
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
-
-  # The Linux build is part of every release. Build jobs upload their archive
-  # to the same GitHub release, so they wait for the `release` job to finish.
-  build-linux:
-    needs: [release]
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v7
         with:
-          fetch-depth: 0
-      - uses: actions/setup-python@v7
-        with:
-          python-version: '3.11'
-      - name: Setup Environment # Composite Action
-        uses: ./.github/actions/setup-environment
-        with:
-          python-version: '3.11'
-      - name: Build Unified Linux Executable with PyInstaller
-        run: make build-linux
-      - name: Prepare ZIP file for release
-        run: |
-          cd release
-          zip -r ../package-linux.zip .
-      - name: Upload ZIP to GitHub Release
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v3
-        with:
-          files: package-linux.zip
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  # Optional build jobs: `--all` in the tagged commit or the manual `all`
-  # input. They run only after the GitHub release exists and keep the release
-  # pipeline Linux-only by default.
-  build-windows:
-    needs: [release, flags]
-    if: needs.flags.outputs.build_all == 'true'
-    runs-on: windows-latest
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-python@v7
-        with:
-          python-version: '3.11'
-      - name: Setup Environment # Composite Action
-        uses: ./.github/actions/setup-environment
-        with:
-          python-version: '3.11'
-      - name: Build Unified EXE with PyInstaller
-        run: make build-win
-      - name: Prepare ZIP file for release
-        run: |
-          echo "  - Double-click to start GUI" >> release\USAGE.txt
-          echo "  - Run from command line for CLI options" >> release\USAGE.txt
-          powershell Compress-Archive -Path release\* -DestinationPath installer-win.zip
-      - name: Upload ZIP to GitHub Release
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v3
-        with:
-          files: installer-win.zip
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  build-macos:
-    needs: [release, flags]
-    if: needs.flags.outputs.build_all == 'true'
-    runs-on: macos-latest
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-python@v7
-        with:
-          python-version: '3.11'
-      - name: Setup Environment # Composite Action
-        uses: ./.github/actions/setup-environment
-        with:
-          python-version: '3.11'
-      - name: Build Unified Executable and App Bundle with PyInstaller
-        run: |
-          make build-macos
-      - name: Prepare ZIP file for release
-        run: |
-          cd release
-          zip -r ../package-macOS.zip .
-      - name: Upload ZIP to GitHub Release
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v3
-        with:
-          files: package-macOS.zip
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          packages-dir: dist

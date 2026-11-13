@@ -625,7 +625,7 @@ Acceptance criteria:
 - Static checks pass.
 - The implementation remains appropriately simple.
 
-### Phase 9 – CI/CD and PyPI Release Preparation
+### Phase 9 – CI/CD and PyPI Release Preparation [-]
 
 Objectives:
 
@@ -633,17 +633,17 @@ Establish reliable automated validation and publishing.
 
 Tasks:
 
-- [ ] Review and simplify the existing GitHub Actions workflows.
-- [ ] Run CI on pushes and pull requests.
-- [ ] Test supported Python versions starting at 3.11 and including current stable versions.
-- [ ] Run Ruff checks.
-- [ ] Run mypy.
-- [ ] Run pytest.
-- [ ] Build source and wheel distributions.
-- [ ] Validate distribution contents.
-- [ ] Test installation from the built wheel.
-- [ ] Configure PyPI publishing through GitHub Actions using Trusted Publishing/OIDC where supported.
-- [ ] Restrict publishing to intentional release events or version tags.
+- [x] Review and simplify the existing GitHub Actions workflows.
+- [x] Run CI on pushes and pull requests.
+- [x] Test supported Python versions starting at 3.11 and including current stable versions.
+- [x] Run Ruff checks.
+- [x] Run mypy.
+- [x] Run pytest.
+- [x] Build source and wheel distributions.
+- [x] Validate distribution contents.
+- [x] Test installation from the built wheel.
+- [x] Configure PyPI publishing through GitHub Actions using Trusted Publishing/OIDC where supported.
+- [x] Restrict publishing to intentional release events or version tags.
 
 Acceptance criteria:
 
