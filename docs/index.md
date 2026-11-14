@@ -114,31 +114,10 @@ mode, WASD is accepted as an alternative to the arrow keys. Direction changes ar
 buffered and applied on the next game tick. Immediate 180-degree reversals are
 rejected.
 
-## Gameplay
+## Games
 
-### Snake single-player
-
-- Eat food to increase your score and length.
-- The snake moves continuously on the grid.
-- Hitting a wall or your own body ends the game.
-- Your score is stored in the single-player leaderboard.
-
-### Snake two-player
-
-- Both players start at the same time on a shared arena.
-- Both snakes compete for the same food.
-- Hitting a wall, yourself or the other snake eliminates you.
-- The surviving snake wins.
-- If both snakes are eliminated on the same tick, the match is a draw.
-
-Player 1 is shown in green and player 2 in cyan by default. Player profiles can
-choose from 16 terminal colors, including the eight normal and eight bright/neon
-variants. Each logical arena cell is rendered as two horizontal characters, so the
-playfield stays visually square in terminals where characters are about twice as
-tall as they are wide. The arena wall and every snake segment use solid block
-characters, with side walls as wide as one arena cell. The selected player color
-distinguishes the snakes, and the head is emphasized in bold rather than with a
-number marker.
+- [Snake](games/snake.md) — classic arcade Snake for one or two local players;
+  eat food, grow longer and avoid crashing.
 
 ## Player profiles, colors and high scores
 
@@ -163,41 +142,6 @@ Application data is stored in the XDG data directory, normally:
 ```
 
 Set `XDG_DATA_HOME` to change the base directory.
-
-## Architecture
-
-Asciicade separates game logic, persistence and the terminal UI.
-
-```text
-src/asciicade/
-├── cli/           Command-line entry point
-├── core/          Player, game, input, session and result contracts
-├── games/
-│   └── snake/     UI-independent Snake engine and registration
-├── persistence/   SQLite schema, migrations and repositories
-└── ui/            Textual application, screens and theme
-```
-
-Key boundaries:
-
-- The core has no Textual dependency and can be tested without a terminal.
-- Games implement the `Game` protocol and do not execute SQL.
-- Persistence is accessed through repositories.
-- The application layer and UI do not contain game-specific rules.
-
-### Extension points
-
-To add a game:
-
-1. Implement the `Game` protocol from `asciicade.core.game`.
-2. Declare a `GameMetadata` instance with an identifier, name, description,
-   supported modes and instructions.
-3. Register the game in `asciicade.games.build_default_registry`.
-4. Add a game-specific Textual screen for rendering and input.
-
-The registry drives the game menu and supported modes. Game-specific screens
-still need to be added when a new game is registered. Third-party plugin
-discovery is intentionally not implemented yet.
 
 ## Development
 
@@ -227,24 +171,15 @@ make syncdocs
 
 MkDocs documentation can be built with `make docs`.
 
-## Release
-
-The project version is `0.1.0`. Releases are created by tagging a commit:
+Releases are created by tagging a commit:
 
 ```bash
 make release
 ```
 
-Pushing a tag triggers the release workflow, which:
-
-1. Runs the full quality gate.
-2. Builds and validates the source and wheel distributions.
-3. Creates a GitHub release with the distributions.
-4. Publishes to PyPI using Trusted Publishing (OIDC).
-
-Trusted Publishing does not require a long-lived PyPI API token. Configure a
-pending publisher for this repository and the `release.yml` workflow in the PyPI
-project settings.
+Pushing a tag triggers the release workflow, which runs the full quality gate,
+builds and validates the distributions, creates a GitHub release and publishes to
+PyPI using Trusted Publishing (OIDC).
 
 ## License
 
