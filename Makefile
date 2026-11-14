@@ -112,6 +112,7 @@ logo:             ## Render logo and favicon PNGs from their SVG sources.
 docs:             ## Build the documentation.
 	$(MAKE) syncdocs
 	@echo "building documentation ..."
+	@rm -rf site
 	@uv run --group docs sphinx-build -W --keep-going -b html docs site
 
 .PHONY: linkcheck
