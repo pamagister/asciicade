@@ -6,6 +6,7 @@
     <option name="PARENT_ENVS" value="true" />
     <envs>
       <env name="PYTHONUNBUFFERED" value="1" />
+      <env name="ASCIICADE_DATA_DIR" value="$PROJECT_DIR$/.devdata" />
     </envs>
     <option name="SDK_HOME" value="" />
     <option name="SDK_NAME" value="~/PycharmProjects/asciicade/.venv" />
@@ -17,7 +18,7 @@
     <option name="RUN_TOOL" value="false" />
     <option name="RUN_AS_SCRIPT" value="false" />
     <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/asciicade/cli/cli.py" />
-    <option name="PARAMETERS" value="--data-dir /tmp/asciicade-manual" />
+    <option name="PARAMETERS" value="" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="true" />
     <option name="MODULE_MODE" value="false" />

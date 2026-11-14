@@ -187,6 +187,9 @@ cython_debug/
 # Ruff stuff:
 .ruff_cache/
 
+# Asciicade development data (project-local dev database)
+.devdata/
+
 # PyPI configuration file
 .pypirc
 

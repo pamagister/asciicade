@@ -12,10 +12,16 @@ from asciicade.persistence.migrations import migrate
 
 APP_NAME = "asciicade"
 DATABASE_FILENAME = "asciicade.db"
+DATA_DIR_ENV = "ASCIICADE_DATA_DIR"
 
 
 def data_dir(override: Path | None = None) -> Path:
-    """Return the XDG data directory used by Asciicade.
+    """Return the data directory used by Asciicade.
+
+    The directory is resolved in this order:
+    1. The ``override`` argument, when given.
+    2. The ``ASCIICADE_DATA_DIR`` environment variable, when set.
+    3. The XDG data directory (``XDG_DATA_HOME`` or ``~/.local/share``).
 
     Args:
         override: Optional explicit directory that takes precedence.
@@ -25,6 +31,9 @@ def data_dir(override: Path | None = None) -> Path:
     """
     if override is not None:
         return Path(override)
+    env_dir = os.environ.get(DATA_DIR_ENV)
+    if env_dir:
+        return Path(env_dir)
     xdg_data_home = os.environ.get("XDG_DATA_HOME")
     base = Path(xdg_data_home) if xdg_data_home else Path.home() / ".local" / "share"
     return base / APP_NAME
