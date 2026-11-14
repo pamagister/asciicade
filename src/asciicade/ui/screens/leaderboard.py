@@ -33,7 +33,7 @@ class LeaderboardScreen(MenuScreen):
                 id="leaderboard-games",
             ),
             DataTable(id="leaderboard-table"),
-            Static("↑/↓ game · Enter/Space select · Tab table · Esc back", id="menu-footer"),
+            Static("W/S game · Enter/Space select · Tab table · A/Esc back", id="menu-footer"),
             classes="menu-screen",
         )
 

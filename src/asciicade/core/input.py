@@ -15,6 +15,8 @@ class InputAction(StrEnum):
     DOWN = "down"
     LEFT = "left"
     RIGHT = "right"
+    ACTION_A = "action_a"
+    ACTION_B = "action_b"
     PAUSE = "pause"
     QUIT = "quit"
 
@@ -63,6 +65,14 @@ _KEY_ALIASES: dict[str, str] = {
     "esc": "escape",
     "return": "enter",
     "spacebar": "space",
+    "altgr": "iso_level3_shift",
+    "alt_gr": "iso_level3_shift",
+    "right_alt": "iso_level3_shift",
+    "right_shift": "shift",
+    "right_ctrl": "control",
+    "left_ctrl": "control",
+    "ctrl": "control",
+    "shift": "shift",
 }
 
 
@@ -141,6 +151,8 @@ _PLAYER_ONE_BINDINGS: tuple[InputBinding, ...] = (
     InputBinding(InputAction.DOWN, frozenset({"down"}), player=1),
     InputBinding(InputAction.LEFT, frozenset({"left"}), player=1),
     InputBinding(InputAction.RIGHT, frozenset({"right"}), player=1),
+    InputBinding(InputAction.ACTION_A, frozenset({"space"}), player=1),
+    InputBinding(InputAction.ACTION_B, frozenset({"iso_level3_shift"}), player=1),
 )
 
 _PLAYER_TWO_BINDINGS: tuple[InputBinding, ...] = (
@@ -148,6 +160,8 @@ _PLAYER_TWO_BINDINGS: tuple[InputBinding, ...] = (
     InputBinding(InputAction.DOWN, frozenset({"s"}), player=2),
     InputBinding(InputAction.LEFT, frozenset({"a"}), player=2),
     InputBinding(InputAction.RIGHT, frozenset({"d"}), player=2),
+    InputBinding(InputAction.ACTION_A, frozenset({"shift"}), player=2),
+    InputBinding(InputAction.ACTION_B, frozenset({"control"}), player=2),
 )
 
 # In single-player mode WASD is accepted as an alternative to the arrow keys.
@@ -156,6 +170,8 @@ _SINGLE_PLAYER_WASD_BINDINGS: tuple[InputBinding, ...] = (
     InputBinding(InputAction.DOWN, frozenset({"s"}), player=1),
     InputBinding(InputAction.LEFT, frozenset({"a"}), player=1),
     InputBinding(InputAction.RIGHT, frozenset({"d"}), player=1),
+    InputBinding(InputAction.ACTION_A, frozenset({"shift"}), player=1),
+    InputBinding(InputAction.ACTION_B, frozenset({"control"}), player=1),
 )
 
 

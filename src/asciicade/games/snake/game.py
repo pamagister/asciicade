@@ -25,11 +25,10 @@ Two players:
 - Hitting a wall, yourself or the other snake eliminates you.
 - The last surviving snake wins. If both crash on the same tick, it is a draw.
 
-Global controls:
-- Escape or P pauses or resumes during a game.
-- While paused, Enter opens the leave-game dialog.
-- Q opens the quit confirmation and exits the application when confirmed.
-- On the game-over screen, Escape returns to the game menu.
+Direction changes are buffered and applied on the next game tick. Immediate
+180-degree reversals are rejected.
+
+See the general controls for pause, leave-game and quit keys.
 """
 
 SNAKE_OPTIONS = GameOptionRegistry(

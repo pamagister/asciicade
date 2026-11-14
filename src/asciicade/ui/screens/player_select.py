@@ -203,11 +203,11 @@ class PlayerSelectScreen(MenuScreen):
             option = self.query_one(OptionList).highlighted_option
         footer = self.query_one("#menu-footer", Static)
         if option is not None and option.id is not None and option.id.startswith("profile:"):
-            footer.update("Enter/Space select · E edit · Backspace undo · ←/Esc back")
+            footer.update("Enter/Space/D select · E edit · Backspace undo · A/←/Esc back")
         elif self._selected:
-            footer.update("Enter/Space select · Backspace undo · ←/Esc back")
+            footer.update("Enter/Space/D select · Backspace undo · A/←/Esc back")
         else:
-            footer.update("Enter/Space select · ←/Esc back")
+            footer.update("Enter/Space/D select · A/←/Esc back")
 
     def _start_game(self) -> None:
         """Validate the selection and start the game."""

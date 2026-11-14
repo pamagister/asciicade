@@ -30,12 +30,8 @@ mode, WASD is accepted as an alternative to the arrow keys. Direction changes ar
 buffered and applied on the next game tick. Immediate 180-degree reversals are
 rejected.
 
-Escape or P pauses or resumes during a game. While paused, Enter opens the
-leave-game dialog to open the game menu, return to the main menu or stay. Q opens
-the quit confirmation and exits the application when confirmed. On the game-over
-screen, the arrow keys move between actions, Enter or Space selects one, and
-Escape returns to the game menu. The full, game-independent control list is on
-the [using guide](../usage/index.md#controls).
+Escape or P pauses or resumes during a game. The full, game-independent control
+list is on the [controls page](../index.md#controls).
 
 Snake rendering uses solid block characters: the wall, every snake segment and
 side walls that are one arena cell wide. The head is emphasized in bold rather

@@ -29,7 +29,7 @@ MenuPurpose = Literal["high-scores", "match-history", "instructions"]
 class MainMenuScreen(MenuScreen):
     """The application entry screen."""
 
-    _DEFAULT_FOOTER = "↑/↓ move · Enter/Space select · Esc×3 exit"
+    _DEFAULT_FOOTER = "W/S move · Enter/Space/D select · A/Esc back · Esc×3 exit"
     _ESCAPE_WINDOW = 1.5
 
     BINDINGS = [

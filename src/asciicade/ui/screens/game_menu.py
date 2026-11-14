@@ -40,7 +40,13 @@ class GameMenuScreen(Screen[None]):
 
     BINDINGS = [
         Binding("right", "confirm", "Select", show=False),
+        Binding("d", "confirm", "Select", show=False),
         Binding("escape", "back", "Back", show=False),
+        Binding("a", "back", "Back", show=False),
+        Binding("up", "cursor_up", "Move up", show=False),
+        Binding("down", "cursor_down", "Move down", show=False),
+        Binding("w", "cursor_up", "Move up", show=False),
+        Binding("s", "cursor_down", "Move down", show=False),
         Binding("space", "toggle_option", "Toggle option", show=False),
     ]
 
@@ -155,16 +161,16 @@ class GameMenuScreen(Screen[None]):
             return
         if option.id.startswith("option:"):
             key = option.id.removeprefix("option:")
-            if event.key in ("left", "h"):
+            if event.key in ("left", "h", "a"):
                 self._change_option(key, -1)
                 event.stop()
                 event.prevent_default()
-            elif event.key in ("right", "l"):
+            elif event.key in ("right", "l", "d"):
                 self._change_option(key, 1)
                 event.stop()
                 event.prevent_default()
             return
-        if event.key == "left":
+        if event.key in ("left", "a"):
             event.stop()
             event.prevent_default()
             await self.action_back()
@@ -204,6 +210,18 @@ class GameMenuScreen(Screen[None]):
         """Select the currently highlighted menu entry."""
         self.query_one(OptionList).action_select()
 
+    def action_cursor_up(self) -> None:
+        """Move the focused OptionList cursor up."""
+        option_list = self.query_one(OptionList)
+        if option_list.has_focus:
+            option_list.action_cursor_up()
+
+    def action_cursor_down(self) -> None:
+        """Move the focused OptionList cursor down."""
+        option_list = self.query_one(OptionList)
+        if option_list.has_focus:
+            option_list.action_cursor_down()
+
     async def action_back(self) -> None:
         """Leave this screen when possible."""
         await self.app.action_back()
@@ -217,15 +235,15 @@ class GameMenuScreen(Screen[None]):
             footer.update("Esc back")
             return
         if option.id == "play":
-            footer.update("Enter/Space start · Esc back")
+            footer.update("Enter/Space/D start · A/Esc back")
         elif option.id == "instructions":
-            footer.update("Enter/Space show · Esc back")
+            footer.update("Enter/Space/D show · A/Esc back")
         elif option.id == _OPTION_SEPARATOR_ID:
-            footer.update("↓/↑ navigate · Esc back")
+            footer.update("W/S navigate · A/Esc back")
         elif option.id.startswith("option:"):
-            footer.update("Space/Enter cycle · ←/→ change · Esc")
+            footer.update("Space/Enter/D cycle · A/D/←/→ change · Esc")
         else:
-            footer.update("Esc back")
+            footer.update("A/Esc back")
 
     def _update_info_panel(self, option: Option | None) -> None:
         """Show a description for the highlighted option, if any."""

@@ -103,4 +103,61 @@ def test_bindings_for_mode_are_distinct() -> None:
 def test_input_map_len_counts_keys() -> None:
     input_map = InputMap(bindings_for_mode(GameMode.MULTIPLAYER))
 
-    assert len(input_map) == 10
+    assert len(input_map) == 14
+
+
+def test_player_one_action_buttons() -> None:
+    input_map = input_map_for_mode(GameMode.MULTIPLAYER)
+
+    action_a = input_map.resolve("space")
+    action_b = input_map.resolve("altgr")
+    action_b_alias = input_map.resolve("right_alt")
+
+    assert action_a is not None
+    assert action_a.action is InputAction.ACTION_A
+    assert action_a.player == 1
+    assert action_b is not None
+    assert action_b.action is InputAction.ACTION_B
+    assert action_b.player == 1
+    assert action_b_alias is not None
+    assert action_b_alias.action is InputAction.ACTION_B
+    assert action_b_alias.player == 1
+
+
+def test_player_two_action_buttons() -> None:
+    input_map = input_map_for_mode(GameMode.MULTIPLAYER)
+
+    action_a = input_map.resolve("shift")
+    action_b = input_map.resolve("control")
+
+    assert action_a is not None
+    assert action_a.action is InputAction.ACTION_A
+    assert action_a.player == 2
+    assert action_b is not None
+    assert action_b.action is InputAction.ACTION_B
+    assert action_b.player == 2
+
+
+def test_single_player_action_buttons_use_wasd_modifiers() -> None:
+    input_map = input_map_for_mode(GameMode.SINGLE_PLAYER)
+
+    action_a = input_map.resolve("shift")
+    action_b = input_map.resolve("control")
+
+    assert action_a is not None
+    assert action_a.action is InputAction.ACTION_A
+    assert action_a.player == 1
+    assert action_b is not None
+    assert action_b.action is InputAction.ACTION_B
+    assert action_b.player == 1
+
+
+def test_direction_for_action_returns_none_for_action_buttons() -> None:
+    assert direction_for_action(InputAction.ACTION_A) is None
+    assert direction_for_action(InputAction.ACTION_B) is None
+
+
+def test_normalize_key_resolves_action_button_aliases() -> None:
+    assert normalize_key("AltGr") == "iso_level3_shift"
+    assert normalize_key("right_ctrl") == "control"
+    assert normalize_key("shift") == "shift"

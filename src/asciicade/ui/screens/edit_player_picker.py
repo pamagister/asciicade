@@ -21,7 +21,13 @@ class EditPlayerPickerScreen(Screen[PlayerProfile | None]):
 
     BINDINGS = [
         Binding("right", "confirm", "Select", show=False),
+        Binding("d", "confirm", "Select", show=False),
         Binding("left", "back", "Back", show=False),
+        Binding("a", "back", "Back", show=False),
+        Binding("up", "cursor_up", "Move up", show=False),
+        Binding("down", "cursor_down", "Move down", show=False),
+        Binding("w", "cursor_up", "Move up", show=False),
+        Binding("s", "cursor_down", "Move down", show=False),
         Binding("space", "confirm", "Select", show=False),
     ]
 
@@ -36,7 +42,7 @@ class EditPlayerPickerScreen(Screen[PlayerProfile | None]):
             Static("EDIT PLAYER", id="screen-title"),
             Static("Choose a profile to edit.", id="player-selection-status"),
             OptionList(id="edit-player-list"),
-            Static("Enter/Space edit · ←/Esc back", id="menu-footer"),
+            Static("Enter/Space/D edit · A/←/Esc back", id="menu-footer"),
             classes="menu-screen",
         )
 
@@ -62,6 +68,18 @@ class EditPlayerPickerScreen(Screen[PlayerProfile | None]):
     def action_confirm(self) -> None:
         """Select the highlighted profile."""
         self.query_one(OptionList).action_select()
+
+    def action_cursor_up(self) -> None:
+        """Move the focused OptionList cursor up."""
+        option_list = self.query_one(OptionList)
+        if option_list.has_focus:
+            option_list.action_cursor_up()
+
+    def action_cursor_down(self) -> None:
+        """Move the focused OptionList cursor down."""
+        option_list = self.query_one(OptionList)
+        if option_list.has_focus:
+            option_list.action_cursor_down()
 
     async def action_back(self) -> None:
         """Close the picker."""

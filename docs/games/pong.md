@@ -27,19 +27,10 @@ paddle, use the paddle edges to aim, and be first to reach the score limit.
 - **Difficulty:** Easy, Normal (default) or Hard. Difficulty changes the ball
   speed and, in single-player mode, the computer paddle speed.
 
-## Controls
-
-| Action | Key |
-|---|---|
-| Player 1 paddle up / down | Arrow Up / Arrow Down |
-| Player 2 paddle up / down | W / S |
-| Pause / resume | Escape or P |
-| Leave game while paused | Enter |
-| Quit application | Q, then confirm |
-| Game-over back | Escape |
-
 In single-player mode the human can use either the arrow keys or WASD. In
 two-player mode the arrow keys belong to Player 1 and W/S to Player 2.
+
+The full, game-independent control list is on the [controls page](../index.md#controls).
 
 Tap a direction key to move the paddle one half-block. Hold it longer than 0.1
 seconds to move continuously; releasing the key stops movement immediately.
