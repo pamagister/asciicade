@@ -45,6 +45,9 @@ docs = [
     "mkdocs>=1.6.1",
     "mkdocs-awesome-nav>=2.6.1",
     "pygments>=2.19.1",
+    "sphinx>=8.0",
+    "myst-parser>=4.0",
+    "sphinx-rtd-theme>=2.0",
 ]
 
 [project.scripts]
