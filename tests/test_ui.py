@@ -178,15 +178,17 @@ def test_snake_screen_renders_and_handles_input(tmp_path: Path) -> None:
 
             await pilot.press("up")
             await pilot.pause()
+            head_before = screen._game.snapshot.snakes[0].body[0]
             screen._on_tick()
             assert screen._game.snapshot.snakes[0].direction is Direction.UP
-            assert screen._game.snapshot.snakes[0].body[0] == Position(7, 6)
+            assert screen._game.snapshot.snakes[0].body[0] == head_before.step(Direction.UP)
 
             await pilot.press("escape")
             await pilot.pause()
             assert screen._paused
+            head_paused = screen._game.snapshot.snakes[0].body[0]
             screen._on_tick()
-            assert screen._game.snapshot.snakes[0].body[0] == Position(7, 6)
+            assert screen._game.snapshot.snakes[0].body[0] == head_paused
 
     asyncio.run(scenario())
 

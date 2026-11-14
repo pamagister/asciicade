@@ -68,8 +68,7 @@ uv sync --all-groups
 uv run asciicade
 ```
 
-Supported Python versions are 3.11 and newer. CI tests 3.11, 3.12, 3.13 and
-3.14 on Linux.
+Supported Python versions are 3.11 and newer. CI tests 3.11 and 3.14 on Linux.
 
 ## Quick start
 
