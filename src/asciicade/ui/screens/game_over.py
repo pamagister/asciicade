@@ -34,6 +34,7 @@ class GameOverScreen(Screen[None]):
         result: GameResult,
         *,
         options: GameOptions | None = None,
+        winner_label: str | None = None,
     ) -> None:
         """Store the completed session."""
         super().__init__()
@@ -43,6 +44,7 @@ class GameOverScreen(Screen[None]):
         self._players = players
         self._result = result
         self._options = options
+        self._winner_label = winner_label
 
     def compose(self) -> ComposeResult:
         """Build the result summary."""
@@ -82,11 +84,11 @@ class GameOverScreen(Screen[None]):
         """Handle the selected action."""
         button_id = event.button.id
         if button_id == "play-again":
-            from asciicade.ui.screens.snake_game import SnakeGameScreen
+            from asciicade.ui.screens.game_screen_factory import create_game_screen
 
             self.app.pop_screen()
             self.app.switch_screen(
-                SnakeGameScreen(
+                create_game_screen(
                     self._app_context,
                     self._registration,
                     self._mode,
@@ -109,6 +111,8 @@ class GameOverScreen(Screen[None]):
         lines: list[str] = []
         if self._result.is_draw:
             lines.append("Result: Draw")
+        elif self._winner_label is not None:
+            lines.append(f"Winner: {self._winner_label}")
         elif self._result.winner_name is not None:
             lines.append(f"Winner: {self._result.winner_name}")
         else:

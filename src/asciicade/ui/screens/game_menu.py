@@ -300,10 +300,10 @@ class GameMenuScreen(Screen[None]):
 
     def _start_game(self) -> None:
         """Push the gameplay screen with the selected options."""
-        from asciicade.ui.screens.snake_game import SnakeGameScreen
+        from asciicade.ui.screens.game_screen_factory import create_game_screen
 
         self.app.push_screen(
-            SnakeGameScreen(
+            create_game_screen(
                 self._app_context,
                 self._registration,
                 self._mode,
