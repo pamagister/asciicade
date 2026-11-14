@@ -41,6 +41,8 @@ paddle, use the paddle edges to aim, and be first to reach the score limit.
 In single-player mode the human can use either the arrow keys or WASD. In
 two-player mode the arrow keys belong to Player 1 and W/S to Player 2.
 
+Tap a direction key to move the paddle one half-block. Hold it longer than 0.1
+seconds to move continuously; releasing the key stops movement immediately.
 Hold-to-move uses Kitty keyboard release events when the terminal supports them.
 Terminals without release reporting use a short fallback timeout before the
 paddle stops.

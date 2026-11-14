@@ -29,6 +29,7 @@ from asciicade.core.registry import GameRegistration
 from asciicade.games.pong import PongGame, PongSnapshot
 from asciicade.persistence import LastSession
 from asciicade.ui.context import AppContext
+from asciicade.ui.keyboard import release_reporting_available
 from asciicade.ui.navigation import go_to_game_menu, go_to_main_menu
 from asciicade.ui.screens.game_over import GameOverScreen
 from asciicade.ui.screens.leave_game import LeaveGameScreen
@@ -43,6 +44,7 @@ _DIRECTION_ACTIONS = {
 # With Kitty release events enabled, the direction is cleared immediately.
 # This timeout is a fallback for terminals without release reporting.
 _PADDLE_REPEAT_TICKS = 2
+_HOLD_DELAY = 0.1
 _KEY_HOLD_TIMEOUT = 0.3
 
 
@@ -76,6 +78,7 @@ class PongGameScreen(Screen[None]):
         self._paused = False
         self._finished = False
         self._held_directions: dict[int, Direction] = {}
+        self._hold_started_at: dict[int, float] = {}
         self._last_key_at: dict[int, float] = {}
         self._tick_count = 0
 
@@ -127,6 +130,7 @@ class PongGameScreen(Screen[None]):
                     and self._held_directions.get(release_event.player) == release_direction
                 ):
                     self._held_directions.pop(release_event.player, None)
+                    self._hold_started_at.pop(release_event.player, None)
                     self._last_key_at.pop(release_event.player, None)
             return
         if self._paused and event.key == "enter":
@@ -143,12 +147,15 @@ class PongGameScreen(Screen[None]):
             if not self._paused:
                 direction = direction_for_action(input_event.action)
                 if direction is not None and input_event.player is not None:
+                    now = time.monotonic()
                     previous = self._held_directions.get(input_event.player)
-                    self._held_directions[input_event.player] = direction
-                    self._last_key_at[input_event.player] = time.monotonic()
                     if previous != direction:
+                        self._held_directions[input_event.player] = direction
+                        self._hold_started_at[input_event.player] = now
                         self._game.handle_input(input_event)
                         self._update_display()
+                    # Repeated press events keep the no-release fallback alive.
+                    self._last_key_at[input_event.player] = now
 
     def action_toggle_pause(self) -> None:
         """Pause or resume the game."""
@@ -171,6 +178,7 @@ class PongGameScreen(Screen[None]):
     def _clear_held_paddles(self) -> None:
         """Stop continuous paddle movement."""
         self._held_directions.clear()
+        self._hold_started_at.clear()
         self._last_key_at.clear()
 
     def _open_leave_dialog(self) -> None:
@@ -213,13 +221,21 @@ class PongGameScreen(Screen[None]):
             self._finish()
 
     def _move_held_paddles(self) -> None:
-        """Move paddles whose direction key was pressed recently."""
+        """Move paddles whose direction key has been held long enough."""
         if self._game is None:
             return
         now = time.monotonic()
+        release_supported = release_reporting_available()
         for player, direction in tuple(self._held_directions.items()):
-            if now - self._last_key_at.get(player, 0.0) > _KEY_HOLD_TIMEOUT:
-                self._held_directions.pop(player, None)
+            if not release_supported:
+                last_key_at = self._last_key_at.get(player)
+                if last_key_at is None or now - last_key_at > _KEY_HOLD_TIMEOUT:
+                    self._held_directions.pop(player, None)
+                    self._hold_started_at.pop(player, None)
+                    self._last_key_at.pop(player, None)
+                    continue
+            started_at = self._hold_started_at.get(player)
+            if started_at is None or now - started_at < _HOLD_DELAY:
                 continue
             action = InputAction.UP if direction is Direction.UP else InputAction.DOWN
             self._game.handle_input(InputEvent(action, player=player))

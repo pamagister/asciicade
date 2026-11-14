@@ -8,6 +8,8 @@ controls.
 
 from __future__ import annotations
 
+import re
+from collections.abc import Iterable
 from functools import lru_cache
 
 from textual import events
@@ -15,9 +17,23 @@ from textual._keyboard_protocol import FUNCTIONAL_KEYS
 from textual._xterm_parser import XTermParser, _re_extended_key
 from textual.drivers.linux_driver import LinuxDriver
 from textual.keys import _character_to_key
+from textual.message import Message
 
 _KITTY_REPORT_EVENT_TYPES = 0b00000010
 _KITTY_PROTOCOL_FLAGS = 0b00000001 | _KITTY_REPORT_EVENT_TYPES | 0b00001000 | 0b00010000
+_KITTY_QUERY_RESPONSE = re.compile(r"\x1b\[\?(\d+)u")
+_release_reporting_available = False
+
+
+def release_reporting_available() -> bool:
+    """Return whether the terminal reported Kitty release-event support."""
+    return _release_reporting_available
+
+
+def reset_release_reporting() -> None:
+    """Forget the cached terminal release-event capability."""
+    global _release_reporting_available
+    _release_reporting_available = False
 
 
 def _kitty_sequence_parts(sequence: str) -> tuple[list[str], str, str | None] | None:
@@ -45,17 +61,40 @@ def _release_key_name(parts: list[str], end: str) -> str | None:
 class ReleaseXTermParser(XTermParser):
     """XTerm parser that emits ``<key>_release`` events."""
 
+    def feed(self, data: str) -> Iterable[Message]:
+        """Parse input and detect the terminal's Kitty capability response."""
+        global _release_reporting_available
+
+        if not data:
+            yield from super().feed(data)
+            return
+
+        while (match := _KITTY_QUERY_RESPONSE.search(data)) is not None:
+            flags = int(match.group(1))
+            _release_reporting_available = _release_reporting_available or bool(
+                flags & _KITTY_REPORT_EVENT_TYPES
+            )
+            data = data[: match.start()] + data[match.end() :]
+        if data:
+            yield from super().feed(data)
+
     @lru_cache(maxsize=1024)  # noqa: B019 - parser lifetime matches the app.
     def _parse_extended_key(self, sequence: str) -> list[events.Key] | None:
         """Parse a Kitty key sequence, including release events."""
+        global _release_reporting_available
+
         parsed = _kitty_sequence_parts(sequence)
         if parsed is not None:
             parts, end, event_type = parsed
             if event_type == "3":
                 release_key = _release_key_name(parts, end)
                 if release_key is not None:
+                    _release_reporting_available = True
                     return [events.Key(f"{release_key}_release", None)]
             elif event_type in ("1", "2"):
+                # Explicit Kitty event types mean the terminal understands the
+                # protocol, including release reporting.
+                _release_reporting_available = True
                 # Textual's parser expects the legacy modifier field without
                 # the Kitty event-type suffix.
                 parts[1] = parts[1].split(":", 1)[0]
@@ -70,7 +109,9 @@ class AsciicadeLinuxDriver(LinuxDriver):
         """Start the driver and request key-release events."""
         import textual.drivers.linux_driver as linux_driver
 
+        reset_release_reporting()
         linux_driver.XTermParser = ReleaseXTermParser  # type: ignore[misc]
         super().start_application_mode()
         self.write(f"\x1b[>{_KITTY_PROTOCOL_FLAGS}u")
+        self.write("\x1b[?u")
         self.flush()

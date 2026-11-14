@@ -22,7 +22,11 @@ from asciicade.persistence import (
     SettingsRepository,
 )
 from asciicade.ui.app import AsciicadeApp
-from asciicade.ui.keyboard import ReleaseXTermParser
+from asciicade.ui.keyboard import (
+    ReleaseXTermParser,
+    release_reporting_available,
+    reset_release_reporting,
+)
 from asciicade.ui.screens.game_menu import GameMenuScreen
 from asciicade.ui.screens.game_over import GameOverScreen
 from asciicade.ui.screens.game_select import GameSelectScreen
@@ -375,7 +379,22 @@ def test_release_parser_emits_release_key_events() -> None:
     assert [event.key for event in parser.feed("\x1b[1;1A")] == ["up"]
 
 
-def test_pong_paddle_starts_immediately_and_moves_continuously(tmp_path: Path) -> None:
+def test_release_parser_detects_terminal_capability() -> None:
+    reset_release_reporting()
+    try:
+        parser = ReleaseXTermParser(False)
+        list(parser.feed("\x1b[?3u"))
+        assert release_reporting_available()
+
+        reset_release_reporting()
+        parser = ReleaseXTermParser(False)
+        list(parser.feed("\x1b[1;1:3A"))
+        assert release_reporting_available()
+    finally:
+        reset_release_reporting()
+
+
+def test_pong_tap_moves_one_half_block_without_hold_delay(tmp_path: Path) -> None:
     async def scenario() -> None:
         app = make_app(tmp_path)
         async with app.run_test(size=(100, 30)) as pilot:
@@ -388,6 +407,36 @@ def test_pong_paddle_starts_immediately_and_moves_continuously(tmp_path: Path) -
             await pilot.pause()
             assert screen._game.snapshot.players[0].y == 15
 
+            screen._on_tick()
+            screen._on_tick()
+            assert screen._game.snapshot.players[0].y == 15
+
+            screen.on_key(events.Key("up_release", None))
+            screen._on_tick()
+            assert screen._game.snapshot.players[0].y == 15
+
+    asyncio.run(scenario())
+
+
+def test_pong_hold_starts_after_delay_and_moves_continuously(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setattr(
+        "asciicade.ui.screens.pong_game.release_reporting_available",
+        lambda: True,
+    )
+
+    async def scenario() -> None:
+        app = make_app(tmp_path)
+        async with app.run_test(size=(100, 30)) as pilot:
+            await pilot.pause()
+            screen = await push_pong(app, pilot)
+            screen._timer.stop()
+            screen._game._serve_countdown = 0
+
+            await pilot.press("up")
+            await pilot.pause()
+            assert screen._game.snapshot.players[0].y == 15
+
+            screen._hold_started_at[1] -= 0.2
             for _ in range(4):
                 screen._on_tick()
 
@@ -396,7 +445,12 @@ def test_pong_paddle_starts_immediately_and_moves_continuously(tmp_path: Path) -
     asyncio.run(scenario())
 
 
-def test_pong_paddle_movement_stops_after_key_hold_timeout(tmp_path: Path) -> None:
+def test_pong_paddle_movement_stops_after_key_hold_timeout(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setattr(
+        "asciicade.ui.screens.pong_game.release_reporting_available",
+        lambda: False,
+    )
+
     async def scenario() -> None:
         app = make_app(tmp_path)
         async with app.run_test(size=(100, 30)) as pilot:
