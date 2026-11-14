@@ -208,3 +208,5 @@ cython_debug/
 /release/config.yaml
 /release/asciicade.exe
 /release/README.md
+/.idea/vcs.xml
+/.idea/workspace.xml
