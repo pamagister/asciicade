@@ -108,28 +108,38 @@ The application starts in the main menu. Choose Single Player or Two Players
 first, then select a player. The game selection screen is always shown next, even
 when only one game is registered, and shows a description of the highlighted game.
 Choose a game, then open its menu to adjust game-specific options, read the
-instructions, or press Play to start. Use the arrow keys and Enter to navigate,
-or select an entry directly.
+instructions, or press Play to start. Use the arrow keys, Enter or Space to
+navigate and confirm; Left or Escape goes back.
 
 ## Controls
 
 | Action | Key |
 |---|---|
 | Menu up / down | Arrow Up / Arrow Down |
-| Menu confirm | Enter or Right |
+| Menu confirm | Enter, Space or Right |
 | Menu back | Left or Escape |
-| Pause / resume or go back in game | Escape |
-| Quit or leave the current game | Q |
-| Toggle game option | Space |
+| Main-menu exit | Three quick Escape presses within 1.5 s |
+| Pause / resume | Escape or P |
+| Leave game while paused | Enter |
+| Quit application | Q, then confirm |
+| Toggle / cycle game option | Space or Enter |
 | Change game option value | Left or Right |
 
-In the game menu, highlight an option and use Space or Left/Right to change its
-value; the disabled ``--- Options ---`` separator is skipped while navigating.
+In the game menu, highlight an option and use Space or Enter to cycle it, or
+Left/Right to change its value. The disabled ``--- Options ---`` separator is
+skipped while navigating; Left on Play or Instructions goes back.
 
 Player 1 uses the arrow keys by default. Player 2 uses W/A/S/D. In single-player
 mode, WASD is accepted as an alternative to the arrow keys. Direction changes are
 buffered and applied on the next game tick. Immediate 180-degree reversals are
 rejected.
+
+During a game, Escape or P pauses and resumes. While paused, Enter opens a dialog
+to open the game menu, return to the main menu or stay in the game. Q always
+opens a quit confirmation; confirming exits the application. On the game-over
+screen, the arrow keys move between actions, Enter or Space selects one, and
+Escape returns to the game menu. The instructions screen scrolls with Up/Down,
+PageUp/PageDown or Space; Left or Escape goes back.
 
 ## Games
 
