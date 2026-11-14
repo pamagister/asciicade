@@ -78,8 +78,17 @@ class Game(Protocol):
         """Feed a normalized input event into the game."""
         ...
 
+    def clear_pending(self) -> None:
+        """Discard buffered input that has not been applied yet."""
+        ...
+
     def tick(self) -> None:
         """Advance the game state by one deterministic tick."""
+        ...
+
+    @property
+    def tick_rate(self) -> float:
+        """Return the number of simulation ticks per second."""
         ...
 
     @property

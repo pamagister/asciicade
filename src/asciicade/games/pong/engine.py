@@ -58,6 +58,11 @@ class PongEngine:
         self._rally_hits = 0
 
     @property
+    def tick_rate(self) -> float:
+        """Return the number of simulation ticks per second."""
+        return self.config.tick_rate
+
+    @property
     def is_finished(self) -> bool:
         """Return whether the current session has ended."""
         return self._finished

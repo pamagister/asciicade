@@ -32,8 +32,15 @@ class FakeGame:
     def handle_input(self, event: InputEvent) -> None:
         _ = event
 
+    def clear_pending(self) -> None:
+        pass
+
     def tick(self) -> None:
         self.finished = True
+
+    @property
+    def tick_rate(self) -> float:
+        return 60.0
 
     @property
     def is_finished(self) -> bool:

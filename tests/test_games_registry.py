@@ -57,3 +57,14 @@ def test_default_registry_contains_both_builtin_games() -> None:
 
     assert len(registry) == 2
     assert registry.identifiers() == ("pong", "snake")
+
+
+def test_builtin_games_expose_the_tick_contract() -> None:
+    registry = build_default_registry()
+
+    for registration in registry.all():
+        game = registration.factory()
+
+        assert game.tick_rate > 0
+        game.clear_pending()
+        assert not game.is_finished
