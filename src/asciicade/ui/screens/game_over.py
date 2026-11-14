@@ -57,7 +57,7 @@ class GameOverScreen(Screen[None]):
                 ActionButton("High scores", id="high-scores"),
                 id="game-over-actions",
             ),
-            Static("←/→ move · Enter/Space select · Esc game menu", id="menu-footer"),
+            Static("W/S/A/D move · Enter/Space select · A/Esc game menu", id="menu-footer"),
             classes="menu-screen",
         )
 

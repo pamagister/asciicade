@@ -72,7 +72,7 @@ class GameSelectScreen(MenuScreen):
                     id="game-list",
                 ),
                 Static("", id="empty-state"),
-                Static("↑/↓ · Enter/Space select · ←/Esc", id="menu-footer"),
+                Static("W/S move · Enter/Space/D select · A/←/Esc back", id="menu-footer"),
                 classes="menu-pane",
             ),
             Static("", id="game-description"),

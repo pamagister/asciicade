@@ -82,8 +82,75 @@ asciicade [--data-dir PATH] [--version]
 
 Choose Single Player or Two Players, select a player, then choose a game. Use the
 arrow keys, Enter or Space to navigate and confirm; Left or Escape goes back.
-See [Using Asciicade](https://github.com/pamagister/asciicade/blob/main/docs/usage/index.md) for the full control reference, player
+See [Controls](#controls) below for the full keyboard reference, including player
 profiles and saved data.
+
+## Controls
+
+Asciicade uses one consistent keyboard mapping for menus, dialogs and gameplay.
+The same keys work for both players; movement keys differ per player.
+
+### Menus and dialogs
+
+| Action | Key(s) |
+|---|---|
+| Move up / down | Arrow Up / Arrow Down, W / S |
+| Confirm / select | Enter, Space, Right or D |
+| Back / previous | Escape, Left or A |
+| Move between dialog buttons | Arrow Up / Down / Left / Right, W / S / A / D |
+| Cycle a game option | Space or Enter |
+| Change a game option value | Left / Right or A / D |
+| Edit the highlighted player profile | E |
+| Undo the last player selection | Backspace |
+| Scroll the instructions screen | Arrow Up / Down, W / S, PageUp / PageDown or Space |
+| Quit the application | Q, then confirm |
+| Exit from the main menu | Three quick Escape presses within 1.5 s |
+
+W/A/S/D mirror the arrow keys everywhere. In two-player games they belong to
+Player 2, so Player 1 uses the arrow keys and Player 2 uses W/A/S/D.
+
+### Gameplay
+
+| Action | Player 1 | Player 2 | Single player |
+|---|---|---|---|
+| Move | Arrow keys | W / A / S / D | Arrow keys or W / A / S / D |
+| Action A (primary) | Space | Left Shift | Space |
+| Action B (secondary) | AltGr (Right Alt / ISO Level 3 Shift) | Left Ctrl | AltGr |
+| Pause / resume | Escape or P | Escape or P | Escape or P |
+| Leave game while paused | Enter | Enter | Enter |
+| Quit the application | Q, then confirm | Q, then confirm | Q, then confirm |
+
+Action A and Action B are game-defined. For example, they can be used to rotate
+a block left or right in a block-dropping game, or to jump and crouch in a jump
+and run. Snake and Pong currently use movement only; Action A/B are the
+standard for games that use action buttons.
+
+Standalone AltGr, Shift and Ctrl key presses are only reported reliably by
+terminals with Kitty keyboard protocol support. On other terminals, use Space
+for Action A as the portable alternative.
+
+### Player profiles, colors and saved data
+
+- Player profiles are persistent and can be created from the player-selection
+  screen.
+- A guest option is available for quick sessions without creating a profile.
+- Guest player 1 uses green and guest player 2 uses cyan.
+- Profiles can be edited with `E` on a highlighted profile or through the
+  `Edit player` menu entry. The edit dialog changes the name and color.
+- The color palette contains the eight normal terminal colors.
+- A profile cannot occupy both player slots in a two-player match.
+- Single-player scores appear in the leaderboard.
+- Multiplayer results appear in the match history with both participants,
+  scores and the winner or draw.
+- Guest results are stored without a permanent profile.
+
+Application data is stored in the XDG data directory, normally:
+
+```text
+~/.local/share/asciicade/asciicade.db
+```
+
+Set `XDG_DATA_HOME` to change the base directory.
 
 ## Games
 
@@ -96,8 +163,6 @@ profiles and saved data.
 
 ## Documentation
 
-- [Using Asciicade](https://github.com/pamagister/asciicade/blob/main/docs/usage/index.md) — controls, player profiles, high scores and
-  the data directory.
 - [Architecture](https://github.com/pamagister/asciicade/blob/main/docs/develop/architecture.md) — code layout and extension points.
 - [Development](https://github.com/pamagister/asciicade/blob/main/docs/develop/development.md) — setup, tests, documentation and releases.
 - [Funding](https://github.com/pamagister/asciicade/blob/main/docs/funding/funding.md) — ways to support the project.

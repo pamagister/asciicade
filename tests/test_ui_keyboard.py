@@ -532,3 +532,148 @@ def test_create_player_space_selects_color(tmp_path: Path) -> None:
             assert app.screen._color is PlayerColor.YELLOW
 
     asyncio.run(scenario())
+
+
+def test_main_menu_wasd_navigation(tmp_path: Path) -> None:
+    async def scenario() -> None:
+        app = make_app(tmp_path)
+        async with app.run_test(size=(100, 30)) as pilot:
+            await pilot.pause()
+            option_list = app.screen.query_one("OptionList")
+            assert option_list.highlighted == 0
+
+            await pilot.press("s")
+            await pilot.pause()
+            assert option_list.highlighted == 1
+
+            await pilot.press("w")
+            await pilot.pause()
+            assert option_list.highlighted == 0
+
+    asyncio.run(scenario())
+
+
+def test_player_select_wasd_navigation(tmp_path: Path) -> None:
+    async def scenario() -> None:
+        app = make_app(tmp_path)
+        async with app.run_test(size=(100, 30)) as pilot:
+            await pilot.pause()
+            app.push_screen(PlayerSelectScreen(app.context, GameMode.SINGLE_PLAYER))
+            await pilot.pause()
+
+            option_list = app.screen.query_one("OptionList")
+            first = option_list.highlighted
+
+            await pilot.press("s")
+            await pilot.pause()
+            assert option_list.highlighted != first
+
+            await pilot.press("w")
+            await pilot.pause()
+            assert option_list.highlighted == first
+
+    asyncio.run(scenario())
+
+
+def test_game_menu_wasd_changes_option(tmp_path: Path) -> None:
+    async def scenario() -> None:
+        app = make_app(tmp_path)
+        async with app.run_test(size=(100, 30)) as pilot:
+            await pilot.pause()
+            registration = app.context.registry.get("snake")
+            app.push_screen(
+                GameMenuScreen(
+                    app.context,
+                    registration,
+                    GameMode.SINGLE_PLAYER,
+                    (GuestPlayer(1),),
+                )
+            )
+            await pilot.pause()
+
+            option_list = app.screen.query_one("OptionList")
+            option_list.highlighted = 3  # Difficulty
+            option_list.focus()
+            await pilot.pause()
+
+            await pilot.press("d")
+            await pilot.pause()
+            assert app.screen._options.value_for("difficulty") == "Hard"
+
+            await pilot.press("a")
+            await pilot.pause()
+            assert app.screen._options.value_for("difficulty") == "Medium"
+
+    asyncio.run(scenario())
+
+
+def test_dialog_button_focus_wasd(tmp_path: Path) -> None:
+    async def scenario() -> None:
+        app = make_app(tmp_path)
+        async with app.run_test(size=(100, 30)) as pilot:
+            await pilot.pause()
+            app.push_screen(ConfirmQuitScreen())
+            await pilot.pause()
+
+            assert app.focused is not None
+            assert app.focused.id == "cancel"
+
+            await pilot.press("d")
+            await pilot.pause()
+            assert app.focused is not None
+            assert app.focused.id == "quit"
+
+            await pilot.press("a")
+            await pilot.pause()
+            assert app.focused is not None
+            assert app.focused.id == "cancel"
+
+    asyncio.run(scenario())
+
+
+def test_instructions_wasd_scroll(tmp_path: Path) -> None:
+    async def scenario() -> None:
+        app = make_app(tmp_path)
+        async with app.run_test(size=(80, 24)) as pilot:
+            await pilot.pause()
+            registration = app.context.registry.get("snake")
+            app.push_screen(InstructionsScreen(registration))
+            await pilot.pause()
+
+            scroll = app.screen.query_one(VerticalScroll)
+            start = scroll.scroll_offset.y
+
+            await pilot.press("s")
+            await pilot.pause()
+            assert scroll.scroll_offset.y > start
+
+            await pilot.press("w")
+            await pilot.pause()
+            assert scroll.scroll_offset.y == start
+
+    asyncio.run(scenario())
+
+
+def test_create_player_wasd_navigates_color_list(tmp_path: Path) -> None:
+    async def scenario() -> None:
+        app = make_app(tmp_path)
+        async with app.run_test(size=(100, 30)) as pilot:
+            await pilot.pause()
+            app.push_screen(CreatePlayerScreen(app.context.players))
+            await pilot.pause()
+
+            color_list = app.screen.query_one("#color-list", OptionList)
+            color_list.focus()
+            await pilot.pause()
+
+            first = color_list.highlighted
+
+            await pilot.press("s")
+            await pilot.pause()
+            assert color_list.highlighted != first
+
+            await pilot.press("w")
+            await pilot.pause()
+            assert color_list.highlighted == first
+
+    asyncio.run(scenario())

@@ -39,12 +39,12 @@ def handle_button_row_key(screen: Screen, event: events.Key) -> bool:
     """
     if not isinstance(screen.focused, ActionButton):
         return False
-    if event.key in ("left", "up"):
+    if event.key in ("left", "up", "a", "w"):
         event.stop()
         event.prevent_default()
         move_button_focus(screen, -1)
         return True
-    if event.key in ("right", "down"):
+    if event.key in ("right", "down", "d", "s"):
         event.stop()
         event.prevent_default()
         move_button_focus(screen, 1)

@@ -24,6 +24,10 @@ class CreatePlayerScreen(Screen[PlayerProfile | None]):
     BINDINGS = [
         Binding("escape", "cancel", "Cancel", show=False),
         Binding("space", "select_color", "Select color", show=False),
+        Binding("up", "cursor_up", "Move up", show=False),
+        Binding("down", "cursor_down", "Move down", show=False),
+        Binding("w", "cursor_up", "Move up", show=False),
+        Binding("s", "cursor_down", "Move down", show=False),
     ]
 
     def __init__(
@@ -60,7 +64,9 @@ class CreatePlayerScreen(Screen[PlayerProfile | None]):
                 ActionButton("Cancel", id="cancel"),
                 id="create-actions",
             ),
-            Static("Enter save · Space select · Tab next field · Esc cancel", id="menu-footer"),
+            Static(
+                "Enter save · W/S select color · Tab next field · A/Esc cancel", id="menu-footer"
+            ),
             classes="menu-screen modal-screen",
         )
 
@@ -75,6 +81,15 @@ class CreatePlayerScreen(Screen[PlayerProfile | None]):
 
     def on_key(self, event: events.Key) -> None:
         """Move focus between dialog buttons with the arrow keys."""
+        color_list = self.query_one("#color-list", OptionList)
+        if color_list.has_focus and event.key in ("up", "down", "w", "s"):
+            if event.key in ("up", "w"):
+                color_list.action_cursor_up()
+            else:
+                color_list.action_cursor_down()
+            event.stop()
+            event.prevent_default()
+            return
         handle_button_row_key(self, event)
 
     def action_select_color(self) -> None:

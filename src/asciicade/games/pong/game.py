@@ -19,14 +19,14 @@ Single player:
 Two players:
 - Player 1 uses the arrow keys.
 - Player 2 uses W and S.
+- Both players share the same keyboard and playfield.
 - The same paddle and ball physics apply.
 - The first player to the score limit wins.
 
-Global controls:
-- Escape or P pauses or resumes during a game.
-- While paused, Enter opens the leave-game dialog.
-- Q opens the quit confirmation and exits the application when confirmed.
-- On the game-over screen, Escape returns to the game menu.
+Tap a direction key to move the paddle one half-block. Hold it longer than 0.1
+seconds to move continuously; releasing the key stops movement immediately.
+
+See the general controls for pause, leave-game and quit keys.
 """
 
 PONG_OPTIONS = GameOptionRegistry(

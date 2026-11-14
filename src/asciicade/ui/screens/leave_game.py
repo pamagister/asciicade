@@ -39,7 +39,7 @@ class LeaveGameScreen(Screen[str]):
                 ActionButton("Stay", id="stay", variant="primary"),
                 id="confirm-actions",
             ),
-            Static("←/→ move · Enter/Space select · Esc stay", id="menu-footer"),
+            Static("W/S/A/D move · Enter/Space select · A/Esc stay", id="menu-footer"),
             classes="menu-screen modal-screen",
         )
 

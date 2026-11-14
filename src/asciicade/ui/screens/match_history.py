@@ -33,7 +33,7 @@ class MatchHistoryScreen(MenuScreen):
                 id="history-games",
             ),
             DataTable(id="history-table"),
-            Static("↑/↓ game · Enter/Space select · Tab table · Esc back", id="menu-footer"),
+            Static("W/S game · Enter/Space select · Tab table · A/Esc back", id="menu-footer"),
             classes="menu-screen",
         )
 

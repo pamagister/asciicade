@@ -17,7 +17,13 @@ class InstructionsScreen(Screen[None]):
     BINDINGS = [
         Binding("escape", "back", "Back", show=False),
         Binding("left", "back", "Back", show=False),
+        Binding("a", "back", "Back", show=False),
+        Binding("up", "scroll_up", "Scroll up", show=False),
+        Binding("down", "scroll_down", "Scroll down", show=False),
+        Binding("w", "scroll_up", "Scroll up", show=False),
+        Binding("s", "scroll_down", "Scroll down", show=False),
         Binding("space", "page_down", "Page down", show=False),
+        Binding("d", "page_down", "Page down", show=False),
     ]
 
     def __init__(self, registration: GameRegistration) -> None:
@@ -36,7 +42,7 @@ class InstructionsScreen(Screen[None]):
                 Static(self._registration.metadata.instructions, id="instructions-body"),
                 id="instructions-scroll",
             ),
-            Static("↑/↓ scroll · Space page · ←/Esc back", id="menu-footer"),
+            Static("W/S scroll · D/Space page · A/←/Esc back", id="menu-footer"),
             classes="menu-screen",
         )
 
@@ -51,3 +57,11 @@ class InstructionsScreen(Screen[None]):
     def action_page_down(self) -> None:
         """Scroll the instructions down one page."""
         self.query_one(VerticalScroll).action_page_down()
+
+    def action_scroll_up(self) -> None:
+        """Scroll the instructions up."""
+        self.query_one(VerticalScroll).action_scroll_up()
+
+    def action_scroll_down(self) -> None:
+        """Scroll the instructions down."""
+        self.query_one(VerticalScroll).action_scroll_down()

@@ -29,7 +29,7 @@ class ConfirmQuitScreen(Screen[None]):
                 ActionButton("Cancel", id="cancel", variant="primary"),
                 id="confirm-actions",
             ),
-            Static("←/→ move · Enter/Space select · Esc cancel", id="menu-footer"),
+            Static("W/S/A/D move · Enter/Space select · A/Esc cancel", id="menu-footer"),
             classes="menu-screen modal-screen",
         )
 
