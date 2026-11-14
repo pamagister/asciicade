@@ -22,6 +22,7 @@ from asciicade.ui.app import AsciicadeApp
 from asciicade.ui.screens.game_over import GameOverScreen
 from asciicade.ui.screens.leave_game import LeaveGameScreen
 from asciicade.ui.screens.pong_game import PongGameScreen
+from asciicade.ui.widgets import ActionButton
 
 
 def make_app(tmp_path: Path) -> AsciicadeApp:
@@ -204,8 +205,7 @@ def test_pong_game_over_records_result_and_replays(tmp_path: Path) -> None:
             assert len(app.context.results.match_history("pong", mode=None)) == 1
             assert "Winner: Guest 1" in app.screen._summary()
 
-            await pilot.pause(0.1)
-            await pilot.press("enter")
+            app.screen.query_one("#play-again", ActionButton).press()
             for _ in range(10):
                 await pilot.pause()
                 if isinstance(app.screen, PongGameScreen):
