@@ -101,11 +101,25 @@ def test_blockfall_screen_renders_board_and_info(tmp_path: Path) -> None:
             assert len(lines) <= 24
             assert max(len(line) for line in lines) <= 80
 
-            border = next(line for line in lines if line.startswith("╔"))[:22]
-            assert len(border) == 22
-            row = next(line for line in lines if line.startswith("║"))[:22]
-            assert len(row) == 22
-            assert len(row[1:-1]) == 20
+            border = next(line for line in lines if line.startswith("╔"))
+            bottom = next(line for line in lines if line.startswith("╚"))
+            row = next(line for line in lines if line.startswith("║"))
+
+            # Border width must match the board row width: each cell renders
+            # as two block characters plus both side borders.
+            snapshot = screen._game.snapshot
+            view = snapshot.players[0]
+            board_lines = screen._board_lines(view)
+            border = board_lines[0].plain
+            bottom = board_lines[-1].plain
+            row = board_lines[1].plain
+
+            # Border width must match the board row width: each cell renders
+            # as two block characters plus both side borders.
+            width_chars = view.board.width * 2
+            assert len(border) == len(row)
+            assert len(bottom) == len(row)
+            assert len(row) == 1 + width_chars + 1
 
             styles = {str(span.style) for span in rendered.spans}
             assert any(
@@ -167,8 +181,16 @@ def test_blockfall_two_player_layout_puts_player_two_left(tmp_path: Path) -> Non
             assert plain.index("P2") < plain.index("P1")
             assert plain.index("P2") < plain.index("╔")
             assert plain.rindex("P1") > plain.rindex("╚")
+
+            snapshot = screen._game.snapshot
+            width_chars = snapshot.players[0].board.width * 2
             assert len(lines) <= 24
             assert max(len(line) for line in lines) <= 80
+            for player_view in snapshot.players:
+                board_lines = screen._board_lines(player_view)
+                assert len(board_lines[0].plain) == width_chars + 2
+                assert len(board_lines[-1].plain) == width_chars + 2
+                assert len(board_lines[1].plain) == width_chars + 2
 
     asyncio.run(scenario())
 

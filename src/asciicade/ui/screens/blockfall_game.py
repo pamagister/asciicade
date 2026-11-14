@@ -342,7 +342,10 @@ class BlockfallGameScreen(Screen[None]):
 
     def _board_lines(self, view: BlockfallPlayerView) -> list[Text]:
         """Build the bordered board lines for one player."""
-        border = "═" * view.board.width
+        # Each logical cell renders as two horizontal block characters, so the
+        # visible row width is 2 * width plus both side borders. The top and
+        # bottom borders must match this width.
+        border = "═" * (view.board.width * 2)
         lines = [Text(f"╔{border}╗", style="blue")]
         occupancy = self._occupancy(view)
         for y in range(view.board.height):
