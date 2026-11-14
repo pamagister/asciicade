@@ -56,10 +56,10 @@ def test_guest_player_rejects_blank_name() -> None:
 
 
 def test_profile_create_stores_color() -> None:
-    profile = PlayerProfile.create("Paul", color=PlayerColor.BRIGHT_CYAN)
+    profile = PlayerProfile.create("Paul", color=PlayerColor.CYAN)
 
-    assert profile.color is PlayerColor.BRIGHT_CYAN
-    assert profile.color.label == "Bright Cyan"
+    assert profile.color is PlayerColor.CYAN
+    assert profile.color.label == "Cyan"
 
 
 def test_guest_players_get_slot_colors() -> None:
@@ -79,9 +79,9 @@ def test_player_color_helper_handles_profiles_and_guests() -> None:
     assert player_color(guest) is PlayerColor.CYAN
 
 
-def test_player_color_has_sixteen_terminal_colors() -> None:
-    assert len(tuple(PlayerColor)) == 16
-    assert PlayerColor("bright_red") is PlayerColor.BRIGHT_RED
+def test_player_color_has_eight_terminal_colors() -> None:
+    assert len(tuple(PlayerColor)) == 8
+    assert PlayerColor("red") is PlayerColor.RED
 
 
 def test_selection_accepts_one_and_two_players() -> None:

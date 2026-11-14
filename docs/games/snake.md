@@ -40,7 +40,6 @@ the [using guide](../usage/index.md#controls).
 Snake rendering uses solid block characters: the wall, every snake segment and
 side walls that are one arena cell wide. The head is emphasized in bold rather
 than with a number marker. Player 1 is shown in green and player 2 in cyan by
-default; player profiles can choose from 16 terminal colors (eight normal and
-eight bright/neon variants). Each logical arena cell is rendered as two horizontal
+default; player profiles can choose from the eight normal terminal colors. Each logical arena cell is rendered as two horizontal
 characters, so the playfield stays visually square in terminals where characters
 are about twice as tall as they are wide.

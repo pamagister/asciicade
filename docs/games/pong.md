@@ -59,5 +59,5 @@ paddle stops.
   both players time to reposition.
 - Paddles are one terminal column wide and use half-block characters
   (`▀`, `▄`, `█`) for precise vertical movement.
-- The center line, border, paddles and ball use the retro/neon terminal colors.
+- The center line, border, paddles and ball use the eight normal terminal colors.
   Player profiles use their selected color; the computer uses red.

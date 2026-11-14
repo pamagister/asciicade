@@ -5,9 +5,9 @@ Asciicade is a polished, extensible arcade game collection for Linux terminals.
 
 ## Features
 
-- Unified retro/neon terminal interface built with [Textual](https://textual.textualize.io/).
+- Unified terminal interface built with [Textual](https://textual.textualize.io/).
 - Persistent player profiles stored in SQLite.
-- Player profiles with 16 selectable terminal colors.
+- Player profiles with eight selectable terminal colors.
 - Snake single-player mode.
 - Snake competitive local two-player mode on one keyboard.
 - Pong single-player mode against a computer opponent.

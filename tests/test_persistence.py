@@ -137,14 +137,14 @@ def test_repository_updates_profile(database: Database) -> None:
         id=profile.id,
         name="Paula",
         created_at=profile.created_at,
-        color=PlayerColor.BRIGHT_YELLOW,
+        color=PlayerColor.YELLOW,
     )
     repository.update(updated)
 
     loaded = repository.get(profile.id)
     assert loaded is not None
     assert loaded.name == "Paula"
-    assert loaded.color is PlayerColor.BRIGHT_YELLOW
+    assert loaded.color is PlayerColor.YELLOW
 
 
 def test_repository_update_rejects_missing_profile(database: Database) -> None:

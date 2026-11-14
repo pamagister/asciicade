@@ -303,15 +303,15 @@ class PongGameScreen(Screen[None]):
             style="bold yellow",
         )
         self._append_scores(text, snapshot)
-        text.append(f"First to {snapshot.score_limit}\n", style="bright_black")
+        text.append(f"First to {snapshot.score_limit}\n", style="white")
 
         border = "═" * snapshot.width
-        text.append(f"╔{border}╗\n", style="bright_blue")
+        text.append(f"╔{border}╗\n", style="blue")
         for row in range(snapshot.height):
-            text.append("║", style="bright_blue")
+            text.append("║", style="blue")
             text.append_text(self._render_row(snapshot, row))
-            text.append("║\n", style="bright_blue")
-        text.append(f"╚{border}╝\n", style="bright_blue")
+            text.append("║\n", style="blue")
+        text.append(f"╚{border}╝\n", style="blue")
 
         if self._finished:
             text.append("\nGAME OVER\n", style="bold red")
@@ -323,12 +323,12 @@ class PongGameScreen(Screen[None]):
         elif self._mode is GameMode.SINGLE_PLAYER:
             text.append(
                 "\nArrows/WASD move · Esc/P pause · Q quit\n",
-                style="bright_black",
+                style="white",
             )
         else:
             text.append(
                 "\nP1 Arrows · P2 W/S · Esc/P pause · Q quit\n",
-                style="bright_black",
+                style="white",
             )
         return text
 
@@ -341,7 +341,7 @@ class PongGameScreen(Screen[None]):
                 style=f"bold {human_color}",
             )
             text.append("    ", style="")
-            text.append(f"CPU: {snapshot.players[1].score}", style="bold bright_red")
+            text.append(f"CPU: {snapshot.players[1].score}", style="bold red")
         else:
             first_color = player_color(self._players[0]).value
             second_color = player_color(self._players[1]).value
@@ -362,7 +362,7 @@ class PongGameScreen(Screen[None]):
         center = snapshot.width // 2
         for subrow in (row * 2, row * 2 + 1):
             if subrow % 2 == 0:
-                occupancy[(center, subrow)] = "bright_black"
+                occupancy[(center, subrow)] = "white"
 
         for player in snapshot.players:
             color = self._player_color(player.player_index)
@@ -379,7 +379,7 @@ class PongGameScreen(Screen[None]):
             math.floor(snapshot.ball.y + 0.5),
         }:
             if 0 <= subrow < snapshot.height * 2:
-                occupancy[(ball_x, subrow)] = "bright_white"
+                occupancy[(ball_x, subrow)] = "white"
 
         text = Text()
         for x in range(snapshot.width):
@@ -402,4 +402,4 @@ class PongGameScreen(Screen[None]):
         """Return the display color for a player or the CPU."""
         if 1 <= player_index <= len(self._players):
             return player_color(self._players[player_index - 1]).value
-        return "bright_red"
+        return "red"

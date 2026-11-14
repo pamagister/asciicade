@@ -45,7 +45,7 @@ PageUp/PageDown or Space; Left or Escape goes back.
 - Guest player 1 uses green and guest player 2 uses cyan.
 - Profiles can be edited with `E` on a highlighted profile or through the `Edit player` menu entry.
   The edit dialog changes the name and color.
-- The color palette contains the eight normal terminal colors and their eight bright/neon variants.
+- The color palette contains the eight normal terminal colors.
 - A profile cannot occupy both player slots in a two-player match.
 - Single-player scores appear in the leaderboard.
 - Multiplayer results appear in the match history with both participants, scores and the winner or

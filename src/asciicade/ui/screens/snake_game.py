@@ -234,14 +234,14 @@ class SnakeGameScreen(Screen[None]):
 
         wall = "█" * _CELL_WIDTH
         border = wall * (snapshot.width + 2)
-        text.append(f"{border}\n", style="bright_black")
+        text.append(f"{border}\n", style="white")
         for y in range(snapshot.height):
-            text.append(wall, style="bright_black")
+            text.append(wall, style="white")
             for x in range(snapshot.width):
                 char, style = cells.get(Position(x, y), (" " * _CELL_WIDTH, ""))
                 text.append(char, style=style)
-            text.append(f"{wall}\n", style="bright_black")
-        text.append(f"{border}\n", style="bright_black")
+            text.append(f"{wall}\n", style="white")
+        text.append(f"{border}\n", style="white")
 
         if self._paused:
             text.append(
@@ -251,7 +251,7 @@ class SnakeGameScreen(Screen[None]):
         else:
             text.append(
                 "\nArrows/WASD move · Esc/P pause · Q quit\n",
-                style="bright_black",
+                style="white",
             )
         if self._finished:
             text.append("\nGAME OVER\n", style="bold red")
