@@ -63,3 +63,8 @@ Load the shared and supporting skills as needed:
 - `workflow-autopilot`: full-plan or selected-phase execution.
 - `git-workflow`: Git, GitHub issues, `gh` CLI, commits, pushes and CI.
 - `mission-planning`: turn a mission or external specification into one executable plan.
+
+## New Game: Game protocol
+
+- When implementing a new game, consider docs/develop/architecture.md
+- also consider the gameplay controls in docs/index.md
