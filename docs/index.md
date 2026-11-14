@@ -12,8 +12,12 @@ Asciicade is a polished, extensible arcade game collection for Linux terminals.
 - Snake competitive local two-player mode on one keyboard.
 - Pong single-player mode against a computer opponent.
 - Pong competitive local two-player mode on one keyboard.
-- Per-game options (for example Snake difficulty and wrap-around walls, or Pong
-  score limit and difficulty).
+- Blockfall single-player mode with guideline scoring, levels, wall kicks and a
+  ghost piece.
+- Blockfall competitive local two-player mode on separate boards.
+- Per-game options (for example Snake difficulty and wrap-around walls, Pong
+  score limit and difficulty, or Blockfall start level, next preview and ghost
+  piece).
 - Persistent high scores and match history.
 - Short in-application instructions.
 - Consistent keyboard controls with normalized player input.
@@ -123,6 +127,12 @@ a block left or right in a block-dropping game, or to jump and crouch in a jump
 and run. Snake and Pong currently use movement only; Action A/B are the
 standard for games that use action buttons.
 
+Blockfall uses Action A and Action B for rotation. Player 1 rotates clockwise
+with Space (Action A) and counterclockwise with AltGr (Action B). Player 2
+rotates clockwise with Ctrl (Action B) and counterclockwise with Shift
+(Action A). In single-player mode, Space or Shift rotates clockwise and AltGr or
+Ctrl rotates counterclockwise.
+
 Standalone AltGr, Shift and Ctrl key presses are only reported reliably by
 terminals with Kitty keyboard protocol support. On other terminals, use Space
 for Action A as the portable alternative.
@@ -158,6 +168,9 @@ Set `XDG_DATA_HOME` to change the base directory.
 - [Pong](games/pong.md) — classic arcade Pong for one or two local players;
   aim with the paddle edges, use half-block rendering and choose the score limit
   and difficulty.
+- [Blockfall](games/blockfall.md) — classic falling-block puzzle for one or two
+  local players; arrange tetrominoes into lines, use wall kicks and a ghost
+  piece, and choose the start level.
 
 ## Documentation
 
@@ -170,6 +183,7 @@ Set `XDG_DATA_HOME` to change the base directory.
 :caption: Documentation
 :maxdepth: 2
 
+games/blockfall
 games/snake
 games/pong
 develop/architecture

@@ -12,6 +12,7 @@ from asciicade.core.options import GameOptions
 from asciicade.core.player import GuestPlayer
 from asciicade.core.registry import GameRegistration
 from asciicade.ui.context import AppContext
+from asciicade.ui.screens.blockfall_game import BlockfallGameScreen
 from asciicade.ui.screens.game_screen_factory import (
     GameScreenNotFoundError,
     GameScreenRegistry,
@@ -48,9 +49,11 @@ def _registration(identifier: str) -> GameRegistration:
 def test_default_registry_maps_builtin_screens() -> None:
     registry = build_default_screen_registry()
 
+    assert registry.get("blockfall") is BlockfallGameScreen
     assert registry.get("snake") is SnakeGameScreen
     assert registry.get("pong") is PongGameScreen
-    assert len(registry) == 2
+    assert len(registry) == 3
+    assert "blockfall" in registry
     assert "pong" in registry
 
 

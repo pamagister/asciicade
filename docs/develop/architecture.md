@@ -7,6 +7,7 @@ src/asciicade/
 ├── cli/           Command-line entry point
 ├── core/          Player, game, input, session and result contracts
 ├── games/
+│   ├── blockfall/  UI-independent Blockfall engine and registration
 │   ├── pong/      UI-independent Pong engine and registration
 │   └── snake/     UI-independent Snake engine and registration
 ├── persistence/   SQLite schema, migrations and repositories

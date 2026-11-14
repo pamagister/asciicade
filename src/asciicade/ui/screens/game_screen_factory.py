@@ -96,10 +96,12 @@ class GameScreenRegistry:
 
 def build_default_screen_registry() -> GameScreenRegistry:
     """Return a registry containing the built-in game screens."""
+    from asciicade.ui.screens.blockfall_game import BlockfallGameScreen
     from asciicade.ui.screens.pong_game import PongGameScreen
     from asciicade.ui.screens.snake_game import SnakeGameScreen
 
     registry = GameScreenRegistry()
+    registry.register("blockfall", BlockfallGameScreen)
     registry.register("pong", PongGameScreen)
     registry.register("snake", SnakeGameScreen)
     return registry
