@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+import time
 from typing import cast
 
 from rich.text import Text
@@ -15,7 +16,13 @@ from textual.timer import Timer
 from textual.widgets import Static
 
 from asciicade.core.game import GameMode
-from asciicade.core.input import InputAction, input_map_for_mode
+from asciicade.core.input import (
+    Direction,
+    InputAction,
+    InputEvent,
+    direction_for_action,
+    input_map_for_mode,
+)
 from asciicade.core.options import GameOptions
 from asciicade.core.player import GuestPlayer, PlayerProfile, player_color
 from asciicade.core.registry import GameRegistration
@@ -32,6 +39,11 @@ _DIRECTION_ACTIONS = {
     InputAction.LEFT,
     InputAction.RIGHT,
 }
+
+# With Kitty release events enabled, the direction is cleared immediately.
+# This timeout is a fallback for terminals without release reporting.
+_PADDLE_REPEAT_TICKS = 2
+_KEY_HOLD_TIMEOUT = 0.3
 
 
 class PongGameScreen(Screen[None]):
@@ -63,6 +75,9 @@ class PongGameScreen(Screen[None]):
         self._timer: Timer | None = None
         self._paused = False
         self._finished = False
+        self._held_directions: dict[int, Direction] = {}
+        self._last_key_at: dict[int, float] = {}
+        self._tick_count = 0
 
     def compose(self) -> ComposeResult:
         """Build the arena view."""
@@ -88,6 +103,7 @@ class PongGameScreen(Screen[None]):
 
     def on_unmount(self) -> None:
         """Stop the timer when the screen closes."""
+        self._clear_held_paddles()
         if self._timer is not None:
             self._timer.stop()
             self._timer = None
@@ -95,6 +111,23 @@ class PongGameScreen(Screen[None]):
     def on_key(self, event: events.Key) -> None:
         """Feed direction keys into the engine and handle pause actions."""
         if self._game is None or self._finished:
+            return
+        if event.key.endswith("_release"):
+            release_event = self._input_map.resolve(event.key.removesuffix("_release"))
+            if (
+                release_event is not None
+                and release_event.action in _DIRECTION_ACTIONS
+                and release_event.player is not None
+            ):
+                event.stop()
+                event.prevent_default()
+                release_direction = direction_for_action(release_event.action)
+                if (
+                    release_direction is not None
+                    and self._held_directions.get(release_event.player) == release_direction
+                ):
+                    self._held_directions.pop(release_event.player, None)
+                    self._last_key_at.pop(release_event.player, None)
             return
         if self._paused and event.key == "enter":
             event.stop()
@@ -108,7 +141,14 @@ class PongGameScreen(Screen[None]):
             event.stop()
             event.prevent_default()
             if not self._paused:
-                self._game.handle_input(input_event)
+                direction = direction_for_action(input_event.action)
+                if direction is not None and input_event.player is not None:
+                    previous = self._held_directions.get(input_event.player)
+                    self._held_directions[input_event.player] = direction
+                    self._last_key_at[input_event.player] = time.monotonic()
+                    if previous != direction:
+                        self._game.handle_input(input_event)
+                        self._update_display()
 
     def action_toggle_pause(self) -> None:
         """Pause or resume the game."""
@@ -123,9 +163,15 @@ class PongGameScreen(Screen[None]):
         self.notify("Paused" if self._paused else "Resumed")
 
     def _clear_pending(self) -> None:
-        """Discard buffered input requests."""
+        """Discard buffered input requests and held paddle directions."""
+        self._clear_held_paddles()
         if self._game is not None:
             self._game.clear_pending()
+
+    def _clear_held_paddles(self) -> None:
+        """Stop continuous paddle movement."""
+        self._held_directions.clear()
+        self._last_key_at.clear()
 
     def _open_leave_dialog(self) -> None:
         """Ask whether to leave the current game."""
@@ -158,16 +204,32 @@ class PongGameScreen(Screen[None]):
         """Advance the engine and refresh the display."""
         if self._game is None or self._paused or self._finished:
             return
+        self._tick_count += 1
+        if self._tick_count % _PADDLE_REPEAT_TICKS == 0:
+            self._move_held_paddles()
         self._game.tick()
         self._update_display()
         if self._game.is_finished:
             self._finish()
+
+    def _move_held_paddles(self) -> None:
+        """Move paddles whose direction key was pressed recently."""
+        if self._game is None:
+            return
+        now = time.monotonic()
+        for player, direction in tuple(self._held_directions.items()):
+            if now - self._last_key_at.get(player, 0.0) > _KEY_HOLD_TIMEOUT:
+                self._held_directions.pop(player, None)
+                continue
+            action = InputAction.UP if direction is Direction.UP else InputAction.DOWN
+            self._game.handle_input(InputEvent(action, player=player))
 
     def _finish(self) -> None:
         """Persist the result and show the game-over screen."""
         if self._game is None or self._finished:
             return
         self._finished = True
+        self._clear_held_paddles()
         if self._timer is not None:
             self._timer.stop()
             self._timer = None

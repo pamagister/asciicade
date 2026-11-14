@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import asyncio
+import time
 from pathlib import Path
 
+from textual import events
 from textual.pilot import Pilot
 from textual.widgets import OptionList
 
@@ -20,6 +22,7 @@ from asciicade.persistence import (
     SettingsRepository,
 )
 from asciicade.ui.app import AsciicadeApp
+from asciicade.ui.keyboard import ReleaseXTermParser
 from asciicade.ui.screens.game_menu import GameMenuScreen
 from asciicade.ui.screens.game_over import GameOverScreen
 from asciicade.ui.screens.game_select import GameSelectScreen
@@ -334,5 +337,106 @@ def test_game_menu_starts_pong_with_selected_options(tmp_path: Path) -> None:
             screen = app.screen
             screen._timer.stop()
             assert screen._game.config.score_limit == 15
+
+    asyncio.run(scenario())
+
+
+def test_pong_key_release_stops_paddle_immediately(tmp_path: Path) -> None:
+    async def scenario() -> None:
+        app = make_app(tmp_path)
+        async with app.run_test(size=(100, 30)) as pilot:
+            await pilot.pause()
+            screen = await push_pong(app, pilot)
+            screen._timer.stop()
+            screen._game._serve_countdown = 0
+
+            await pilot.press("up")
+            await pilot.pause()
+            assert screen._game.snapshot.players[0].y == 15
+            assert 1 in screen._held_directions
+
+            screen.on_key(events.Key("up_release", None))
+            assert 1 not in screen._held_directions
+
+            for _ in range(2):
+                screen._on_tick()
+            assert screen._game.snapshot.players[0].y == 15
+
+    asyncio.run(scenario())
+
+
+def test_release_parser_emits_release_key_events() -> None:
+    parser = ReleaseXTermParser(False)
+
+    assert [event.key for event in parser.feed("\x1b[1;1:3A")] == ["up_release"]
+    assert [event.key for event in parser.feed("\x1b[119;1:3u")] == ["w_release"]
+    assert [event.key for event in parser.feed("\x1b[1;1:1A")] == ["up"]
+    assert [event.key for event in parser.feed("\x1b[119;1:1u")] == ["w"]
+    assert [event.key for event in parser.feed("\x1b[1;1A")] == ["up"]
+
+
+def test_pong_paddle_starts_immediately_and_moves_continuously(tmp_path: Path) -> None:
+    async def scenario() -> None:
+        app = make_app(tmp_path)
+        async with app.run_test(size=(100, 30)) as pilot:
+            await pilot.pause()
+            screen = await push_pong(app, pilot)
+            screen._timer.stop()
+            screen._game._serve_countdown = 0
+
+            await pilot.press("up")
+            await pilot.pause()
+            assert screen._game.snapshot.players[0].y == 15
+
+            for _ in range(4):
+                screen._on_tick()
+
+            assert screen._game.snapshot.players[0].y == 13
+
+    asyncio.run(scenario())
+
+
+def test_pong_paddle_movement_stops_after_key_hold_timeout(tmp_path: Path) -> None:
+    async def scenario() -> None:
+        app = make_app(tmp_path)
+        async with app.run_test(size=(100, 30)) as pilot:
+            await pilot.pause()
+            screen = await push_pong(app, pilot)
+            screen._timer.stop()
+            screen._game._serve_countdown = 0
+
+            await pilot.press("up")
+            await pilot.pause()
+            assert screen._game.snapshot.players[0].y == 15
+
+            screen._last_key_at[1] = time.monotonic() - 1
+            for _ in range(2):
+                screen._on_tick()
+
+            assert screen._game.snapshot.players[0].y == 15
+
+    asyncio.run(scenario())
+
+
+def test_pong_pause_clears_held_paddle_direction(tmp_path: Path) -> None:
+    async def scenario() -> None:
+        app = make_app(tmp_path)
+        async with app.run_test(size=(100, 30)) as pilot:
+            await pilot.pause()
+            screen = await push_pong(app, pilot)
+            screen._timer.stop()
+            screen._game._serve_countdown = 0
+
+            await pilot.press("up")
+            await pilot.pause()
+            assert screen._game.snapshot.players[0].y == 15
+
+            await pilot.press("escape")
+            await pilot.press("escape")
+            await pilot.pause()
+            for _ in range(2):
+                screen._on_tick()
+
+            assert screen._game.snapshot.players[0].y == 15
 
     asyncio.run(scenario())

@@ -16,6 +16,7 @@ from asciicade.persistence import (
     database_path,
 )
 from asciicade.ui.context import AppContext
+from asciicade.ui.keyboard import AsciicadeLinuxDriver
 from asciicade.ui.screens.confirm_quit import ConfirmQuitScreen
 from asciicade.ui.screens.main_menu import MainMenuScreen
 
@@ -47,7 +48,7 @@ class AsciicadeApp(App[None]):
             results: Optional result repository (used by tests).
             settings: Optional settings repository (used by tests).
         """
-        super().__init__()
+        super().__init__(driver_class=AsciicadeLinuxDriver)
         self._data_dir = data_dir
         self._database = database
         self._players = players

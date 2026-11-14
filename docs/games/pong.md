@@ -41,6 +41,10 @@ paddle, use the paddle edges to aim, and be first to reach the score limit.
 In single-player mode the human can use either the arrow keys or WASD. In
 two-player mode the arrow keys belong to Player 1 and W/S to Player 2.
 
+Hold-to-move uses Kitty keyboard release events when the terminal supports them.
+Terminals without release reporting use a short fallback timeout before the
+paddle stops.
+
 ## Physics and rendering
 
 - The ball reflects based on where it hits the paddle. A center hit produces a
