@@ -113,7 +113,8 @@ def test_play_navigates_to_snake_game(tmp_path: Path) -> None:
             await pilot.press("enter")
             assert isinstance(app.screen, GameSelectScreen)
 
-            # Pong sorts before Snake; move down to select Snake.
+            # Blockfall and Pong sort before Snake; move down twice to select Snake.
+            await pilot.press("down")
             await pilot.press("down")
             await pilot.press("enter")
             assert isinstance(app.screen, GameMenuScreen)
@@ -274,6 +275,7 @@ def test_snake_uses_player_color(tmp_path: Path) -> None:
             await pilot.press("enter")
             assert isinstance(app.screen, GameSelectScreen)
 
+            await pilot.press("down")
             await pilot.press("down")
             await pilot.press("enter")
             assert isinstance(app.screen, GameMenuScreen)
@@ -448,6 +450,7 @@ def test_create_player_dialog_creates_profile_and_starts(tmp_path: Path) -> None
             assert isinstance(app.screen, GameSelectScreen)
 
             await pilot.press("down")
+            await pilot.press("down")
             await pilot.press("enter")
             assert isinstance(app.screen, GameMenuScreen)
 
@@ -523,6 +526,7 @@ def test_two_player_flow_selects_two_profiles(tmp_path: Path) -> None:
             await pilot.press("enter")
             assert isinstance(app.screen, GameSelectScreen)
 
+            await pilot.press("down")
             await pilot.press("down")
             await pilot.press("enter")
             assert isinstance(app.screen, GameMenuScreen)

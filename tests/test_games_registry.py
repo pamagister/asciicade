@@ -4,8 +4,21 @@ from __future__ import annotations
 
 from asciicade.core.game import GameMode
 from asciicade.games import build_default_registry
+from asciicade.games.blockfall import BlockfallGame
 from asciicade.games.pong import PongGame
 from asciicade.games.snake import SnakeGame
+
+
+def test_default_registry_contains_blockfall() -> None:
+    registry = build_default_registry()
+
+    registration = registry.get("blockfall")
+
+    assert registration.metadata.name == "Blockfall"
+    assert registration.modes == (
+        GameMode.SINGLE_PLAYER,
+        GameMode.MULTIPLAYER,
+    )
 
 
 def test_default_registry_contains_snake() -> None:
@@ -32,6 +45,16 @@ def test_default_registry_contains_pong() -> None:
     )
 
 
+def test_registered_factory_creates_blockfall_game() -> None:
+    registry = build_default_registry()
+
+    game = registry.get("blockfall").factory()
+
+    assert isinstance(game, BlockfallGame)
+    assert game.metadata.identifier == "blockfall"
+    assert not game.is_finished
+
+
 def test_registered_factory_creates_snake_game() -> None:
     registry = build_default_registry()
 
@@ -52,11 +75,11 @@ def test_registered_factory_creates_pong_game() -> None:
     assert not game.is_finished
 
 
-def test_default_registry_contains_both_builtin_games() -> None:
+def test_default_registry_contains_all_builtin_games() -> None:
     registry = build_default_registry()
 
-    assert len(registry) == 2
-    assert registry.identifiers() == ("pong", "snake")
+    assert len(registry) == 3
+    assert registry.identifiers() == ("blockfall", "pong", "snake")
 
 
 def test_builtin_games_expose_the_tick_contract() -> None:
