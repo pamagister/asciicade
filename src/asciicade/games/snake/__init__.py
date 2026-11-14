@@ -6,6 +6,7 @@ from asciicade.games.snake.engine import SnakeEngine
 from asciicade.games.snake.game import SNAKE_INSTRUCTIONS, SnakeGame
 from asciicade.games.snake.models import (
     Arena,
+    FoodView,
     Position,
     Snake,
     SnakeConfig,
@@ -22,6 +23,7 @@ from asciicade.games.snake.rules import (
 __all__ = [
     "SNAKE_INSTRUCTIONS",
     "Arena",
+    "FoodView",
     "Position",
     "Snake",
     "SnakeConfig",

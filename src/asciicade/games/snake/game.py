@@ -21,7 +21,11 @@ Single player:
 Two players:
 - Player 1 uses the arrow keys.
 - Player 2 uses W, A, S and D.
-- Both snakes share the arena and the same food.
+- Both snakes share the arena.
+- By default each player has their own food in their own color and can only eat
+  that food.
+- Set "Food per player" to off for the classic shared food that either snake can
+  eat.
 - Hitting a wall, yourself or the other snake eliminates you.
 - The last surviving snake wins. If both crash on the same tick, it is a draw.
 
@@ -43,6 +47,11 @@ SNAKE_OPTIONS = GameOptionRegistry(
             key="wrap_walls",
             label="Wrap walls",
             default=False,
+        ),
+        BooleanOptionDefinition(
+            key="food_per_player",
+            label="Food per player",
+            default=True,
         ),
     )
 )

@@ -48,6 +48,16 @@ def place_body(
     snake.alive = True
 
 
+def set_food(engine: SnakeGame, position: Position, *, player_index: int = 1) -> None:
+    """Replace the food with a single item for one owner."""
+    engine._foods = {player_index: position}
+
+
+def food_positions(engine: SnakeGame) -> dict[int, Position]:
+    """Return the current food position per owner."""
+    return {food.player_index: food.position for food in engine.snapshot.foods}
+
+
 def test_single_player_initial_state() -> None:
     engine = make_engine()
     snapshot = engine.snapshot
@@ -61,13 +71,14 @@ def test_single_player_initial_state() -> None:
         Position(5, 7),
     )
     assert snapshot.snakes[0].direction is Direction.RIGHT
-    assert snapshot.food is not None
-    assert snapshot.food not in occupied_cells(engine._snakes)
+    foods = food_positions(engine)
+    assert set(foods) == {1}
+    assert foods[1] not in occupied_cells(engine._snakes)
 
 
 def test_tick_moves_and_drops_tail() -> None:
     engine = make_engine()
-    engine._food = Position(0, 0)
+    set_food(engine, Position(0, 0))
 
     engine.tick()
 
@@ -81,7 +92,7 @@ def test_tick_moves_and_drops_tail() -> None:
 
 def test_eating_grows_and_scores() -> None:
     engine = make_engine()
-    engine._food = Position(8, 7)
+    set_food(engine, Position(8, 7))
 
     engine.tick()
 
@@ -93,13 +104,14 @@ def test_eating_grows_and_scores() -> None:
         Position(5, 7),
     )
     assert snake.score == 1
-    assert engine.snapshot.food is not None
-    assert engine.snapshot.food not in occupied_cells(engine._snakes)
+    foods = food_positions(engine)
+    assert set(foods) == {1}
+    assert foods[1] not in occupied_cells(engine._snakes)
 
 
 def test_wall_collision_ends_single_player_game() -> None:
     engine = make_engine()
-    engine._food = Position(0, 0)
+    set_food(engine, Position(0, 0))
 
     for _ in range(30):
         engine.tick()
@@ -115,7 +127,7 @@ def test_wall_collision_ends_single_player_game() -> None:
 
 def test_self_collision_ends_game() -> None:
     engine = make_engine(config=SnakeConfig(initial_length=5))
-    engine._food = Position(0, 0)
+    set_food(engine, Position(0, 0))
 
     engine.handle_input(InputEvent(InputAction.UP, player=1))
     engine.tick()
@@ -131,7 +143,7 @@ def test_self_collision_ends_game() -> None:
 
 def test_reverse_direction_is_rejected() -> None:
     engine = make_engine()
-    engine._food = Position(0, 0)
+    set_food(engine, Position(0, 0))
 
     engine.handle_input(InputEvent(InputAction.LEFT, player=1))
     engine.tick()
@@ -142,7 +154,7 @@ def test_reverse_direction_is_rejected() -> None:
 
 def test_direction_buffer_applies_one_per_tick() -> None:
     engine = make_engine()
-    engine._food = Position(0, 0)
+    set_food(engine, Position(0, 0))
 
     engine.handle_input(InputEvent(InputAction.UP, player=1))
     engine.handle_input(InputEvent(InputAction.LEFT, player=1))
@@ -158,7 +170,7 @@ def test_direction_buffer_applies_one_per_tick() -> None:
 
 def test_tail_chase_is_allowed() -> None:
     engine = make_engine()
-    engine._food = Position(0, 0)
+    set_food(engine, Position(0, 0))
     place_body(
         engine,
         0,
@@ -180,19 +192,27 @@ def test_tail_chase_is_allowed() -> None:
 
 def test_food_never_spawns_on_a_snake() -> None:
     engine = make_engine()
-    engine._food = Position(8, 7)
+    set_food(engine, Position(8, 7))
 
     engine.tick()
 
-    assert engine.snapshot.food is not None
-    assert engine.snapshot.food not in occupied_cells(engine._snakes)
+    foods = food_positions(engine)
+    assert set(foods) == {1}
+    assert foods[1] not in occupied_cells(engine._snakes)
 
 
 def test_same_seed_produces_same_food() -> None:
     first = make_engine(seed=99)
     second = make_engine(seed=99)
 
-    assert first.snapshot.food == second.snapshot.food
+    assert first.snapshot.foods == second.snapshot.foods
+
+
+def test_food_per_player_is_on_by_default() -> None:
+    defaults = SnakeGame.metadata.options.defaults()
+
+    assert defaults is not None
+    assert defaults.value_for("food_per_player") == "on"
 
 
 def test_multiplayer_initial_state_has_two_snakes() -> None:
@@ -208,6 +228,81 @@ def test_multiplayer_initial_state_has_two_snakes() -> None:
     assert snapshot.snakes[0].direction is Direction.RIGHT
     assert snapshot.snakes[1].direction is Direction.LEFT
     assert snapshot.snakes[0].body[0] != snapshot.snakes[1].body[0]
+    assert set(food_positions(engine)) == {1, 2}
+
+
+def test_multiplayer_each_player_eats_only_their_own_food() -> None:
+    engine = make_engine(
+        GameMode.MULTIPLAYER,
+        players=(GuestPlayer(1), GuestPlayer(2)),
+        options=GameOptions(
+            (("difficulty", "Medium"), ("wrap_walls", "off"), ("food_per_player", "on"))
+        ),
+    )
+    first_head = engine.snapshot.snakes[0].body[0]
+    second_head = engine.snapshot.snakes[1].body[0]
+    engine._foods = {
+        1: first_head.step(Direction.RIGHT),
+        2: second_head.step(Direction.LEFT),
+    }
+
+    engine.tick()
+
+    scores = tuple(snake.score for snake in engine.snapshot.snakes)
+    assert scores == (1, 1)
+    foods = food_positions(engine)
+    assert set(foods) == {1, 2}
+    assert all(position not in occupied_cells(engine._snakes) for position in foods.values())
+
+
+def test_multiplayer_cannot_eat_other_players_food() -> None:
+    engine = make_engine(
+        GameMode.MULTIPLAYER,
+        players=(GuestPlayer(1), GuestPlayer(2)),
+        options=GameOptions(
+            (("difficulty", "Medium"), ("wrap_walls", "off"), ("food_per_player", "on"))
+        ),
+    )
+    first_head = engine.snapshot.snakes[0].body[0]
+    other_food = first_head.step(Direction.RIGHT)
+    engine._foods = {1: Position(0, 0), 2: other_food}
+
+    engine.tick()
+
+    assert engine.snapshot.snakes[0].score == 0
+    assert food_positions(engine)[2] == other_food
+
+
+def test_multiplayer_shared_food_can_be_eaten_by_either_player() -> None:
+    engine = make_engine(
+        GameMode.MULTIPLAYER,
+        players=(GuestPlayer(1), GuestPlayer(2)),
+        options=GameOptions(
+            (("difficulty", "Medium"), ("wrap_walls", "off"), ("food_per_player", "off"))
+        ),
+    )
+    first_head = engine.snapshot.snakes[0].body[0]
+    engine._foods = {0: first_head.step(Direction.RIGHT)}
+
+    assert set(food_positions(engine)) == {0}
+
+    engine.tick()
+
+    assert engine.snapshot.snakes[0].score == 1
+    assert set(food_positions(engine)) == {0}
+
+
+def test_multiplayer_foods_never_overlap_snakes_or_each_other() -> None:
+    engine = make_engine(
+        GameMode.MULTIPLAYER,
+        players=(GuestPlayer(1), GuestPlayer(2)),
+    )
+
+    foods = food_positions(engine)
+    snake_cells = occupied_cells(engine._snakes)
+    assert len(foods) == 2
+    assert len(set(foods.values())) == 2
+    assert all(position not in snake_cells for position in foods.values())
 
 
 def test_multiplayer_last_survivor_wins() -> None:
@@ -215,7 +310,7 @@ def test_multiplayer_last_survivor_wins() -> None:
         GameMode.MULTIPLAYER,
         players=(GuestPlayer(1), GuestPlayer(2)),
     )
-    engine._food = Position(0, 0)
+    set_food(engine, Position(0, 0))
     place_body(engine, 1, (Position(0, 9),), Direction.LEFT)
 
     engine.tick()
@@ -233,7 +328,7 @@ def test_multiplayer_head_on_collision_is_a_draw() -> None:
         GameMode.MULTIPLAYER,
         players=(GuestPlayer(1), GuestPlayer(2)),
     )
-    engine._food = Position(0, 0)
+    set_food(engine, Position(0, 0))
     place_body(engine, 0, (Position(5, 5),), Direction.RIGHT)
     place_body(engine, 1, (Position(7, 5),), Direction.LEFT)
 
@@ -252,7 +347,7 @@ def test_multiplayer_collision_with_other_snake_body_eliminates_player() -> None
         GameMode.MULTIPLAYER,
         players=(GuestPlayer(1), GuestPlayer(2)),
     )
-    engine._food = Position(0, 0)
+    set_food(engine, Position(0, 0))
     place_body(engine, 0, (Position(5, 5),), Direction.RIGHT)
     place_body(
         engine,
@@ -281,7 +376,7 @@ def test_multiplayer_may_follow_other_snakes_vacating_tail() -> None:
         GameMode.MULTIPLAYER,
         players=(GuestPlayer(1), GuestPlayer(2)),
     )
-    engine._food = Position(0, 0)
+    set_food(engine, Position(0, 0))
     place_body(engine, 0, (Position(5, 5),), Direction.RIGHT)
     place_body(
         engine,
@@ -308,7 +403,7 @@ def test_profile_players_are_reflected_in_result() -> None:
     engine = SnakeGame(SnakeConfig(), random.Random(7))
     paul = PlayerProfile.create("Paul")
     engine.start(GameMode.SINGLE_PLAYER, (paul,))
-    engine._food = Position(0, 0)
+    set_food(engine, Position(0, 0))
 
     for _ in range(30):
         engine.tick()
@@ -341,9 +436,21 @@ def test_config_validates_dimensions_and_length() -> None:
 
 def test_difficulty_sets_tick_rate() -> None:
     """Difficulty options change the engine tick rate."""
-    easy = make_engine(options=GameOptions((("difficulty", "Easy"), ("wrap_walls", "off"))))
-    medium = make_engine(options=GameOptions((("difficulty", "Medium"), ("wrap_walls", "off"))))
-    hard = make_engine(options=GameOptions((("difficulty", "Hard"), ("wrap_walls", "off"))))
+    easy = make_engine(
+        options=GameOptions(
+            (("difficulty", "Easy"), ("wrap_walls", "off"), ("food_per_player", "off"))
+        )
+    )
+    medium = make_engine(
+        options=GameOptions(
+            (("difficulty", "Medium"), ("wrap_walls", "off"), ("food_per_player", "off"))
+        )
+    )
+    hard = make_engine(
+        options=GameOptions(
+            (("difficulty", "Hard"), ("wrap_walls", "off"), ("food_per_player", "off"))
+        )
+    )
 
     assert easy.config.tick_rate == 5.0
     assert medium.config.tick_rate == 8.0
@@ -358,7 +465,11 @@ def test_difficulty_defaults_to_medium() -> None:
 
 def test_wrap_walls_snake_reappears_on_opposite_side() -> None:
     """With wrap walls enabled, the snake leaves one side and re-enters on the other."""
-    engine = make_engine(options=GameOptions((("difficulty", "Medium"), ("wrap_walls", "on"))))
+    engine = make_engine(
+        options=GameOptions(
+            (("difficulty", "Medium"), ("wrap_walls", "on"), ("food_per_player", "off"))
+        )
+    )
     assert engine.config.wrap_walls is True
 
     # Move the head to the left wall and head leftwards.
@@ -376,7 +487,11 @@ def test_wrap_walls_snake_reappears_on_opposite_side() -> None:
 
 def test_wrap_walls_off_snake_crashes_into_wall() -> None:
     """With wrap walls disabled, leaving the arena ends the game."""
-    engine = make_engine(options=GameOptions((("difficulty", "Medium"), ("wrap_walls", "off"))))
+    engine = make_engine(
+        options=GameOptions(
+            (("difficulty", "Medium"), ("wrap_walls", "off"), ("food_per_player", "off"))
+        )
+    )
     assert engine.config.wrap_walls is False
 
     snake = engine._snakes[0]

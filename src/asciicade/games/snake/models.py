@@ -96,13 +96,25 @@ class SnakeView:
 
 
 @dataclass(frozen=True, slots=True)
+class FoodView:
+    """An immutable snapshot of one food item for rendering.
+
+    ``player_index`` is the one-based player who owns the food, or ``0`` for a
+    shared neutral food.
+    """
+
+    player_index: int
+    position: Position
+
+
+@dataclass(frozen=True, slots=True)
 class SnakeSnapshot:
     """An immutable snapshot of the complete game state."""
 
     width: int
     height: int
     snakes: tuple[SnakeView, ...]
-    food: Position | None
+    foods: tuple[FoodView, ...]
     finished: bool
     winner_index: int | None
     is_draw: bool

@@ -255,7 +255,7 @@ def test_arena_cells_are_two_characters_wide(tmp_path: Path) -> None:
             assert "11" not in rendered
             assert "22" not in rendered
             assert "██" in rendered
-            assert "**" in rendered
+            assert "◖◗" in rendered
 
     asyncio.run(scenario())
 
@@ -658,6 +658,7 @@ def test_game_menu_lists_play_instructions_and_options(tmp_path: Path) -> None:
                 "--- Options ---",
                 "Difficulty: Medium",
                 "Wrap walls: Off",
+                "Food per player: On",
             ]
             assert option_list.highlighted == 0
 
@@ -674,6 +675,9 @@ def test_game_menu_lists_play_instructions_and_options(tmp_path: Path) -> None:
 
             await pilot.press("down")
             assert option_list.highlighted == 4  # Wrap walls
+
+            await pilot.press("down")
+            assert option_list.highlighted == 5  # Food per player
 
             await pilot.press("down")
             assert option_list.highlighted == 0  # Wraps to Play

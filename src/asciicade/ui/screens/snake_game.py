@@ -36,6 +36,9 @@ _DIRECTION_ACTIONS = {
 # logical cell as two horizontal characters keeps the playfield visually square.
 _CELL_WIDTH = 2
 
+# A food ball made of the left and right halves of a filled circle.
+_FOOD_GLYPH = "◖◗"
+
 
 class SnakeGameScreen(Screen[None]):
     """Render and drive a Snake session."""
@@ -224,13 +227,19 @@ class SnakeGameScreen(Screen[None]):
         text.append("\n")
 
         cells: dict[Position, tuple[str, str]] = {}
+        for food in snapshot.foods:
+            if food.player_index == 0:
+                # Shared food is neutral so neither player owns it.
+                style = "bold white"
+            else:
+                player = self._players[food.player_index - 1]
+                style = f"bold {player_color(player).value}"
+            cells[food.position] = (_FOOD_GLYPH, style)
         for player, snake in zip(self._players, snapshot.snakes):
             color = player_color(player).value
             for index, position in enumerate(snake.body):
                 style = f"bold {color}" if index == 0 else color
                 cells[position] = ("█" * _CELL_WIDTH, style)
-        if snapshot.food is not None:
-            cells[snapshot.food] = ("*" * _CELL_WIDTH, "bold yellow")
 
         wall = "█" * _CELL_WIDTH
         border = wall * (snapshot.width + 2)

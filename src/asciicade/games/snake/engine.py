@@ -17,6 +17,7 @@ from asciicade.core.results import (
 )
 from asciicade.games.snake.models import (
     Arena,
+    FoodView,
     Position,
     Snake,
     SnakeConfig,
@@ -64,7 +65,8 @@ class SnakeEngine:
         self._players: tuple[Player, ...] = ()
         self._mode = GameMode.SINGLE_PLAYER
         self._snakes: list[Snake] = []
-        self._food: Position | None = None
+        self._foods: dict[int, Position] = {}
+        self._separate_food = True
         self._finished = False
         self._winner_index: int | None = None
         self._is_draw = False
@@ -100,7 +102,10 @@ class SnakeEngine:
                 )
                 for snake in self._snakes
             ),
-            food=self._food,
+            foods=tuple(
+                FoodView(player_index, position)
+                for player_index, position in sorted(self._foods.items())
+            ),
             finished=self._finished,
             winner_index=self._winner_index,
             is_draw=self._is_draw,
@@ -163,6 +168,9 @@ class SnakeEngine:
         resolved_options = options or SnakeGameOptions.defaults()
         self._mode = mode
         self._players = tuple(players)
+        self._separate_food = (
+            resolved_options.value_for(SnakeGameOptions.FOOD_PER_PLAYER_KEY) == "on"
+        )
         self.config = SnakeConfig(
             width=self.config.width,
             height=self.config.height,
@@ -174,9 +182,8 @@ class SnakeEngine:
         self._finished = False
         self._winner_index = None
         self._is_draw = False
-        self._food = spawn_food(self.arena, occupied_cells(self._snakes), self._rng)
-        if self._food is None:
-            self._finish_board_full()
+        self._foods = {}
+        self._spawn_initial_food()
 
     def handle_input(self, event: InputEvent) -> None:
         """Buffer a direction request for one player.
@@ -216,7 +223,8 @@ class SnakeEngine:
                 continue
             head = snake.head.step(snake.direction)
             new_heads[index] = self._wrap_position(head)
-            growing[index] = self._food is not None and new_heads[index] == self._food
+            food = self._food_position(snake.player_index)
+            growing[index] = food is not None and new_heads[index] == food
 
         dead: set[int] = set()
 
@@ -267,12 +275,61 @@ class SnakeEngine:
                 snake.body = (head, *snake.body[:-1])
 
         if ate:
-            self._food = spawn_food(self.arena, occupied_cells(self._snakes), self._rng)
-            if self._food is None:
+            for index, snake in enumerate(self._snakes):
+                if not snake.alive or not growing.get(index, False):
+                    continue
+                owner = self._food_owner(snake.player_index)
+                if not self._spawn_food_for(owner):
+                    self._foods.pop(owner, None)
+                    self._finish_board_full()
+                    return
+
+        self._resolve_end_condition()
+
+    def _food_owner(self, player_index: int) -> int:
+        """Return the food owner for a snake.
+
+        Player-owned food uses the one-based player index. Shared food uses the
+        neutral owner index ``0``.
+        """
+        if self._mode is GameMode.SINGLE_PLAYER:
+            return 1
+        if self._separate_food:
+            return player_index
+        return 0
+
+    def _food_position(self, player_index: int) -> Position | None:
+        """Return the food position a snake can eat, if any."""
+        return self._foods.get(self._food_owner(player_index))
+
+    def _spawn_initial_food(self) -> None:
+        """Place the initial food items for the current mode."""
+        if self._mode is GameMode.SINGLE_PLAYER:
+            owners: tuple[int, ...] = (1,)
+        elif self._separate_food:
+            owners = tuple(snake.player_index for snake in self._snakes)
+        else:
+            owners = (0,)
+
+        for owner in owners:
+            if not self._spawn_food_for(owner):
                 self._finish_board_full()
                 return
 
-        self._resolve_end_condition()
+    def _spawn_food_for(self, owner_index: int) -> bool:
+        """Place or replace food for one owner.
+
+        Returns:
+            ``True`` when a free cell was found, ``False`` when the board is
+            full.
+        """
+        occupied = occupied_cells(self._snakes)
+        occupied.update(position for index, position in self._foods.items() if index != owner_index)
+        position = spawn_food(self.arena, occupied, self._rng)
+        if position is None:
+            return False
+        self._foods[owner_index] = position
+        return True
 
     def _wrap_position(self, position: Position) -> Position:
         """Wrap a position onto the opposite side when wrap walls are enabled."""
@@ -346,6 +403,7 @@ class SnakeGameOptions:
 
     DIFFICULTY_KEY = "difficulty"
     WRAP_WALLS_KEY = "wrap_walls"
+    FOOD_PER_PLAYER_KEY = "food_per_player"
 
     @staticmethod
     def defaults() -> GameOptions:
@@ -354,5 +412,6 @@ class SnakeGameOptions:
             (
                 (SnakeGameOptions.DIFFICULTY_KEY, "Medium"),
                 (SnakeGameOptions.WRAP_WALLS_KEY, "off"),
+                (SnakeGameOptions.FOOD_PER_PLAYER_KEY, "on"),
             )
         )
