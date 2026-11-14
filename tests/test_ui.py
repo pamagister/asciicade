@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 from pathlib import Path
 
+import pytest
 from textual.widgets import DataTable, Input, OptionList, Static
 
 from asciicade.core.game import GameMode
@@ -32,6 +33,12 @@ from asciicade.ui.screens.main_menu import MainMenuScreen
 from asciicade.ui.screens.match_history import MatchHistoryScreen
 from asciicade.ui.screens.player_select import PlayerSelectScreen
 from asciicade.ui.screens.snake_game import SnakeGameScreen
+
+
+@pytest.fixture(autouse=True)
+def _skip_expensive_display_update(monkeypatch) -> None:
+    """Keep gameplay-state tests fast; rendering is covered where asserted."""
+    monkeypatch.setattr(SnakeGameScreen, "_update_display", lambda self: None)
 
 
 def make_app(tmp_path: Path) -> AsciicadeApp:
@@ -100,23 +107,19 @@ def test_play_navigates_to_snake_game(tmp_path: Path) -> None:
         async with app.run_test(size=(100, 30)) as pilot:
             await pilot.pause()
             await pilot.press("enter")
-            await pilot.pause()
             assert isinstance(app.screen, PlayerSelectScreen)
 
             # No profiles exist, so the guest option is highlighted and starts immediately.
             await pilot.press("enter")
-            await pilot.pause()
             assert isinstance(app.screen, GameSelectScreen)
 
             # Pong sorts before Snake; move down to select Snake.
             await pilot.press("down")
             await pilot.press("enter")
-            await pilot.pause()
             assert isinstance(app.screen, GameMenuScreen)
 
             # Press Play to start the game.
             await pilot.press("enter")
-            await pilot.pause()
 
             assert isinstance(app.screen, SnakeGameScreen)
 
@@ -129,11 +132,9 @@ def test_global_back_returns_to_main_menu(tmp_path: Path) -> None:
         async with app.run_test(size=(100, 30)) as pilot:
             await pilot.pause()
             await pilot.press("enter")
-            await pilot.pause()
             assert isinstance(app.screen, PlayerSelectScreen)
 
             await pilot.press("escape")
-            await pilot.pause()
             assert isinstance(app.screen, MainMenuScreen)
 
     asyncio.run(scenario())
@@ -145,11 +146,9 @@ def test_right_confirms_and_left_goes_back(tmp_path: Path) -> None:
         async with app.run_test(size=(100, 30)) as pilot:
             await pilot.pause()
             await pilot.press("right")
-            await pilot.pause()
             assert isinstance(app.screen, PlayerSelectScreen)
 
             await pilot.press("left")
-            await pilot.pause()
             assert isinstance(app.screen, MainMenuScreen)
 
     asyncio.run(scenario())
@@ -177,14 +176,12 @@ def test_snake_screen_renders_and_handles_input(tmp_path: Path) -> None:
             assert "SNAKE" in str(screen.render_arena())
 
             await pilot.press("up")
-            await pilot.pause()
             head_before = screen._game.snapshot.snakes[0].body[0]
             screen._on_tick()
             assert screen._game.snapshot.snakes[0].direction is Direction.UP
             assert screen._game.snapshot.snakes[0].body[0] == head_before.step(Direction.UP)
 
             await pilot.press("escape")
-            await pilot.pause()
             assert screen._paused
             head_paused = screen._game.snapshot.snakes[0].body[0]
             screen._on_tick()
@@ -220,7 +217,6 @@ def test_snake_screen_supports_two_players(tmp_path: Path) -> None:
             assert "▓" not in text
 
             await pilot.press("w")
-            await pilot.pause()
             screen._on_tick()
             assert screen._game.snapshot.snakes[1].direction is Direction.UP
 
@@ -276,16 +272,13 @@ def test_snake_uses_player_color(tmp_path: Path) -> None:
             assert app.screen.query_one(OptionList).highlighted == 3
 
             await pilot.press("enter")
-            await pilot.pause()
             assert isinstance(app.screen, GameSelectScreen)
 
             await pilot.press("down")
             await pilot.press("enter")
-            await pilot.pause()
             assert isinstance(app.screen, GameMenuScreen)
 
             await pilot.press("enter")
-            await pilot.pause()
             assert isinstance(app.screen, SnakeGameScreen)
             screen = app.screen
             screen._timer.stop()
@@ -330,7 +323,6 @@ def test_game_over_records_result_and_restarts(tmp_path: Path) -> None:
             assert len(app.context.results.match_history("snake", mode=None)) == 1
 
             await pilot.press("enter")
-            await pilot.pause()
             assert isinstance(app.screen, SnakeGameScreen)
 
     asyncio.run(scenario())
@@ -448,22 +440,18 @@ def test_create_player_dialog_creates_profile_and_starts(tmp_path: Path) -> None
 
             await pilot.press("down")
             await pilot.press("enter")
-            await pilot.pause()
             assert isinstance(app.screen, CreatePlayerScreen)
 
             app.screen.query_one(Input).value = "Paul"
             app.screen._color = PlayerColor.BLUE
             await pilot.press("enter")
-            await pilot.pause()
             assert isinstance(app.screen, GameSelectScreen)
 
             await pilot.press("down")
             await pilot.press("enter")
-            await pilot.pause()
             assert isinstance(app.screen, GameMenuScreen)
 
             await pilot.press("enter")
-            await pilot.pause()
             assert isinstance(app.screen, SnakeGameScreen)
             profiles = app.context.players.list()
             assert [profile.name for profile in profiles] == ["Paul"]
@@ -483,13 +471,11 @@ def test_edit_profile_changes_name_and_color(tmp_path: Path) -> None:
             await pilot.pause()
 
             await pilot.press("e")
-            await pilot.pause()
             assert isinstance(app.screen, CreatePlayerScreen)
 
             app.screen.query_one(Input).value = "Paula"
             app.screen._color = PlayerColor.MAGENTA
             await pilot.press("enter")
-            await pilot.pause()
 
             assert isinstance(app.screen, PlayerSelectScreen)
             profiles = app.context.players.list()
@@ -511,11 +497,9 @@ def test_edit_player_menu_option(tmp_path: Path) -> None:
             # Default highlight is the profile; move up to Edit player.
             await pilot.press("up")
             await pilot.press("enter")
-            await pilot.pause()
             assert isinstance(app.screen, EditPlayerPickerScreen)
 
             await pilot.press("enter")
-            await pilot.pause()
             assert isinstance(app.screen, CreatePlayerScreen)
 
     asyncio.run(scenario())
@@ -533,21 +517,17 @@ def test_two_player_flow_selects_two_profiles(tmp_path: Path) -> None:
 
             # Newest profile is first; select Ada, then Paul.
             await pilot.press("enter")
-            await pilot.pause()
             assert isinstance(app.screen, PlayerSelectScreen)
             assert [player.name for player in app.screen._selected] == ["Ada"]
 
             await pilot.press("enter")
-            await pilot.pause()
             assert isinstance(app.screen, GameSelectScreen)
 
             await pilot.press("down")
             await pilot.press("enter")
-            await pilot.pause()
             assert isinstance(app.screen, GameMenuScreen)
 
             await pilot.press("enter")
-            await pilot.pause()
             assert isinstance(app.screen, SnakeGameScreen)
             assert {player.id for player in app.screen._players} == {paul.id, ada.id}
             session = app.context.settings.get_last_session()
@@ -566,11 +546,9 @@ def test_main_menu_high_scores_navigation(tmp_path: Path) -> None:
             await pilot.press("down")
             await pilot.press("down")
             await pilot.press("enter")
-            await pilot.pause()
             assert isinstance(app.screen, GameSelectScreen)
 
             await pilot.press("enter")
-            await pilot.pause()
             assert isinstance(app.screen, LeaderboardScreen)
 
     asyncio.run(scenario())
@@ -585,11 +563,9 @@ def test_main_menu_match_history_navigation(tmp_path: Path) -> None:
             await pilot.press("down")
             await pilot.press("down")
             await pilot.press("enter")
-            await pilot.pause()
             assert isinstance(app.screen, GameSelectScreen)
 
             await pilot.press("enter")
-            await pilot.pause()
             assert isinstance(app.screen, MatchHistoryScreen)
 
     asyncio.run(scenario())
@@ -605,11 +581,9 @@ def test_main_menu_instructions_navigation(tmp_path: Path) -> None:
             await pilot.press("down")
             await pilot.press("down")
             await pilot.press("enter")
-            await pilot.pause()
             assert isinstance(app.screen, GameSelectScreen)
 
             await pilot.press("enter")
-            await pilot.pause()
             assert isinstance(app.screen, InstructionsScreen)
 
     asyncio.run(scenario())
@@ -624,11 +598,9 @@ def test_typing_q_in_player_name_does_not_quit(tmp_path: Path) -> None:
             await pilot.pause()
             await pilot.press("down")
             await pilot.press("enter")
-            await pilot.pause()
             assert isinstance(app.screen, CreatePlayerScreen)
 
             await pilot.press("q")
-            await pilot.pause()
 
             assert isinstance(app.screen, CreatePlayerScreen)
             assert app.screen.query_one(Input).value == "q"
@@ -657,7 +629,6 @@ def test_confirm_quit_can_be_cancelled(tmp_path: Path) -> None:
             assert isinstance(app.screen, ConfirmQuitScreen)
 
             await pilot.press("escape")
-            await pilot.pause()
             assert isinstance(app.screen, MainMenuScreen)
 
     asyncio.run(scenario())
@@ -696,19 +667,15 @@ def test_game_menu_lists_play_instructions_and_options(tmp_path: Path) -> None:
             assert separator.disabled
 
             await pilot.press("down")
-            await pilot.pause()
             assert option_list.highlighted == 1  # Instructions
 
             await pilot.press("down")
-            await pilot.pause()
             assert option_list.highlighted == 3  # Difficulty (separator skipped)
 
             await pilot.press("down")
-            await pilot.pause()
             assert option_list.highlighted == 4  # Wrap walls
 
             await pilot.press("down")
-            await pilot.pause()
             assert option_list.highlighted == 0  # Wraps to Play
 
 
@@ -734,7 +701,6 @@ def test_game_menu_space_toggles_boolean_option(tmp_path: Path) -> None:
             option_list.focus()
             await pilot.pause()
             await pilot.press("space")
-            await pilot.pause()
 
             # The cursor stays on the edited option instead of jumping back to Play.
             assert option_list.highlighted == 4
@@ -744,7 +710,6 @@ def test_game_menu_space_toggles_boolean_option(tmp_path: Path) -> None:
 
             # Toggle it off again.
             await pilot.press("space")
-            await pilot.pause()
             prompts = [str(option.prompt) for option in option_list.options]
             assert "Wrap walls: Off" in prompts
             assert app.screen._options.value_for("wrap_walls") == "off"
@@ -773,13 +738,11 @@ def test_game_menu_left_right_change_choice_option(tmp_path: Path) -> None:
             await pilot.pause()
 
             await pilot.press("right")
-            await pilot.pause()
             prompts = [str(option.prompt) for option in option_list.options]
             assert "Difficulty: Hard" in prompts
             assert app.screen._options.value_for("difficulty") == "Hard"
 
             await pilot.press("left")
-            await pilot.pause()
             prompts = [str(option.prompt) for option in option_list.options]
             assert "Difficulty: Medium" in prompts
             assert app.screen._options.value_for("difficulty") == "Medium"
@@ -807,12 +770,10 @@ def test_game_menu_enter_cycles_option(tmp_path: Path) -> None:
             await pilot.pause()
 
             await pilot.press("enter")
-            await pilot.pause()
             prompts = [str(option.prompt) for option in option_list.options]
             assert "Wrap walls: On" in prompts
 
             await pilot.press("enter")
-            await pilot.pause()
             prompts = [str(option.prompt) for option in option_list.options]
             assert "Wrap walls: Off" in prompts
 
@@ -839,7 +800,6 @@ def test_game_menu_play_starts_snake_with_options(tmp_path: Path) -> None:
             option_list.focus()
             await pilot.pause()
             await pilot.press("left")
-            await pilot.pause()
             assert app.screen._options.value_for("difficulty") == "Easy"
 
             # Press Play.
@@ -847,7 +807,6 @@ def test_game_menu_play_starts_snake_with_options(tmp_path: Path) -> None:
             option_list.focus()
             await pilot.pause()
             await pilot.press("enter")
-            await pilot.pause()
 
             assert isinstance(app.screen, SnakeGameScreen)
             screen = app.screen

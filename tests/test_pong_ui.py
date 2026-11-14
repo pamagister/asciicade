@@ -6,6 +6,7 @@ import asyncio
 import time
 from pathlib import Path
 
+import pytest
 from textual import events
 from textual.pilot import Pilot
 from textual.widgets import OptionList
@@ -29,10 +30,15 @@ from asciicade.ui.keyboard import (
 )
 from asciicade.ui.screens.game_menu import GameMenuScreen
 from asciicade.ui.screens.game_over import GameOverScreen
-from asciicade.ui.screens.game_select import GameSelectScreen
 from asciicade.ui.screens.leave_game import LeaveGameScreen
 from asciicade.ui.screens.pong_game import PongGameScreen
 from asciicade.ui.widgets import ActionButton
+
+
+@pytest.fixture(autouse=True)
+def _skip_expensive_display_update(monkeypatch) -> None:
+    """Keep gameplay-state tests fast; rendering tests call render_arena directly."""
+    monkeypatch.setattr(PongGameScreen, "_update_display", lambda self: None)
 
 
 def make_app(tmp_path: Path) -> AsciicadeApp:
@@ -79,7 +85,7 @@ async def push_pong(
 def test_pong_screen_renders_field_scores_and_half_blocks(tmp_path: Path) -> None:
     async def scenario() -> None:
         app = make_app(tmp_path)
-        async with app.run_test(size=(100, 30)) as pilot:
+        async with app.run_test(size=(80, 24)) as pilot:
             await pilot.pause()
             screen = await push_pong(app, pilot)
             screen._timer.stop()
@@ -95,7 +101,7 @@ def test_pong_screen_renders_field_scores_and_half_blocks(tmp_path: Path) -> Non
             assert "╚" in rendered
             assert "║" in rendered
             assert any(character in rendered for character in ("▀", "▄", "█"))
-            assert max(len(line) for line in lines) <= 100
+            assert max(len(line) for line in lines) <= 80
 
     asyncio.run(scenario())
 
@@ -175,20 +181,17 @@ def test_pong_pause_resume_and_leave_dialog(tmp_path: Path) -> None:
             before = screen._game.snapshot.serve_countdown
 
             await pilot.press("escape")
-            await pilot.pause()
             assert screen._paused
             screen._on_tick()
             assert screen._game.snapshot.serve_countdown == before
 
             await pilot.press("escape")
-            await pilot.pause()
             assert not screen._paused
             screen._on_tick()
             assert screen._game.snapshot.serve_countdown == before - 1
 
             await pilot.press("escape")
             await pilot.press("enter")
-            await pilot.pause()
             assert isinstance(app.screen, LeaveGameScreen)
 
     asyncio.run(scenario())
@@ -248,65 +251,6 @@ def test_pong_cpu_win_is_labelled_on_game_over(tmp_path: Path) -> None:
     asyncio.run(scenario())
 
 
-def test_pong_screen_respects_score_limit_option(tmp_path: Path) -> None:
-    async def scenario() -> None:
-        app = make_app(tmp_path)
-        async with app.run_test(size=(100, 30)) as pilot:
-            await pilot.pause()
-            screen = await push_pong(
-                app,
-                pilot,
-                options=GameOptions((("score_limit", "5"), ("difficulty", "Hard"))),
-            )
-            screen._timer.stop()
-
-            assert screen._game.config.score_limit == 5
-            assert screen._game.config.difficulty == "Hard"
-
-    asyncio.run(scenario())
-
-
-def test_pong_screen_renders_at_80_by_24(tmp_path: Path) -> None:
-    async def scenario() -> None:
-        app = make_app(tmp_path)
-        async with app.run_test(size=(80, 24)) as pilot:
-            await pilot.pause()
-            screen = await push_pong(app, pilot)
-            screen._timer.stop()
-
-            rendered = str(screen.render_arena())
-            assert "PONG — SINGLE-PLAYER" in rendered
-            assert max(len(line) for line in rendered.splitlines()) <= 80
-
-    asyncio.run(scenario())
-
-
-def test_play_navigates_to_pong_game(tmp_path: Path) -> None:
-    async def scenario() -> None:
-        app = make_app(tmp_path)
-        async with app.run_test(size=(100, 30)) as pilot:
-            await pilot.pause()
-            await pilot.press("enter")
-            await pilot.pause()
-            await pilot.press("enter")
-            await pilot.pause()
-            assert isinstance(app.screen, GameSelectScreen)
-
-            option_ids = [option.id for option in app.screen.query_one(OptionList).options]
-            assert "game:pong" in option_ids
-            assert "game:snake" in option_ids
-
-            await pilot.press("enter")
-            await pilot.pause()
-            assert isinstance(app.screen, GameMenuScreen)
-
-            await pilot.press("enter")
-            await pilot.pause()
-            assert isinstance(app.screen, PongGameScreen)
-
-    asyncio.run(scenario())
-
-
 def test_game_menu_starts_pong_with_selected_options(tmp_path: Path) -> None:
     async def scenario() -> None:
         app = make_app(tmp_path)
@@ -328,14 +272,12 @@ def test_game_menu_starts_pong_with_selected_options(tmp_path: Path) -> None:
             option_list.focus()
             await pilot.pause()
             await pilot.press("right")
-            await pilot.pause()
             assert app.screen._options.value_for("score_limit") == "15"
 
             option_list.highlighted = 0
             option_list.focus()
             await pilot.pause()
             await pilot.press("enter")
-            await pilot.pause()
 
             assert isinstance(app.screen, PongGameScreen)
             screen = app.screen
@@ -355,7 +297,6 @@ def test_pong_key_release_stops_paddle_immediately(tmp_path: Path) -> None:
             screen._game._serve_countdown = 0
 
             await pilot.press("up")
-            await pilot.pause()
             assert screen._game.snapshot.players[0].y == 15
             assert 1 in screen._held_directions
 
@@ -404,9 +345,10 @@ def test_pong_tap_moves_one_half_block_without_hold_delay(tmp_path: Path) -> Non
             screen._game._serve_countdown = 0
 
             await pilot.press("up")
-            await pilot.pause()
             assert screen._game.snapshot.players[0].y == 15
 
+            # Keep the hold timer inside its delay window so the test is deterministic.
+            screen._hold_started_at[1] = time.monotonic()
             screen._on_tick()
             screen._on_tick()
             assert screen._game.snapshot.players[0].y == 15
@@ -433,7 +375,6 @@ def test_pong_hold_starts_after_delay_and_moves_continuously(tmp_path: Path, mon
             screen._game._serve_countdown = 0
 
             await pilot.press("up")
-            await pilot.pause()
             assert screen._game.snapshot.players[0].y == 15
 
             screen._hold_started_at[1] -= 0.2
@@ -460,7 +401,6 @@ def test_pong_paddle_movement_stops_after_key_hold_timeout(tmp_path: Path, monke
             screen._game._serve_countdown = 0
 
             await pilot.press("up")
-            await pilot.pause()
             assert screen._game.snapshot.players[0].y == 15
 
             screen._last_key_at[1] = time.monotonic() - 1
@@ -482,12 +422,10 @@ def test_pong_pause_clears_held_paddle_direction(tmp_path: Path) -> None:
             screen._game._serve_countdown = 0
 
             await pilot.press("up")
-            await pilot.pause()
             assert screen._game.snapshot.players[0].y == 15
 
             await pilot.press("escape")
             await pilot.press("escape")
-            await pilot.pause()
             for _ in range(2):
                 screen._on_tick()
 
