@@ -4,10 +4,6 @@
 
 Asciicade is a polished, extensible arcade game collection for Linux terminals.
 
-The initial release, **v0.1.0**, focuses on Snake and Pong and provides a unified
-terminal interface, persistent player profiles, local two-player matches, high
-scores and match history.
-
 ## Features
 
 - Unified retro/neon terminal interface built with [Textual](https://textual.textualize.io/).
@@ -42,49 +38,6 @@ Main menu:
 |  |   Quit                       |                |
 |  +------------------------------+                |
 +--------------------------------------------------+
-```
-
-Snake arena:
-
-```text
-SNAKE — SINGLE-PLAYER
-Guest 1: 3
-
-██████████████████████████████████████████████████
-██                                              ██
-██        ██████████                            ██
-██        ██      ██                            ██
-██        ██      ██                            ██
-██        ██      ████████████  **              ██
-██                                              ██
-██████████████████████████████████████████████████
-```
-
-Pong arena:
-
-```text
-PONG — SINGLE-PLAYER
-Guest 1: 3    CPU: 2
-First to 11
-╔════════════════════════════════════════════════════════╗
-║ ▄                          ▄                           ║
-║ █                          █                           ║
-║ █                          █                           ║
-║ ▀                          ▀                           ║
-║                                                      ║
-║                           █                          ║
-║                                                      ║
-║                                                      ║
-║                                                      ║
-║                                                      ║
-║                                                      ║
-║                                                      ║
-║                                                      ║
-║                                                      ║
-║                                                      ║
-╚════════════════════════════════════════════════════════╝
-
-Arrows/WASD move · Esc/P pause · Q quit
 ```
 
 ## Installation
