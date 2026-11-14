@@ -44,19 +44,3 @@ default; player profiles can choose from 16 terminal colors (eight normal and
 eight bright/neon variants). Each logical arena cell is rendered as two horizontal
 characters, so the playfield stays visually square in terminals where characters
 are about twice as tall as they are wide.
-
-## Terminal preview
-
-```text
-SNAKE — SINGLE-PLAYER
-Guest 1: 3
-
-███████████████████████████████████████████████████
-██                                              ██
-██        ██████████                            ██
-██        ██      ██                            ██
-██        ██      ██                            ██
-██        ██      ████████████  **              ██
-██                                              ██
-███████████████████████████████████████████████████
-```
