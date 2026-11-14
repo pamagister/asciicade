@@ -3,6 +3,11 @@
 from __future__ import annotations
 
 from asciicade.core.game import GameMetadata, GameMode
+from asciicade.core.options import (
+    BooleanOptionDefinition,
+    ChoiceOptionDefinition,
+    GameOptionRegistry,
+)
 from asciicade.games.snake.engine import SnakeEngine
 
 SNAKE_INSTRUCTIONS = """\
@@ -25,6 +30,22 @@ Global controls:
 - Q leaves the current game or quits the application.
 """
 
+SNAKE_OPTIONS = GameOptionRegistry(
+    definitions=(
+        ChoiceOptionDefinition(
+            key="difficulty",
+            label="Difficulty",
+            values=("Easy", "Medium", "Hard"),
+            default="Medium",
+        ),
+        BooleanOptionDefinition(
+            key="wrap_walls",
+            label="Wrap walls",
+            default=False,
+        ),
+    )
+)
+
 
 class SnakeGame(SnakeEngine):
     """Snake as a registered :class:`~asciicade.core.game.Game`."""
@@ -35,4 +56,5 @@ class SnakeGame(SnakeEngine):
         description="Classic arcade Snake for one or two local players.",
         modes=(GameMode.SINGLE_PLAYER, GameMode.MULTIPLAYER),
         instructions=SNAKE_INSTRUCTIONS,
+        options=SNAKE_OPTIONS,
     )

@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Literal
 
 from textual.app import ComposeResult
-from textual.containers import Vertical
+from textual.containers import Horizontal, Vertical
 from textual.widgets import OptionList, Static
 from textual.widgets.option_list import Option
 
@@ -29,7 +29,11 @@ _PURPOSE_TITLES: dict[str, str] = {
 
 
 class GameSelectScreen(MenuScreen):
-    """Choose a registered game."""
+    """Choose a registered game.
+
+    A short description of the highlighted game is shown on the right side
+    and updates automatically while scrolling through the list.
+    """
 
     def __init__(
         self,
@@ -56,18 +60,22 @@ class GameSelectScreen(MenuScreen):
         return registrations
 
     def compose(self) -> ComposeResult:
-        """Build the game list."""
-        yield Vertical(
-            Static(_PURPOSE_TITLES[self._purpose], id="screen-title"),
-            OptionList(
-                *(
-                    Option(registration.metadata.name, id=f"game:{registration.identifier}")
-                    for registration in self._registrations()
+        """Build the game list with a description panel."""
+        yield Horizontal(
+            Vertical(
+                Static(_PURPOSE_TITLES[self._purpose], id="game-select-title"),
+                OptionList(
+                    *(
+                        Option(registration.metadata.name, id=f"game:{registration.identifier}")
+                        for registration in self._registrations()
+                    ),
+                    id="game-list",
                 ),
-                id="game-list",
+                Static("Enter/→ select · ←/Esc back", id="menu-footer"),
+                classes="menu-screen",
             ),
-            Static("Enter/→ select · ←/Esc back", id="menu-footer"),
-            classes="menu-screen",
+            Static("", id="game-description"),
+            id="game-select-root",
         )
 
     def on_mount(self) -> None:
@@ -76,6 +84,7 @@ class GameSelectScreen(MenuScreen):
         if option_list.option_count:
             option_list.highlighted = self._default_index(option_list)
             option_list.focus()
+        self._update_description()
 
     def _default_index(self, option_list: OptionList) -> int:
         """Return the highlighted index for the requested default game."""
@@ -84,6 +93,24 @@ class GameSelectScreen(MenuScreen):
                 if option.id == f"game:{self._default_game_id}":
                     return index
         return 0
+
+    def on_option_list_option_highlighted(
+        self,
+        event: OptionList.OptionHighlighted,
+    ) -> None:
+        """Update the description panel for the highlighted game."""
+        self._update_description()
+
+    def _update_description(self) -> None:
+        """Show the description of the highlighted game."""
+        option_list = self.query_one(OptionList)
+        description = self.query_one("#game-description", Static)
+        option = option_list.highlighted_option
+        if option is not None and option.id is not None and option.id.startswith("game:"):
+            registration = self._app_context.registry.get(option.id.removeprefix("game:"))
+            description.update(registration.metadata.description)
+        else:
+            description.update("")
 
     def on_option_list_option_selected(self, event: OptionList.OptionSelected) -> None:
         """Open the selected game in the requested context."""
@@ -99,22 +126,17 @@ class GameSelectScreen(MenuScreen):
             if self._mode is None or not self._players:
                 self.notify("No game mode or players were selected.", severity="error")
                 return
-            if registration.identifier == "snake":
-                from asciicade.ui.screens.snake_game import SnakeGameScreen
+            from asciicade.ui.screens.game_menu import GameMenuScreen
 
-                self.app.push_screen(
-                    SnakeGameScreen(
-                        self._app_context,
-                        registration,
-                        self._mode,
-                        self._players,
-                    )
+            self.app.push_screen(
+                GameMenuScreen(
+                    self._app_context,
+                    registration,
+                    self._mode,
+                    self._players,
                 )
-                return
-            self.notify(
-                f"{registration.metadata.name} has no playable screen yet.",
-                severity="error",
             )
+            return
         elif self._purpose == "high-scores":
             self.app.push_screen(
                 LeaderboardScreen(self._app_context, registration.metadata.identifier)

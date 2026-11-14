@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import TYPE_CHECKING, Protocol
 
+from asciicade.core.options import GameOptionRegistry, GameOptions
 from asciicade.core.player import Player
 
 if TYPE_CHECKING:
@@ -30,6 +31,7 @@ class GameMetadata:
     description: str
     modes: tuple[GameMode, ...]
     instructions: str
+    options: GameOptionRegistry | None = None
 
     def __post_init__(self) -> None:
         """Validate the metadata fields."""
@@ -41,6 +43,10 @@ class GameMetadata:
             raise ValueError("A game must declare at least one mode.")
         if len(set(self.modes)) != len(self.modes):
             raise ValueError("Game modes must be unique.")
+        if self.options is not None:
+            keys = [definition.key for definition in self.options.definitions]
+            if len(set(keys)) != len(keys):
+                raise ValueError("Option keys must be unique.")
 
 
 class Game(Protocol):
@@ -51,8 +57,21 @@ class Game(Protocol):
         """Return the static metadata for this game."""
         ...
 
-    def start(self, mode: GameMode, players: Sequence[Player]) -> None:
-        """Initialize a new session for the given mode and players."""
+    def start(
+        self,
+        mode: GameMode,
+        players: Sequence[Player],
+        *,
+        options: GameOptions | None = None,
+    ) -> None:
+        """Initialize a new session for the given mode and players.
+
+        Args:
+            mode: The game mode.
+            players: One player for single-player, two for multiplayer.
+            options: Optional resolved game options. Defaults to the game's
+                declared option defaults.
+        """
         ...
 
     def handle_input(self, event: InputEvent) -> None:

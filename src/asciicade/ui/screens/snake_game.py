@@ -15,6 +15,7 @@ from textual.widgets import Static
 
 from asciicade.core.game import GameMode
 from asciicade.core.input import InputAction, input_map_for_mode
+from asciicade.core.options import GameOptions
 from asciicade.core.player import GuestPlayer, PlayerProfile, player_color
 from asciicade.core.registry import GameRegistration
 from asciicade.games.snake import Position, SnakeGame
@@ -45,6 +46,8 @@ class SnakeGameScreen(Screen[None]):
         registration: GameRegistration,
         mode: GameMode,
         players: tuple[PlayerProfile | GuestPlayer, ...],
+        *,
+        options: GameOptions | None = None,
     ) -> None:
         """Store the session configuration."""
         super().__init__()
@@ -52,6 +55,7 @@ class SnakeGameScreen(Screen[None]):
         self._registration = registration
         self._mode = mode
         self._players = players
+        self._options = options
         self._game: SnakeGame | None = None
         self._input_map = input_map_for_mode(mode)
         self._timer: Timer | None = None
@@ -68,7 +72,7 @@ class SnakeGameScreen(Screen[None]):
     def on_mount(self) -> None:
         """Start the game and the tick timer."""
         self._game = cast(SnakeGame, self._registration.factory())
-        self._game.start(self._mode, self._players)
+        self._game.start(self._mode, self._players, options=self._options)
         profile_ids = tuple(
             player.id for player in self._players if isinstance(player, PlayerProfile)
         )
@@ -133,6 +137,7 @@ class SnakeGameScreen(Screen[None]):
                     self._mode,
                     self._players,
                     result,
+                    options=self._options,
                 )
             )
         self._update_display()

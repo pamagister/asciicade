@@ -54,6 +54,56 @@ OptionList:focus {
     border: round #4dd0e1;
 }
 
+#game-select-title {
+    width: 100%;
+    height: 1;
+    color: #39ff14;
+    text-style: bold;
+    content-align: center middle;
+}
+
+#game-select-root {
+    width: 100%;
+    height: 100%;
+    align: center middle;
+}
+
+#game-description {
+    width: 45;
+    height: auto;
+    color: #d8fff4;
+    content-align: left top;
+    padding: 1 2;
+}
+
+#game-menu-root {
+    width: 100%;
+    height: 100%;
+    align: center middle;
+}
+
+#game-info-panel {
+    width: 45;
+    height: auto;
+    color: #d8fff4;
+    content-align: left top;
+    padding: 1 2;
+}
+
+#menu-list {
+    width: 60;
+    height: auto;
+    max-height: 20;
+    border: round #39ff14;
+    background: #0b1220;
+    color: #d8fff4;
+    padding: 1 2;
+}
+
+#menu-list:focus {
+    border: round #4dd0e1;
+}
+
 DataTable {
     width: 90;
     height: 16;

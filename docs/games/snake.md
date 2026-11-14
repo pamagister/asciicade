@@ -17,6 +17,14 @@ Classic arcade Snake for one or two local players. Eat food, grow longer and avo
 - The surviving snake wins.
 - If both snakes are eliminated on the same tick, the match is a draw.
 
+## Options
+
+- Difficulty: Easy, Medium (default), Hard. Changes the game speed.
+- Wrap walls: Off (default), On. When on, the snake reappears on the opposite
+  side of the arena when it leaves the play area. Hitting a wall no longer
+  crashes the snake, but hitting your own or the other snake's body still ends
+  the game.
+
 Player 1 uses the arrow keys by default. Player 2 uses W/A/S/D. In single-player
 mode, WASD is accepted as an alternative to the arrow keys. Direction changes are
 buffered and applied on the next game tick. Immediate 180-degree reversals are

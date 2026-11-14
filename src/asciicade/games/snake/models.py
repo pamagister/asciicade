@@ -112,6 +112,7 @@ class SnakeConfig:
     height: int = 15
     initial_length: int = 3
     tick_rate: float = 8.0
+    wrap_walls: bool = False
 
     def __post_init__(self) -> None:
         """Validate the configuration."""

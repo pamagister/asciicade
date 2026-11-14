@@ -13,6 +13,7 @@ match history.
 - Player profiles with 16 selectable terminal colors.
 - Snake single-player mode.
 - Snake competitive local two-player mode on one keyboard.
+- Per-game options (for example Snake difficulty and wrap-around walls).
 - Persistent high scores and match history.
 - Short in-application instructions.
 - Consistent keyboard controls with normalized player input.
@@ -104,9 +105,11 @@ asciicade [--data-dir PATH] [--version]
 - `--version` prints the installed version.
 
 The application starts in the main menu. Choose Single Player or Two Players
-first, then select a player. If only one game is registered, it starts directly;
-otherwise the last played game is preselected. Use the arrow keys and Enter to
-navigate, or select an entry directly.
+first, then select a player. The game selection screen is always shown next, even
+when only one game is registered, and shows a description of the highlighted game.
+Choose a game, then open its menu to adjust game-specific options, read the
+instructions, or press Play to start. Use the arrow keys and Enter to navigate,
+or select an entry directly.
 
 ## Controls
 
@@ -117,6 +120,11 @@ navigate, or select an entry directly.
 | Menu back | Left or Escape |
 | Pause / resume or go back in game | Escape |
 | Quit or leave the current game | Q |
+| Toggle game option | Space |
+| Change game option value | Left or Right |
+
+In the game menu, highlight an option and use Space or Left/Right to change its
+value; the disabled ``--- Options ---`` separator is skipped while navigating.
 
 Player 1 uses the arrow keys by default. Player 2 uses W/A/S/D. In single-player
 mode, WASD is accepted as an alternative to the arrow keys. Direction changes are
@@ -126,7 +134,8 @@ rejected.
 ## Games
 
 - [Snake](games/snake.md) — classic arcade Snake for one or two local players;
-  eat food, grow longer and avoid crashing.
+  eat food, grow longer and avoid crashing, with adjustable difficulty and
+  wrap-around walls.
 
 ## Player profiles, colors and high scores
 

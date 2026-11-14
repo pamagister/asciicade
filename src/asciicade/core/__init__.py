@@ -14,6 +14,12 @@ from asciicade.core.input import (
     input_map_for_mode,
     normalize_key,
 )
+from asciicade.core.options import (
+    BooleanOptionDefinition,
+    ChoiceOptionDefinition,
+    GameOptionRegistry,
+    GameOptions,
+)
 from asciicade.core.player import (
     GuestPlayer,
     Player,
@@ -38,11 +44,15 @@ from asciicade.core.results import (
 from asciicade.core.session import GameSession
 
 __all__ = [
+    "BooleanOptionDefinition",
+    "ChoiceOptionDefinition",
     "Direction",
     "Game",
     "GameMetadata",
     "GameMode",
     "GameNotFoundError",
+    "GameOptionRegistry",
+    "GameOptions",
     "GameRegistration",
     "GameRegistry",
     "GameResult",

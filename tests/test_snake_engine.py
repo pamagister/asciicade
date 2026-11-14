@@ -11,6 +11,7 @@ import pytest
 
 from asciicade.core.game import GameMode
 from asciicade.core.input import Direction, InputAction, InputEvent
+from asciicade.core.options import GameOptions
 from asciicade.core.player import GuestPlayer, PlayerProfile
 from asciicade.core.results import MatchOutcome
 from asciicade.games.snake import (
@@ -27,11 +28,12 @@ def make_engine(
     seed: int = 1234,
     config: SnakeConfig | None = None,
     players: tuple[GuestPlayer, ...] | None = None,
+    options: GameOptions | None = None,
 ) -> SnakeGame:
     """Create a started engine for tests."""
     engine = SnakeGame(config or SnakeConfig(), random.Random(seed))
     selected = players or (GuestPlayer(1),)
-    engine.start(mode, selected)
+    engine.start(mode, selected, options=options)
     return engine
 
 
@@ -335,6 +337,57 @@ def test_config_validates_dimensions_and_length() -> None:
         SnakeConfig(width=10, height=10, initial_length=10)
     with pytest.raises(ValueError, match="positive"):
         SnakeConfig(tick_rate=0)
+
+
+def test_difficulty_sets_tick_rate() -> None:
+    """Difficulty options change the engine tick rate."""
+    easy = make_engine(options=GameOptions((("difficulty", "Easy"), ("wrap_walls", "off"))))
+    medium = make_engine(options=GameOptions((("difficulty", "Medium"), ("wrap_walls", "off"))))
+    hard = make_engine(options=GameOptions((("difficulty", "Hard"), ("wrap_walls", "off"))))
+
+    assert easy.config.tick_rate == 5.0
+    assert medium.config.tick_rate == 8.0
+    assert hard.config.tick_rate == 12.0
+
+
+def test_difficulty_defaults_to_medium() -> None:
+    """Without options, the engine uses the Medium tick rate."""
+    engine = make_engine()
+    assert engine.config.tick_rate == 8.0
+
+
+def test_wrap_walls_snake_reappears_on_opposite_side() -> None:
+    """With wrap walls enabled, the snake leaves one side and re-enters on the other."""
+    engine = make_engine(options=GameOptions((("difficulty", "Medium"), ("wrap_walls", "on"))))
+    assert engine.config.wrap_walls is True
+
+    # Move the head to the left wall and head leftwards.
+    snake = engine._snakes[0]
+    snake.body = (Position(0, 7), Position(1, 7), Position(2, 7))
+    snake.direction = Direction.LEFT
+    snake.pending.clear()
+
+    engine.tick()
+
+    head = engine.snapshot.snakes[0].body[0]
+    assert head == Position(engine.arena.width - 1, 7)
+    assert engine.snapshot.snakes[0].alive
+
+
+def test_wrap_walls_off_snake_crashes_into_wall() -> None:
+    """With wrap walls disabled, leaving the arena ends the game."""
+    engine = make_engine(options=GameOptions((("difficulty", "Medium"), ("wrap_walls", "off"))))
+    assert engine.config.wrap_walls is False
+
+    snake = engine._snakes[0]
+    snake.body = (Position(0, 7), Position(1, 7), Position(2, 7))
+    snake.direction = Direction.LEFT
+    snake.pending.clear()
+
+    engine.tick()
+
+    assert engine.is_finished
+    assert not engine.snapshot.snakes[0].alive
 
 
 def test_engine_does_not_import_textual() -> None:

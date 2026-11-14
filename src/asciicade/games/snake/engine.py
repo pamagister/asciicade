@@ -7,6 +7,7 @@ from collections.abc import Sequence
 
 from asciicade.core.game import GameMode
 from asciicade.core.input import Direction, InputEvent, direction_for_action
+from asciicade.core.options import GameOptions
 from asciicade.core.player import Player
 from asciicade.core.results import (
     GameResult,
@@ -28,6 +29,20 @@ from asciicade.games.snake.rules import (
     occupied_cells,
     spawn_food,
 )
+
+# Ticks per second per difficulty.
+_DIFFICULTY_TICK_RATES = {
+    "Easy": 5.0,
+    "Medium": 8.0,
+    "Hard": 12.0,
+}
+
+_DEFAULT_DIFFICULTY = "Medium"
+
+
+def _tick_rate_for(difficulty: str) -> float:
+    """Return the tick rate for a difficulty value."""
+    return _DIFFICULTY_TICK_RATES.get(difficulty, _DIFFICULTY_TICK_RATES[_DEFAULT_DIFFICULTY])
 
 
 class SnakeEngine:
@@ -116,12 +131,20 @@ class SnakeEngine:
             is_draw=self._is_draw,
         )
 
-    def start(self, mode: GameMode, players: Sequence[Player]) -> None:
+    def start(
+        self,
+        mode: GameMode,
+        players: Sequence[Player],
+        *,
+        options: GameOptions | None = None,
+    ) -> None:
         """Initialize a new session.
 
         Args:
             mode: The game mode.
             players: One player for single-player, two for multiplayer.
+            options: Optional resolved game options. Defaults to the game's
+                declared option defaults.
 
         Raises:
             ValueError: If the mode or player count is invalid.
@@ -132,8 +155,16 @@ class SnakeEngine:
         if len(players) != expected_players:
             raise ValueError(f"{mode.value} Snake requires {expected_players} player(s).")
 
+        resolved_options = options or SnakeGameOptions.defaults()
         self._mode = mode
         self._players = tuple(players)
+        self.config = SnakeConfig(
+            width=self.config.width,
+            height=self.config.height,
+            initial_length=self.config.initial_length,
+            tick_rate=_tick_rate_for(resolved_options.value_for("difficulty")),
+            wrap_walls=resolved_options.value_for("wrap_walls") == "on",
+        )
         self._snakes = self._create_snakes()
         self._finished = False
         self._winner_index = None
@@ -174,8 +205,8 @@ class SnakeEngine:
             if not snake.alive:
                 continue
             head = snake.head.step(snake.direction)
-            new_heads[index] = head
-            growing[index] = self._food is not None and head == self._food
+            new_heads[index] = self._wrap_position(head)
+            growing[index] = self._food is not None and new_heads[index] == self._food
 
         dead: set[int] = set()
 
@@ -232,6 +263,13 @@ class SnakeEngine:
                 return
 
         self._resolve_end_condition()
+
+    def _wrap_position(self, position: Position) -> Position:
+        """Wrap a position onto the opposite side when wrap walls are enabled."""
+        if not self.config.wrap_walls:
+            return position
+        arena = self.arena
+        return Position(position.x % arena.width, position.y % arena.height)
 
     def _create_snakes(self) -> list[Snake]:
         """Create the initial snakes for the current mode."""
@@ -291,3 +329,20 @@ class SnakeEngine:
         self._finished = True
         self._winner_index = winner_index
         self._is_draw = is_draw
+
+
+class SnakeGameOptions:
+    """Resolved option values for Snake."""
+
+    DIFFICULTY_KEY = "difficulty"
+    WRAP_WALLS_KEY = "wrap_walls"
+
+    @staticmethod
+    def defaults() -> GameOptions:
+        """Return the default option values for Snake."""
+        return GameOptions(
+            (
+                (SnakeGameOptions.DIFFICULTY_KEY, "Medium"),
+                (SnakeGameOptions.WRAP_WALLS_KEY, "off"),
+            )
+        )

@@ -18,13 +18,11 @@ from asciicade.core.player import (
     PlayerSelection,
     player_identity,
 )
-from asciicade.core.registry import GameRegistration
 from asciicade.ui.context import AppContext
 from asciicade.ui.screens.create_player import CreatePlayerScreen
 from asciicade.ui.screens.edit_player_picker import EditPlayerPickerScreen
 from asciicade.ui.screens.game_select import GameSelectScreen
 from asciicade.ui.screens.menu import MenuScreen
-from asciicade.ui.screens.snake_game import SnakeGameScreen
 
 
 class PlayerSelectScreen(MenuScreen):
@@ -205,9 +203,6 @@ class PlayerSelectScreen(MenuScreen):
         if not registrations:
             self.notify("No game supports the selected mode.", severity="error")
             return
-        if len(registrations) == 1:
-            self._start_registration(registrations[0], selection)
-            return
 
         last_session = self._app_context.settings.get_last_session()
         default_game_id = registrations[0].identifier
@@ -225,25 +220,4 @@ class PlayerSelectScreen(MenuScreen):
                 players=selection.players,
                 default_game_id=default_game_id,
             )
-        )
-
-    def _start_registration(
-        self,
-        registration: GameRegistration,
-        selection: PlayerSelection,
-    ) -> None:
-        """Start a registered game with the selected players."""
-        if registration.identifier == "snake":
-            self.app.push_screen(
-                SnakeGameScreen(
-                    self._app_context,
-                    registration,
-                    self._mode,
-                    selection.players,
-                )
-            )
-            return
-        self.notify(
-            f"{registration.metadata.name} has no playable screen yet.",
-            severity="error",
         )

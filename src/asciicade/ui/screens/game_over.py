@@ -8,6 +8,7 @@ from textual.screen import Screen
 from textual.widgets import Button, Static
 
 from asciicade.core.game import GameMode
+from asciicade.core.options import GameOptions
 from asciicade.core.player import GuestPlayer, PlayerProfile
 from asciicade.core.registry import GameRegistration
 from asciicade.core.results import GameResult
@@ -26,6 +27,8 @@ class GameOverScreen(Screen[None]):
         mode: GameMode,
         players: tuple[PlayerProfile | GuestPlayer, ...],
         result: GameResult,
+        *,
+        options: GameOptions | None = None,
     ) -> None:
         """Store the completed session."""
         super().__init__()
@@ -34,6 +37,7 @@ class GameOverScreen(Screen[None]):
         self._mode = mode
         self._players = players
         self._result = result
+        self._options = options
 
     def compose(self) -> ComposeResult:
         """Build the result summary."""
@@ -66,6 +70,7 @@ class GameOverScreen(Screen[None]):
                     self._registration,
                     self._mode,
                     self._players,
+                    options=self._options,
                 )
             )
         elif button_id == "main-menu":
