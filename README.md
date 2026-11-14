@@ -12,6 +12,7 @@ match history.
 
 - Unified retro/neon terminal interface built with [Textual](https://textual.textualize.io/).
 - Persistent player profiles stored in SQLite.
+- Player profiles with 16 selectable terminal colors.
 - Snake single-player mode.
 - Snake competitive local two-player mode on one keyboard.
 - Persistent high scores and match history.
@@ -29,7 +30,8 @@ Main menu:
 |             A modular terminal arcade            |
 |                                                  |
 |  +------------------------------+                |
-|  | > Play                       |                |
+|  | > Single Player              |                |
+|  |   Two Players                |                |
 |  |   High Scores                |                |
 |  |   Match History              |                |
 |  |   Instructions               |                |
@@ -46,10 +48,10 @@ Guest 1: 3
 
 +----------------------------------------------+
 |                                              |
-|        ██████                              |
-|        ██    ██                            |
-|        ██    ██            ****            |
-|        ██11████                            |
+|        ██████████                            |
+|        ██      ██                            |
+|        ██      ██                            |
+|        ██      ████████11  **               |
 |                                              |
 +----------------------------------------------+
 ```
@@ -94,28 +96,25 @@ asciicade [--data-dir PATH] [--version]
 - `--data-dir PATH` overrides the directory used for persistent game data.
 - `--version` prints the installed version.
 
-The application starts in the main menu. Use the arrow keys and Enter to
+The application starts in the main menu. Choose Single Player or Two Players
+first, then select a player. If only one game is registered, it starts directly;
+otherwise the last played game is preselected. Use the arrow keys and Enter to
 navigate, or select an entry directly.
 
 ## Controls
 
-| Action | Player 1 | Player 2 |
-|---|---|---|
-| Up | Arrow Up | W |
-| Down | Arrow Down | S |
-| Left | Arrow Left | A |
-| Right | Arrow Right | D |
-
-Global controls:
-
 | Action | Key |
 |---|---|
-| Pause / resume or go back | Escape |
+| Menu up / down | Arrow Up / Arrow Down |
+| Menu confirm | Enter or Right |
+| Menu back | Left or Escape |
+| Pause / resume or go back in game | Escape |
 | Quit or leave the current game | Q |
 
-In single-player mode, WASD is accepted as an alternative to the arrow keys.
-Direction changes are buffered and applied on the next game tick. Immediate
-180-degree reversals are rejected.
+Player 1 uses the arrow keys by default. Player 2 uses W/A/S/D. In single-player
+mode, WASD is accepted as an alternative to the arrow keys. Direction changes are
+buffered and applied on the next game tick. Immediate 180-degree reversals are
+rejected.
 
 ## Gameplay
 
@@ -134,17 +133,24 @@ Direction changes are buffered and applied on the next game tick. Immediate
 - The surviving snake wins.
 - If both snakes are eliminated on the same tick, the match is a draw.
 
-Player 1 is shown in green and player 2 in cyan. Each logical arena cell is
-rendered as two horizontal characters, so the playfield stays visually square in
-terminals where characters are about twice as tall as they are wide. The head of
-each snake also uses a distinct two-character marker (`11` or `22`), so the
-players remain distinguishable without relying on color alone.
+Player 1 is shown in green and player 2 in cyan by default. Player profiles can
+choose from 16 terminal colors, including the eight normal and eight bright/neon
+variants. Each logical arena cell is rendered as two horizontal characters, so the
+playfield stays visually square in terminals where characters are about twice as
+tall as they are wide. The head of each snake also uses a distinct two-character
+marker (`11` or `22`), so the players remain distinguishable without relying on
+color alone.
 
-## Player profiles and high scores
+## Player profiles, colors and high scores
 
 - Player profiles are persistent and can be created from the player-selection
   screen.
 - A guest option is available for quick sessions without creating a profile.
+- Guest player 1 uses green and guest player 2 uses cyan.
+- Profiles can be edited with `E` on a highlighted profile or through the
+  `Edit player` menu entry. The edit dialog changes the name and color.
+- The color palette contains the eight normal terminal colors and their eight
+  bright/neon variants.
 - A profile cannot occupy both player slots in a two-player match.
 - Single-player scores appear in the leaderboard.
 - Multiplayer results appear in the match history with both participants,
@@ -190,8 +196,9 @@ To add a game:
 3. Register the game in `asciicade.games.build_default_registry`.
 4. Add a game-specific Textual screen for rendering and input.
 
-The registry drives the game and mode menus, so no menu changes are required.
-Third-party plugin discovery is intentionally not implemented yet.
+The registry drives the game menu and supported modes. Game-specific screens
+still need to be added when a new game is registered. Third-party plugin
+discovery is intentionally not implemented yet.
 
 ## Development
 
