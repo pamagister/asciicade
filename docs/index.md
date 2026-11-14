@@ -20,6 +20,9 @@ Asciicade is a polished, extensible arcade game collection for Linux terminals.
   piece).
 - Persistent high scores and match history.
 - Short in-application instructions.
+- Optional sound effects for Snake food collection, Pong paddle hits and points,
+  Blockfall single and multi-line clears, and game over. Playback uses a system
+  audio player and is skipped silently when none is available.
 - Consistent keyboard controls with normalized player input.
 - PyPI-compatible package with the `asciicade` command.
 
@@ -72,6 +75,10 @@ uv run asciicade
 ```
 
 Supported Python versions are 3.11 and newer. CI tests 3.11 and 3.14 on Linux.
+
+Sound effects are optional and use a system audio player. Install one of the
+supported players, for example `ffmpeg` (for `ffplay`) or `pulseaudio-utils`
+(for `paplay`). Set `ASCIICADE_SOUND=off` to disable playback.
 
 ## Quick start
 

@@ -61,7 +61,7 @@ package-dir = {"" = "src"}
 where = ["src"]
 
 [tool.setuptools.package-data]
-asciicade = ["py.typed", "ui/styles/*.tcss"]
+asciicade = ["py.typed", "ui/styles/*.tcss", "assets/sounds/*.mp3"]
 
 [tool.ruff]
 line-length = 100

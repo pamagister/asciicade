@@ -14,6 +14,7 @@ from asciicade.core.options import GameOptions
 from asciicade.core.player import GuestPlayer, PlayerProfile
 from asciicade.core.registry import GameRegistration
 from asciicade.core.results import GameResult
+from asciicade.ui.audio import SoundEffect
 from asciicade.ui.context import AppContext
 from asciicade.ui.navigation import go_to_game_menu, go_to_main_menu
 from asciicade.ui.screens.leaderboard import LeaderboardScreen
@@ -62,7 +63,8 @@ class GameOverScreen(Screen[None]):
         )
 
     def on_mount(self) -> None:
-        """Focus the first action."""
+        """Play the game-over effect and focus the first action."""
+        self._app_context.audio.play(SoundEffect.GAME_OVER)
         self.query_one("#play-again", ActionButton).focus()
 
     def on_key(self, event: events.Key) -> None:

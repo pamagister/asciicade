@@ -28,6 +28,7 @@ from asciicade.core.player import GuestPlayer, PlayerProfile, player_color
 from asciicade.core.registry import GameRegistration
 from asciicade.games.pong import PongGame, PongSnapshot
 from asciicade.persistence import LastSession
+from asciicade.ui.audio import SoundEffect
 from asciicade.ui.context import AppContext
 from asciicade.ui.keyboard import release_reporting_available
 from asciicade.ui.navigation import go_to_game_menu, go_to_main_menu
@@ -81,6 +82,9 @@ class PongGameScreen(Screen[None]):
         self._hold_started_at: dict[int, float] = {}
         self._last_key_at: dict[int, float] = {}
         self._tick_count = 0
+        self._last_ball_x: float | None = None
+        self._ball_moving_right: bool | None = None
+        self._last_scores: tuple[int, int] = (0, 0)
 
     def compose(self) -> ComposeResult:
         """Build the arena view."""
@@ -216,9 +220,45 @@ class PongGameScreen(Screen[None]):
         if self._tick_count % _PADDLE_REPEAT_TICKS == 0:
             self._move_held_paddles()
         self._game.tick()
+        self._play_paddle_hit_sound()
+        self._play_score_sound()
         self._update_display()
         if self._game.is_finished:
             self._finish()
+
+    def _play_paddle_hit_sound(self) -> None:
+        """Play the paddle effect when the ball reverses near a paddle."""
+        if self._game is None:
+            return
+        snapshot = self._game.snapshot
+        previous_x = self._last_ball_x
+        self._last_ball_x = snapshot.ball.x
+        if previous_x is None or snapshot.serving or snapshot.ball.x == previous_x:
+            return
+        moving_right = snapshot.ball.x > previous_x
+        previous_direction = self._ball_moving_right
+        self._ball_moving_right = moving_right
+        if previous_direction is None or moving_right == previous_direction:
+            return
+        if self._game.is_finished:
+            return
+        near_paddle = snapshot.ball.x < 6 or snapshot.ball.x > snapshot.width - 6
+        if near_paddle:
+            self._app_context.audio.play(SoundEffect.PADDLE_HIT)
+
+    def _play_score_sound(self) -> None:
+        """Play the point effect when a player scores, unless the match ends."""
+        if self._game is None:
+            return
+        scores = tuple(player.score for player in self._game.snapshot.players)
+        if len(scores) != 2:
+            return
+        scored = any(
+            current > previous for current, previous in zip(scores, self._last_scores, strict=True)
+        )
+        self._last_scores = (scores[0], scores[1])
+        if scored and not self._game.is_finished:
+            self._app_context.audio.play(SoundEffect.POINT_SCORED)
 
     def _move_held_paddles(self) -> None:
         """Move paddles whose direction key has been held long enough."""

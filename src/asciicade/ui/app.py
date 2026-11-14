@@ -15,6 +15,7 @@ from asciicade.persistence import (
     SettingsRepository,
     database_path,
 )
+from asciicade.ui.audio import AudioPlayer
 from asciicade.ui.context import AppContext
 from asciicade.ui.keyboard import AsciicadeLinuxDriver
 from asciicade.ui.screens.confirm_quit import ConfirmQuitScreen
@@ -38,6 +39,7 @@ class AsciicadeApp(App[None]):
         players: PlayerRepository | None = None,
         results: ResultRepository | None = None,
         settings: SettingsRepository | None = None,
+        audio: AudioPlayer | None = None,
     ) -> None:
         """Create the application.
 
@@ -47,6 +49,7 @@ class AsciicadeApp(App[None]):
             players: Optional player repository (used by tests).
             results: Optional result repository (used by tests).
             settings: Optional settings repository (used by tests).
+            audio: Optional audio player (used by tests).
         """
         super().__init__(driver_class=AsciicadeLinuxDriver)
         self._data_dir = data_dir
@@ -54,6 +57,7 @@ class AsciicadeApp(App[None]):
         self._players = players
         self._results = results
         self._settings = settings
+        self._audio = audio or AudioPlayer()
         self._app_context: AppContext | None = None
 
     @property
@@ -78,6 +82,7 @@ class AsciicadeApp(App[None]):
                 players=players,
                 results=results,
                 settings=settings,
+                audio=self._audio,
             )
         except Exception as exc:  # pragma: no cover - defensive startup guard
             self.notify(f"Could not initialize storage: {exc}", severity="error")

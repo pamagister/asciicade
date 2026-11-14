@@ -28,6 +28,7 @@ from asciicade.games.blockfall import (
     Position,
 )
 from asciicade.persistence import LastSession
+from asciicade.ui.audio import SoundEffect
 from asciicade.ui.context import AppContext
 from asciicade.ui.keyboard import release_reporting_available
 from asciicade.ui.navigation import go_to_game_menu, go_to_main_menu
@@ -88,6 +89,7 @@ class BlockfallGameScreen(Screen[None]):
         self._timer: Timer | None = None
         self._paused = False
         self._finished = False
+        self._last_lines = 0
         self._held_soft_drop: dict[int, float] = {}
         self._last_soft_drop_at: dict[int, float] = {}
         self._last_key_at: dict[int, float] = {}
@@ -235,9 +237,22 @@ class BlockfallGameScreen(Screen[None]):
             return
         self._process_soft_drop()
         self._game.tick()
+        self._play_line_clear_sound()
         self._update_display()
         if self._game.is_finished:
             self._finish()
+
+    def _play_line_clear_sound(self) -> None:
+        """Play the line-clear effect for single or multiple completed rows."""
+        if self._game is None:
+            return
+        lines = sum(view.lines for view in self._game.snapshot.players)
+        cleared = lines - self._last_lines
+        if cleared >= 2:
+            self._app_context.audio.play(SoundEffect.MULTI_LINE_CLEAR)
+        elif cleared == 1:
+            self._app_context.audio.play(SoundEffect.LINE_CLEAR)
+        self._last_lines = lines
 
     def _process_soft_drop(self) -> None:
         """Apply held soft-drop repeats."""

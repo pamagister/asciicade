@@ -20,6 +20,7 @@ from asciicade.core.player import GuestPlayer, PlayerProfile, player_color
 from asciicade.core.registry import GameRegistration
 from asciicade.games.snake import Position, SnakeGame
 from asciicade.persistence import LastSession
+from asciicade.ui.audio import SoundEffect
 from asciicade.ui.context import AppContext
 from asciicade.ui.navigation import go_to_game_menu, go_to_main_menu
 from asciicade.ui.screens.game_over import GameOverScreen
@@ -69,6 +70,7 @@ class SnakeGameScreen(Screen[None]):
         self._timer: Timer | None = None
         self._paused = False
         self._finished = False
+        self._last_score = 0
 
     def compose(self) -> ComposeResult:
         """Build the arena view."""
@@ -165,9 +167,19 @@ class SnakeGameScreen(Screen[None]):
         if self._game is None or self._paused or self._finished:
             return
         self._game.tick()
+        self._play_food_sound()
         self._update_display()
         if self._game.is_finished:
             self._finish()
+
+    def _play_food_sound(self) -> None:
+        """Play the collect effect when a snake eats food."""
+        if self._game is None:
+            return
+        score = sum(snake.score for snake in self._game.snapshot.snakes)
+        if score > self._last_score:
+            self._app_context.audio.play(SoundEffect.FOOD_EATEN)
+        self._last_score = score
 
     def _finish(self) -> None:
         """Persist the result and show the game-over screen."""

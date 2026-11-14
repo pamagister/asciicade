@@ -4,6 +4,7 @@ Asciicade separates game logic, persistence and the terminal UI.
 
 ```text
 src/asciicade/
+├── assets/        Packaged sound effects
 ├── cli/           Command-line entry point
 ├── core/          Player, game, input, session and result contracts
 ├── games/
