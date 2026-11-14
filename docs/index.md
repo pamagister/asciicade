@@ -2,9 +2,9 @@
 
 Asciicade is a polished, extensible arcade game collection for Linux terminals.
 
-The initial release, **v0.1.0**, focuses on Snake and provides a unified terminal
-interface, persistent player profiles, local two-player matches, high scores and
-match history.
+The initial release, **v0.1.0**, focuses on Snake and Pong and provides a unified
+terminal interface, persistent player profiles, local two-player matches, high
+scores and match history.
 
 ## Features
 
@@ -13,7 +13,10 @@ match history.
 - Player profiles with 16 selectable terminal colors.
 - Snake single-player mode.
 - Snake competitive local two-player mode on one keyboard.
-- Per-game options (for example Snake difficulty and wrap-around walls).
+- Pong single-player mode against a computer opponent.
+- Pong competitive local two-player mode on one keyboard.
+- Per-game options (for example Snake difficulty and wrap-around walls, or Pong
+  score limit and difficulty).
 - Persistent high scores and match history.
 - Short in-application instructions.
 - Consistent keyboard controls with normalized player input.
@@ -26,6 +29,7 @@ match history.
 :maxdepth: 2
 
 games/snake
+games/pong
 develop/architecture
 funding/funding
 ```
@@ -62,6 +66,34 @@ Guest 1: 3
 ██        ██      ████████████  **              ██
 ██                                              ██
 ██████████████████████████████████████████████████
+```
+
+Pong arena:
+
+```text
+PONG — SINGLE-PLAYER
+Guest 1: 3    CPU: 2
+First to 11
+╔════════════════════════════════════════════════════════╗
+║ ▄                          ▄                           ║
+║ █                          █                           ║
+║ █                          █                           ║
+║ ▀                          ▀                           ║
+║                                                      ║
+║                           █                          ║
+║                                                      ║
+║                                                      ║
+║                                                      ║
+║                                                      ║
+║                                                      ║
+║                                                      ║
+║                                                      ║
+║                                                      ║
+║                                                      ║
+║                                                      ║
+╚════════════════════════════════════════════════════════╝
+
+Arrows/WASD move · Esc/P pause · Q quit
 ```
 
 ## Installation
@@ -130,9 +162,10 @@ Left/Right to change its value. The disabled ``--- Options ---`` separator is
 skipped while navigating; Left on Play or Instructions goes back.
 
 Player 1 uses the arrow keys by default. Player 2 uses W/A/S/D. In single-player
-mode, WASD is accepted as an alternative to the arrow keys. Direction changes are
-buffered and applied on the next game tick. Immediate 180-degree reversals are
-rejected.
+mode, WASD is accepted as an alternative to the arrow keys. Pong uses the same
+mapping: Player 1 controls the left paddle with the arrow keys and Player 2
+controls the right paddle with W/S. Direction changes are buffered and applied
+on the next game tick for Snake. Immediate 180-degree reversals are rejected.
 
 During a game, Escape or P pauses and resumes. While paused, Enter opens a dialog
 to open the game menu, return to the main menu or stay in the game. Q always
@@ -146,6 +179,9 @@ PageUp/PageDown or Space; Left or Escape goes back.
 - [Snake](games/snake.md) — classic arcade Snake for one or two local players;
   eat food, grow longer and avoid crashing, with adjustable difficulty and
   wrap-around walls.
+- [Pong](games/pong.md) — classic arcade Pong for one or two local players;
+  aim with the paddle edges, use half-block rendering and choose the score limit
+  and difficulty.
 
 ## Player profiles, colors and high scores
 
