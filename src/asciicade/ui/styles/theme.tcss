@@ -78,6 +78,26 @@ DataTable {
     content-align: center middle;
 }
 
+#menu-footer {
+    width: 80;
+    height: 1;
+    color: #7dd3fc;
+    content-align: center middle;
+}
+
+#color-list {
+    width: 60;
+    height: 10;
+    max-height: 10;
+}
+
+#create-status {
+    width: 60;
+    height: 1;
+    color: #d8fff4;
+    content-align: center middle;
+}
+
 #instructions-body {
     width: 90;
     height: 16;

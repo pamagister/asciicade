@@ -9,17 +9,20 @@ from uuid import UUID
 import pytest
 
 from asciicade.core.game import GameMode
-from asciicade.core.player import GuestPlayer, PlayerProfile, PlayerSelection
+from asciicade.core.player import GuestPlayer, PlayerColor, PlayerProfile, PlayerSelection
 from asciicade.core.results import MatchOutcome, make_game_result, make_player_result
 from asciicade.persistence import (
     SCHEMA_VERSION,
     Database,
+    LastSession,
     PlayerRepository,
     ResultRepository,
+    SettingsRepository,
     current_version,
     data_dir,
     database_path,
 )
+from asciicade.persistence.migrations import _SCHEMA_V1
 
 
 @pytest.fixture
@@ -41,7 +44,31 @@ def test_initialize_creates_schema_and_sets_version(database: Database) -> None:
         }
 
     assert version == SCHEMA_VERSION
-    assert {"players", "game_results", "player_results"} <= tables
+    assert {"players", "game_results", "player_results", "settings"} <= tables
+
+
+def test_initialize_migrates_v1_database(tmp_path: Path) -> None:
+    path = tmp_path / "v1.db"
+    connection = sqlite3.connect(path)
+    connection.executescript(_SCHEMA_V1)
+    connection.execute("PRAGMA user_version = 1")
+    connection.commit()
+    connection.close()
+
+    database = Database(path)
+    database.initialize()
+
+    repository = PlayerRepository(database)
+    profile = repository.create("Paul", color=PlayerColor.RED)
+
+    assert profile.color is PlayerColor.RED
+    assert repository.get(profile.id) is not None
+    with database.connection() as connection:
+        assert current_version(connection) == SCHEMA_VERSION
+        columns = {
+            row["name"] for row in connection.execute("PRAGMA table_info(players)").fetchall()
+        }
+    assert {"color", "last_played_at"} <= columns
 
 
 def test_initialize_is_idempotent(tmp_path: Path) -> None:
@@ -83,6 +110,7 @@ def test_profile_survives_restart(tmp_path: Path) -> None:
     assert loaded is not None
     assert loaded.name == "Paul"
     assert loaded.created_at == profile.created_at
+    assert loaded.color is PlayerColor.GREEN
 
 
 def test_repository_lists_profiles_sorted(database: Database) -> None:
@@ -92,9 +120,50 @@ def test_repository_lists_profiles_sorted(database: Database) -> None:
     paul = repository.create("Paul")
 
     assert repository.count() == 2
+    assert [profile.name for profile in repository.list()] == ["Paul", "Ada"]
+
+    repository.mark_played([ada.id])
     assert [profile.name for profile in repository.list()] == ["Ada", "Paul"]
+
     assert repository.get(ada.id) is not None
     assert repository.get(paul.id) is not None
+
+
+def test_repository_updates_profile(database: Database) -> None:
+    repository = PlayerRepository(database)
+    profile = repository.create("Paul", color=PlayerColor.GREEN)
+
+    updated = PlayerProfile(
+        id=profile.id,
+        name="Paula",
+        created_at=profile.created_at,
+        color=PlayerColor.BRIGHT_YELLOW,
+    )
+    repository.update(updated)
+
+    loaded = repository.get(profile.id)
+    assert loaded is not None
+    assert loaded.name == "Paula"
+    assert loaded.color is PlayerColor.BRIGHT_YELLOW
+
+
+def test_repository_update_rejects_missing_profile(database: Database) -> None:
+    repository = PlayerRepository(database)
+    missing = PlayerProfile.create("Ghost")
+
+    with pytest.raises(ValueError, match="does not exist"):
+        repository.update(missing)
+
+
+def test_settings_round_trip(database: Database) -> None:
+    settings = SettingsRepository(database)
+    player_id = PlayerRepository(database).create("Paul").id
+    session = LastSession("snake", GameMode.MULTIPLAYER, (player_id,))
+
+    settings.save_last_session(session)
+
+    loaded = settings.get_last_session()
+    assert loaded == session
 
 
 def test_repository_rejects_blank_name(database: Database) -> None:

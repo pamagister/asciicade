@@ -17,8 +17,10 @@ from asciicade.core.input import (
 from asciicade.core.player import (
     GuestPlayer,
     Player,
+    PlayerColor,
     PlayerProfile,
     PlayerSelection,
+    player_color,
     player_identity,
 )
 from asciicade.core.registry import (
@@ -52,6 +54,7 @@ __all__ = [
     "InputMap",
     "MatchOutcome",
     "Player",
+    "PlayerColor",
     "PlayerProfile",
     "PlayerResult",
     "PlayerSelection",
@@ -61,5 +64,6 @@ __all__ = [
     "make_game_result",
     "make_player_result",
     "normalize_key",
+    "player_color",
     "player_identity",
 ]

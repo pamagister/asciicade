@@ -12,6 +12,7 @@ from asciicade.persistence import (
     Database,
     PlayerRepository,
     ResultRepository,
+    SettingsRepository,
     database_path,
 )
 from asciicade.ui.context import AppContext
@@ -35,6 +36,7 @@ class AsciicadeApp(App[None]):
         database: Database | None = None,
         players: PlayerRepository | None = None,
         results: ResultRepository | None = None,
+        settings: SettingsRepository | None = None,
     ) -> None:
         """Create the application.
 
@@ -43,12 +45,14 @@ class AsciicadeApp(App[None]):
             database: Optional pre-initialized database (used by tests).
             players: Optional player repository (used by tests).
             results: Optional result repository (used by tests).
+            settings: Optional settings repository (used by tests).
         """
         super().__init__()
         self._data_dir = data_dir
         self._database = database
         self._players = players
         self._results = results
+        self._settings = settings
         self._app_context: AppContext | None = None
 
     @property
@@ -67,10 +71,12 @@ class AsciicadeApp(App[None]):
                 database.initialize()
             players = self._players or PlayerRepository(database)
             results = self._results or ResultRepository(database)
+            settings = self._settings or SettingsRepository(database)
             self._app_context = AppContext(
                 registry=build_default_registry(),
                 players=players,
                 results=results,
+                settings=settings,
             )
         except Exception as exc:  # pragma: no cover - defensive startup guard
             self.notify(f"Could not initialize storage: {exc}", severity="error")

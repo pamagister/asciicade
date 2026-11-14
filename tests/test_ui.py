@@ -9,20 +9,25 @@ from textual.widgets import DataTable, Input, OptionList, Static
 
 from asciicade.core.game import GameMode
 from asciicade.core.input import Direction
-from asciicade.core.player import GuestPlayer
+from asciicade.core.player import GuestPlayer, PlayerColor
 from asciicade.core.results import MatchOutcome, make_game_result, make_player_result
 from asciicade.games.snake import Position
-from asciicade.persistence import Database, PlayerRepository, ResultRepository
+from asciicade.persistence import (
+    Database,
+    LastSession,
+    PlayerRepository,
+    ResultRepository,
+    SettingsRepository,
+)
 from asciicade.ui.app import AsciicadeApp
 from asciicade.ui.screens.confirm_quit import ConfirmQuitScreen
 from asciicade.ui.screens.create_player import CreatePlayerScreen
+from asciicade.ui.screens.edit_player_picker import EditPlayerPickerScreen
 from asciicade.ui.screens.game_over import GameOverScreen
-from asciicade.ui.screens.game_select import GameSelectScreen
 from asciicade.ui.screens.instructions import InstructionsScreen
 from asciicade.ui.screens.leaderboard import LeaderboardScreen
 from asciicade.ui.screens.main_menu import MainMenuScreen
 from asciicade.ui.screens.match_history import MatchHistoryScreen
-from asciicade.ui.screens.mode_select import ModeSelectScreen
 from asciicade.ui.screens.player_select import PlayerSelectScreen
 from asciicade.ui.screens.snake_game import SnakeGameScreen
 
@@ -35,6 +40,26 @@ def make_app(tmp_path: Path) -> AsciicadeApp:
         database=database,
         players=PlayerRepository(database),
         results=ResultRepository(database),
+        settings=SettingsRepository(database),
+    )
+
+
+def make_prepared_app(
+    tmp_path: Path,
+    *,
+    last_mode: GameMode | None = None,
+) -> AsciicadeApp:
+    """Create an application with an optional stored last session."""
+    database = Database(tmp_path / "ui.db")
+    database.initialize()
+    settings = SettingsRepository(database)
+    if last_mode is not None:
+        settings.save_last_session(LastSession("snake", last_mode, ()))
+    return AsciicadeApp(
+        database=database,
+        players=PlayerRepository(database),
+        results=ResultRepository(database),
+        settings=settings,
     )
 
 
@@ -46,12 +71,23 @@ def test_main_menu_lists_entries(tmp_path: Path) -> None:
             assert isinstance(app.screen, MainMenuScreen)
             prompts = [str(option.prompt) for option in app.screen.query_one(OptionList).options]
             assert prompts == [
-                "Play",
+                "Single Player",
+                "Two Players",
                 "High Scores",
                 "Match History",
                 "Instructions",
                 "Quit",
             ]
+
+    asyncio.run(scenario())
+
+
+def test_main_menu_preselects_last_mode(tmp_path: Path) -> None:
+    async def scenario() -> None:
+        app = make_prepared_app(tmp_path, last_mode=GameMode.MULTIPLAYER)
+        async with app.run_test(size=(100, 30)) as pilot:
+            await pilot.pause()
+            assert app.screen.query_one(OptionList).highlighted == 1
 
     asyncio.run(scenario())
 
@@ -63,23 +99,9 @@ def test_play_navigates_to_snake_game(tmp_path: Path) -> None:
             await pilot.pause()
             await pilot.press("enter")
             await pilot.pause()
-            assert isinstance(app.screen, GameSelectScreen)
-
-            await pilot.press("enter")
-            await pilot.pause()
-            assert isinstance(app.screen, ModeSelectScreen)
-
-            await pilot.press("enter")
-            await pilot.pause()
             assert isinstance(app.screen, PlayerSelectScreen)
 
-            # Single player is highlighted first; choose the guest option.
-            await pilot.press("down")
-            await pilot.press("enter")
-            await pilot.pause()
-            # The list refreshes with Start game; move to it and start.
-            await pilot.press("down")
-            await pilot.press("down")
+            # No profiles exist, so the guest option is highlighted and starts immediately.
             await pilot.press("enter")
             await pilot.pause()
 
@@ -95,9 +117,25 @@ def test_global_back_returns_to_main_menu(tmp_path: Path) -> None:
             await pilot.pause()
             await pilot.press("enter")
             await pilot.pause()
-            assert isinstance(app.screen, GameSelectScreen)
+            assert isinstance(app.screen, PlayerSelectScreen)
 
             await pilot.press("escape")
+            await pilot.pause()
+            assert isinstance(app.screen, MainMenuScreen)
+
+    asyncio.run(scenario())
+
+
+def test_right_confirms_and_left_goes_back(tmp_path: Path) -> None:
+    async def scenario() -> None:
+        app = make_app(tmp_path)
+        async with app.run_test(size=(100, 30)) as pilot:
+            await pilot.pause()
+            await pilot.press("right")
+            await pilot.pause()
+            assert isinstance(app.screen, PlayerSelectScreen)
+
+            await pilot.press("left")
             await pilot.pause()
             assert isinstance(app.screen, MainMenuScreen)
 
@@ -200,6 +238,31 @@ def test_arena_cells_are_two_characters_wide(tmp_path: Path) -> None:
             assert "11" in rendered
             assert "██" in rendered
             assert "**" in rendered
+
+    asyncio.run(scenario())
+
+
+def test_snake_uses_player_color(tmp_path: Path) -> None:
+    async def scenario() -> None:
+        app = make_app(tmp_path)
+        async with app.run_test(size=(100, 30)) as pilot:
+            await pilot.pause()
+            profile = app.context.players.create("Paul", color=PlayerColor.RED)
+            app.push_screen(PlayerSelectScreen(app.context, GameMode.SINGLE_PLAYER))
+            await pilot.pause()
+            assert isinstance(app.screen, PlayerSelectScreen)
+            assert app.screen.query_one(OptionList).highlighted == 3
+
+            await pilot.press("enter")
+            await pilot.pause()
+            assert isinstance(app.screen, SnakeGameScreen)
+            screen = app.screen
+            screen._timer.stop()
+
+            rendered = screen.render_arena()
+            styles = {str(span.style) for span in rendered.spans}
+            assert any("red" in style for style in styles)
+            assert screen._players[0].id == profile.id
 
     asyncio.run(scenario())
 
@@ -324,28 +387,125 @@ def test_instructions_screen_shows_game_instructions(tmp_path: Path) -> None:
     asyncio.run(scenario())
 
 
-def test_create_player_dialog_creates_profile(tmp_path: Path) -> None:
+def test_player_list_orders_and_preselects_profiles(tmp_path: Path) -> None:
     async def scenario() -> None:
         app = make_app(tmp_path)
         async with app.run_test(size=(100, 30)) as pilot:
             await pilot.pause()
-            registration = app.context.registry.get("snake")
-            app.push_screen(PlayerSelectScreen(app.context, registration, GameMode.SINGLE_PLAYER))
+            paul = app.context.players.create("Paul")
+            ada = app.context.players.create("Ada")
+            app.context.players.mark_played([ada.id])
+            app.push_screen(PlayerSelectScreen(app.context, GameMode.SINGLE_PLAYER))
             await pilot.pause()
-            assert isinstance(app.screen, PlayerSelectScreen)
+            option_list = app.screen.query_one(OptionList)
+            prompts = [str(option.prompt) for option in option_list.options]
+            assert prompts == ["Play as guest", "New player", "Edit player", "Ada", "Paul"]
+            assert option_list.highlighted == 3
+            assert app.screen._selected == []
+            assert paul.name == "Paul"
 
-            # The first option is "Create new player".
+    asyncio.run(scenario())
+
+
+def test_create_player_dialog_creates_profile_and_starts(tmp_path: Path) -> None:
+    async def scenario() -> None:
+        app = make_app(tmp_path)
+        async with app.run_test(size=(100, 30)) as pilot:
+            await pilot.pause()
+            app.push_screen(PlayerSelectScreen(app.context, GameMode.SINGLE_PLAYER))
+            await pilot.pause()
+
+            await pilot.press("down")
             await pilot.press("enter")
             await pilot.pause()
             assert isinstance(app.screen, CreatePlayerScreen)
 
             app.screen.query_one(Input).value = "Paul"
+            app.screen._color = PlayerColor.BLUE
+            await pilot.press("enter")
+            await pilot.pause()
+
+            assert isinstance(app.screen, SnakeGameScreen)
+            profiles = app.context.players.list()
+            assert [profile.name for profile in profiles] == ["Paul"]
+            assert profiles[0].color is PlayerColor.BLUE
+            assert app.context.settings.get_last_session() is not None
+
+    asyncio.run(scenario())
+
+
+def test_edit_profile_changes_name_and_color(tmp_path: Path) -> None:
+    async def scenario() -> None:
+        app = make_app(tmp_path)
+        async with app.run_test(size=(100, 30)) as pilot:
+            await pilot.pause()
+            app.context.players.create("Paul")
+            app.push_screen(PlayerSelectScreen(app.context, GameMode.SINGLE_PLAYER))
+            await pilot.pause()
+
+            await pilot.press("e")
+            await pilot.pause()
+            assert isinstance(app.screen, CreatePlayerScreen)
+
+            app.screen.query_one(Input).value = "Paula"
+            app.screen._color = PlayerColor.MAGENTA
             await pilot.press("enter")
             await pilot.pause()
 
             assert isinstance(app.screen, PlayerSelectScreen)
-            assert [player.name for player in app.screen._selected] == ["Paul"]
-            assert [profile.name for profile in app.context.players.list()] == ["Paul"]
+            profiles = app.context.players.list()
+            assert [profile.name for profile in profiles] == ["Paula"]
+            assert profiles[0].color is PlayerColor.MAGENTA
+
+    asyncio.run(scenario())
+
+
+def test_edit_player_menu_option(tmp_path: Path) -> None:
+    async def scenario() -> None:
+        app = make_app(tmp_path)
+        async with app.run_test(size=(100, 30)) as pilot:
+            await pilot.pause()
+            app.context.players.create("Paul")
+            app.push_screen(PlayerSelectScreen(app.context, GameMode.SINGLE_PLAYER))
+            await pilot.pause()
+
+            # Default highlight is the profile; move up to Edit player.
+            await pilot.press("up")
+            await pilot.press("enter")
+            await pilot.pause()
+            assert isinstance(app.screen, EditPlayerPickerScreen)
+
+            await pilot.press("enter")
+            await pilot.pause()
+            assert isinstance(app.screen, CreatePlayerScreen)
+
+    asyncio.run(scenario())
+
+
+def test_two_player_flow_selects_two_profiles(tmp_path: Path) -> None:
+    async def scenario() -> None:
+        app = make_app(tmp_path)
+        async with app.run_test(size=(100, 30)) as pilot:
+            await pilot.pause()
+            paul = app.context.players.create("Paul")
+            ada = app.context.players.create("Ada")
+            app.push_screen(PlayerSelectScreen(app.context, GameMode.MULTIPLAYER))
+            await pilot.pause()
+
+            # Newest profile is first; select Ada, then Paul.
+            await pilot.press("enter")
+            await pilot.pause()
+            assert isinstance(app.screen, PlayerSelectScreen)
+            assert [player.name for player in app.screen._selected] == ["Ada"]
+
+            await pilot.press("enter")
+            await pilot.pause()
+            assert isinstance(app.screen, SnakeGameScreen)
+            assert {player.id for player in app.screen._players} == {paul.id, ada.id}
+            session = app.context.settings.get_last_session()
+            assert session is not None
+            assert session.mode is GameMode.MULTIPLAYER
+            assert set(session.player_ids) == {paul.id, ada.id}
 
     asyncio.run(scenario())
 
@@ -356,10 +516,7 @@ def test_main_menu_high_scores_navigation(tmp_path: Path) -> None:
         async with app.run_test(size=(100, 30)) as pilot:
             await pilot.pause()
             await pilot.press("down")
-            await pilot.press("enter")
-            await pilot.pause()
-            assert isinstance(app.screen, GameSelectScreen)
-
+            await pilot.press("down")
             await pilot.press("enter")
             await pilot.pause()
             assert isinstance(app.screen, LeaderboardScreen)
@@ -374,10 +531,7 @@ def test_main_menu_match_history_navigation(tmp_path: Path) -> None:
             await pilot.pause()
             await pilot.press("down")
             await pilot.press("down")
-            await pilot.press("enter")
-            await pilot.pause()
-            assert isinstance(app.screen, GameSelectScreen)
-
+            await pilot.press("down")
             await pilot.press("enter")
             await pilot.pause()
             assert isinstance(app.screen, MatchHistoryScreen)
@@ -393,10 +547,7 @@ def test_main_menu_instructions_navigation(tmp_path: Path) -> None:
             await pilot.press("down")
             await pilot.press("down")
             await pilot.press("down")
-            await pilot.press("enter")
-            await pilot.pause()
-            assert isinstance(app.screen, GameSelectScreen)
-
+            await pilot.press("down")
             await pilot.press("enter")
             await pilot.pause()
             assert isinstance(app.screen, InstructionsScreen)
@@ -409,9 +560,9 @@ def test_typing_q_in_player_name_does_not_quit(tmp_path: Path) -> None:
         app = make_app(tmp_path)
         async with app.run_test(size=(100, 30)) as pilot:
             await pilot.pause()
-            registration = app.context.registry.get("snake")
-            app.push_screen(PlayerSelectScreen(app.context, registration, GameMode.SINGLE_PLAYER))
+            app.push_screen(PlayerSelectScreen(app.context, GameMode.SINGLE_PLAYER))
             await pilot.pause()
+            await pilot.press("down")
             await pilot.press("enter")
             await pilot.pause()
             assert isinstance(app.screen, CreatePlayerScreen)

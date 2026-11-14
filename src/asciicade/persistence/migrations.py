@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import sqlite3
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 
-_SCHEMA = """
+_SCHEMA_V1 = """
 CREATE TABLE players (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
@@ -36,6 +36,18 @@ CREATE TABLE player_results (
 CREATE INDEX idx_player_results_result ON player_results(result_id);
 """
 
+_SCHEMA_V2 = """
+ALTER TABLE players ADD COLUMN color TEXT NOT NULL DEFAULT 'green';
+ALTER TABLE players ADD COLUMN last_played_at TEXT;
+
+CREATE INDEX idx_players_last_played ON players(last_played_at DESC);
+
+CREATE TABLE settings (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+);
+"""
+
 
 def current_version(connection: sqlite3.Connection) -> int:
     """Return the schema version stored in the database."""
@@ -58,5 +70,7 @@ def migrate(connection: sqlite3.Connection) -> None:
             f"Database schema version {version} is newer than supported version {SCHEMA_VERSION}."
         )
     if version < 1:
-        connection.executescript(_SCHEMA)
+        connection.executescript(_SCHEMA_V1)
+    if version < 2:
+        connection.executescript(_SCHEMA_V2)
         connection.execute(f"PRAGMA user_version = {SCHEMA_VERSION}")

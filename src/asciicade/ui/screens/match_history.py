@@ -4,14 +4,14 @@ from __future__ import annotations
 
 from textual.app import ComposeResult
 from textual.containers import Vertical
-from textual.screen import Screen
 from textual.widgets import DataTable, OptionList, Static
 from textual.widgets.option_list import Option
 
 from asciicade.ui.context import AppContext
+from asciicade.ui.screens.menu import MenuScreen
 
 
-class MatchHistoryScreen(Screen[None]):
+class MatchHistoryScreen(MenuScreen):
     """Display stored match results for a game."""
 
     def __init__(self, context: AppContext, game_id: str | None = None) -> None:
@@ -33,6 +33,7 @@ class MatchHistoryScreen(Screen[None]):
                 id="history-games",
             ),
             DataTable(id="history-table"),
+            Static("Enter/→ select · ←/Esc back", id="menu-footer"),
             classes="menu-screen",
         )
 

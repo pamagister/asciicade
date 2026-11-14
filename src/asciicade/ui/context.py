@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from asciicade.core.registry import GameRegistry
 from asciicade.persistence.players import PlayerRepository
 from asciicade.persistence.results import ResultRepository
+from asciicade.persistence.settings import SettingsRepository
 
 
 @dataclass(frozen=True, slots=True)
@@ -16,3 +17,4 @@ class AppContext:
     registry: GameRegistry
     players: PlayerRepository
     results: ResultRepository
+    settings: SettingsRepository

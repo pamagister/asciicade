@@ -6,16 +6,17 @@ from typing import Literal
 
 from textual.app import ComposeResult
 from textual.containers import Vertical
-from textual.screen import Screen
 from textual.widgets import OptionList, Static
 from textual.widgets.option_list import Option
 
+from asciicade.core.game import GameMode
+from asciicade.core.player import GuestPlayer, PlayerProfile
 from asciicade.core.registry import GameRegistration
 from asciicade.ui.context import AppContext
 from asciicade.ui.screens.instructions import InstructionsScreen
 from asciicade.ui.screens.leaderboard import LeaderboardScreen
 from asciicade.ui.screens.match_history import MatchHistoryScreen
-from asciicade.ui.screens.mode_select import ModeSelectScreen
+from asciicade.ui.screens.menu import MenuScreen
 
 GameSelectPurpose = Literal["play", "high-scores", "match-history", "instructions"]
 
@@ -27,36 +28,62 @@ _PURPOSE_TITLES: dict[str, str] = {
 }
 
 
-class GameSelectScreen(Screen[None]):
+class GameSelectScreen(MenuScreen):
     """Choose a registered game."""
 
-    def __init__(self, context: AppContext, purpose: GameSelectPurpose) -> None:
+    def __init__(
+        self,
+        context: AppContext,
+        purpose: GameSelectPurpose,
+        *,
+        mode: GameMode | None = None,
+        players: tuple[PlayerProfile | GuestPlayer, ...] = (),
+        default_game_id: str | None = None,
+    ) -> None:
         """Store the context and navigation purpose."""
         super().__init__()
         self._app_context = context
         self._purpose = purpose
+        self._mode = mode
+        self._players = players
+        self._default_game_id = default_game_id
+
+    def _registrations(self) -> tuple[GameRegistration, ...]:
+        """Return the games available for the current purpose."""
+        registrations = self._app_context.registry.all()
+        if self._purpose == "play" and self._mode is not None:
+            return tuple(item for item in registrations if self._mode in item.modes)
+        return registrations
 
     def compose(self) -> ComposeResult:
         """Build the game list."""
-        registrations = self._app_context.registry.all()
         yield Vertical(
             Static(_PURPOSE_TITLES[self._purpose], id="screen-title"),
             OptionList(
                 *(
                     Option(registration.metadata.name, id=f"game:{registration.identifier}")
-                    for registration in registrations
+                    for registration in self._registrations()
                 ),
                 id="game-list",
             ),
+            Static("Enter/→ select · ←/Esc back", id="menu-footer"),
             classes="menu-screen",
         )
 
     def on_mount(self) -> None:
-        """Focus the game list when it has entries."""
+        """Focus the game list and preselect the default game."""
         option_list = self.query_one(OptionList)
         if option_list.option_count:
-            option_list.highlighted = 0
+            option_list.highlighted = self._default_index(option_list)
             option_list.focus()
+
+    def _default_index(self, option_list: OptionList) -> int:
+        """Return the highlighted index for the requested default game."""
+        if self._default_game_id is not None:
+            for index, option in enumerate(option_list.options):
+                if option.id == f"game:{self._default_game_id}":
+                    return index
+        return 0
 
     def on_option_list_option_selected(self, event: OptionList.OptionSelected) -> None:
         """Open the selected game in the requested context."""
@@ -69,7 +96,25 @@ class GameSelectScreen(Screen[None]):
     def _open(self, registration: GameRegistration) -> None:
         """Push the next screen for the selected game."""
         if self._purpose == "play":
-            self.app.push_screen(ModeSelectScreen(self._app_context, registration))
+            if self._mode is None or not self._players:
+                self.notify("No game mode or players were selected.", severity="error")
+                return
+            if registration.identifier == "snake":
+                from asciicade.ui.screens.snake_game import SnakeGameScreen
+
+                self.app.push_screen(
+                    SnakeGameScreen(
+                        self._app_context,
+                        registration,
+                        self._mode,
+                        self._players,
+                    )
+                )
+                return
+            self.notify(
+                f"{registration.metadata.name} has no playable screen yet.",
+                severity="error",
+            )
         elif self._purpose == "high-scores":
             self.app.push_screen(
                 LeaderboardScreen(self._app_context, registration.metadata.identifier)

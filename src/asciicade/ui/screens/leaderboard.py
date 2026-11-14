@@ -4,14 +4,14 @@ from __future__ import annotations
 
 from textual.app import ComposeResult
 from textual.containers import Vertical
-from textual.screen import Screen
 from textual.widgets import DataTable, OptionList, Static
 from textual.widgets.option_list import Option
 
 from asciicade.ui.context import AppContext
+from asciicade.ui.screens.menu import MenuScreen
 
 
-class LeaderboardScreen(Screen[None]):
+class LeaderboardScreen(MenuScreen):
     """Display stored high scores for a game."""
 
     def __init__(self, context: AppContext, game_id: str | None = None) -> None:
@@ -33,6 +33,7 @@ class LeaderboardScreen(Screen[None]):
                 id="leaderboard-games",
             ),
             DataTable(id="leaderboard-table"),
+            Static("Enter/→ select · ←/Esc back", id="menu-footer"),
             classes="menu-screen",
         )
 

@@ -14,14 +14,17 @@ from asciicade.persistence.results import (
     MatchRecord,
     ResultRepository,
 )
+from asciicade.persistence.settings import LastSession, SettingsRepository
 
 __all__ = [
     "SCHEMA_VERSION",
     "Database",
+    "LastSession",
     "LeaderboardEntry",
     "MatchRecord",
     "PlayerRepository",
     "ResultRepository",
+    "SettingsRepository",
     "current_version",
     "data_dir",
     "database_path",

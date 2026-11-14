@@ -11,7 +11,14 @@ from uuid import uuid4
 import pytest
 
 from asciicade.core.game import GameMode
-from asciicade.core.player import GuestPlayer, PlayerProfile, PlayerSelection, player_identity
+from asciicade.core.player import (
+    GuestPlayer,
+    PlayerColor,
+    PlayerProfile,
+    PlayerSelection,
+    player_color,
+    player_identity,
+)
 from asciicade.core.results import (
     MatchOutcome,
     make_game_result,
@@ -46,6 +53,35 @@ def test_guest_player_rejects_invalid_slot() -> None:
 def test_guest_player_rejects_blank_name() -> None:
     with pytest.raises(ValueError, match="must not be empty"):
         GuestPlayer(slot=1, name="   ")
+
+
+def test_profile_create_stores_color() -> None:
+    profile = PlayerProfile.create("Paul", color=PlayerColor.BRIGHT_CYAN)
+
+    assert profile.color is PlayerColor.BRIGHT_CYAN
+    assert profile.color.label == "Bright Cyan"
+
+
+def test_guest_players_get_slot_colors() -> None:
+    assert GuestPlayer(slot=1).color is PlayerColor.GREEN
+    assert GuestPlayer(slot=2).color is PlayerColor.CYAN
+
+
+def test_guest_players_can_override_color() -> None:
+    assert GuestPlayer(slot=1, color=PlayerColor.YELLOW).color is PlayerColor.YELLOW
+
+
+def test_player_color_helper_handles_profiles_and_guests() -> None:
+    profile = PlayerProfile.create("Paul", color=PlayerColor.BLUE)
+    guest = GuestPlayer(slot=2)
+
+    assert player_color(profile) is PlayerColor.BLUE
+    assert player_color(guest) is PlayerColor.CYAN
+
+
+def test_player_color_has_sixteen_terminal_colors() -> None:
+    assert len(tuple(PlayerColor)) == 16
+    assert PlayerColor("bright_red") is PlayerColor.BRIGHT_RED
 
 
 def test_selection_accepts_one_and_two_players() -> None:

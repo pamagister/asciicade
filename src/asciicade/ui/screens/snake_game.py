@@ -15,9 +15,10 @@ from textual.widgets import Static
 
 from asciicade.core.game import GameMode
 from asciicade.core.input import InputAction, input_map_for_mode
-from asciicade.core.player import GuestPlayer, PlayerProfile
+from asciicade.core.player import GuestPlayer, PlayerProfile, player_color
 from asciicade.core.registry import GameRegistration
 from asciicade.games.snake import Position, SnakeGame
+from asciicade.persistence import LastSession
 from asciicade.ui.context import AppContext
 from asciicade.ui.screens.game_over import GameOverScreen
 
@@ -68,6 +69,13 @@ class SnakeGameScreen(Screen[None]):
         """Start the game and the tick timer."""
         self._game = cast(SnakeGame, self._registration.factory())
         self._game.start(self._mode, self._players)
+        profile_ids = tuple(
+            player.id for player in self._players if isinstance(player, PlayerProfile)
+        )
+        self._app_context.settings.save_last_session(
+            LastSession(self._registration.identifier, self._mode, profile_ids)
+        )
+        self._app_context.players.mark_played(profile_ids)
         self._timer = self.set_interval(1.0 / self._game.config.tick_rate, self._on_tick)
         self._update_display()
         self.focus()
@@ -146,12 +154,16 @@ class SnakeGameScreen(Screen[None]):
             style="bold yellow",
         )
         for player, snake in zip(self._players, snapshot.snakes):
-            text.append(f"{player.name}: {snake.score}   ", style="bold")
+            color = player_color(player).value
+            text.append(
+                f"{player.name}: {snake.score}   ",
+                style=f"bold {color}",
+            )
         text.append("\n")
 
         cells: dict[Position, tuple[str, str]] = {}
-        for snake in snapshot.snakes:
-            color = "green" if snake.player_index == 1 else "cyan"
+        for player, snake in zip(self._players, snapshot.snakes):
+            color = player_color(player).value
             for index, position in enumerate(snake.body):
                 if index == 0:
                     cells[position] = (
