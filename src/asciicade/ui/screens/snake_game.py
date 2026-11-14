@@ -21,7 +21,9 @@ from asciicade.core.registry import GameRegistration
 from asciicade.games.snake import Position, SnakeGame
 from asciicade.persistence import LastSession
 from asciicade.ui.context import AppContext
+from asciicade.ui.navigation import go_to_game_menu, go_to_main_menu
 from asciicade.ui.screens.game_over import GameOverScreen
+from asciicade.ui.screens.leave_game import LeaveGameScreen
 
 _DIRECTION_ACTIONS = {
     InputAction.UP,
@@ -38,7 +40,10 @@ _CELL_WIDTH = 2
 class SnakeGameScreen(Screen[None]):
     """Render and drive a Snake session."""
 
-    BINDINGS = [Binding("escape", "toggle_pause", "Pause", show=True)]
+    BINDINGS = [
+        Binding("escape", "toggle_pause", "Pause", show=True),
+        Binding("p", "toggle_pause", "Pause", show=False),
+    ]
 
     def __init__(
         self,
@@ -91,24 +96,66 @@ class SnakeGameScreen(Screen[None]):
             self._timer = None
 
     def on_key(self, event: events.Key) -> None:
-        """Feed direction keys into the engine."""
+        """Feed direction keys into the engine and handle pause actions."""
         if self._game is None or self._finished:
+            return
+        if self._paused and event.key == "enter":
+            event.stop()
+            event.prevent_default()
+            self._open_leave_dialog()
             return
         input_event = self._input_map.resolve(event.key)
         if input_event is None:
             return
         if input_event.action in _DIRECTION_ACTIONS:
-            self._game.handle_input(input_event)
             event.stop()
             event.prevent_default()
+            if not self._paused:
+                self._game.handle_input(input_event)
 
     def action_toggle_pause(self) -> None:
         """Pause or resume the game."""
-        if self._game is None or self._finished:
+        if self._game is None:
+            return
+        if self._finished:
+            self._open_leave_dialog()
             return
         self._paused = not self._paused
+        self._clear_pending()
         self._update_display()
         self.notify("Paused" if self._paused else "Resumed")
+
+    def _clear_pending(self) -> None:
+        """Discard buffered direction requests."""
+        if self._game is not None:
+            self._game.clear_pending()
+
+    def _open_leave_dialog(self) -> None:
+        """Ask whether to leave the current game."""
+        self.app.push_screen(
+            LeaveGameScreen(self._registration.metadata.name, self._mode),
+            self._on_leave_choice,
+        )
+
+    def _on_leave_choice(self, choice: str | None) -> None:
+        """Handle the leave-game dialog result."""
+        if choice == "game-menu":
+            go_to_game_menu(
+                self.app,
+                self._app_context,
+                self._registration,
+                self._mode,
+                self._players,
+                self._options,
+            )
+            return
+        if choice == "main-menu":
+            go_to_main_menu(self.app, self._app_context)
+            return
+        self._paused = False
+        self._clear_pending()
+        self._update_display()
+        self.notify("Resumed")
 
     def _on_tick(self) -> None:
         """Advance the engine and refresh the display."""
@@ -128,18 +175,28 @@ class SnakeGameScreen(Screen[None]):
             self._timer.stop()
             self._timer = None
         result = self._game.result
-        if result is not None:
-            self._app_context.results.record(result)
-            self.app.push_screen(
-                GameOverScreen(
-                    self._app_context,
-                    self._registration,
-                    self._mode,
-                    self._players,
-                    result,
-                    options=self._options,
-                )
+        if result is None:
+            self.notify("The game finished without a result.", severity="error")
+            go_to_game_menu(
+                self.app,
+                self._app_context,
+                self._registration,
+                self._mode,
+                self._players,
+                self._options,
             )
+            return
+        self._app_context.results.record(result)
+        self.app.push_screen(
+            GameOverScreen(
+                self._app_context,
+                self._registration,
+                self._mode,
+                self._players,
+                result,
+                options=self._options,
+            )
+        )
         self._update_display()
 
     def _update_display(self) -> None:
@@ -187,7 +244,15 @@ class SnakeGameScreen(Screen[None]):
         text.append(f"{border}\n", style="bright_black")
 
         if self._paused:
-            text.append("\nPAUSED — Escape to resume\n", style="bold yellow")
+            text.append(
+                "\nPAUSED — Esc/P resume · Enter leave · Q quit\n",
+                style="bold yellow",
+            )
+        else:
+            text.append(
+                "\nArrows/WASD move · Esc/P pause · Q quit\n",
+                style="bright_black",
+            )
         if self._finished:
             text.append("\nGAME OVER\n", style="bold red")
         return text

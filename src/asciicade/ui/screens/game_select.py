@@ -71,8 +71,9 @@ class GameSelectScreen(MenuScreen):
                     ),
                     id="game-list",
                 ),
-                Static("Enter/→ select · ←/Esc back", id="menu-footer"),
-                classes="menu-screen",
+                Static("", id="empty-state"),
+                Static("↑/↓ · Enter/Space select · ←/Esc", id="menu-footer"),
+                classes="menu-pane",
             ),
             Static("", id="game-description"),
             id="game-select-root",
@@ -84,6 +85,9 @@ class GameSelectScreen(MenuScreen):
         if option_list.option_count:
             option_list.highlighted = self._default_index(option_list)
             option_list.focus()
+        else:
+            self.query_one("#empty-state", Static).update("No games available for this mode.")
+            self.query_one("#menu-footer", Static).update("←/Esc back")
         self._update_description()
 
     def _default_index(self, option_list: OptionList) -> int:

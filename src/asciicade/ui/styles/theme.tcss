@@ -34,6 +34,12 @@ Screen {
     align: center middle;
 }
 
+.menu-pane {
+    width: 1fr;
+    height: 100%;
+    align: center middle;
+}
+
 .game-screen {
     width: 100%;
     height: 100%;
@@ -69,11 +75,25 @@ OptionList:focus {
 }
 
 #game-description {
-    width: 45;
+    width: 40;
     height: auto;
     color: #d8fff4;
     content-align: left top;
     padding: 1 2;
+}
+
+#empty-state {
+    width: 100%;
+    max-width: 60;
+    height: 1;
+    color: #ff3864;
+    content-align: center middle;
+}
+
+#game-list,
+#menu-list {
+    width: 100%;
+    max-width: 60;
 }
 
 #game-menu-root {
@@ -83,7 +103,7 @@ OptionList:focus {
 }
 
 #game-info-panel {
-    width: 45;
+    width: 40;
     height: auto;
     color: #d8fff4;
     content-align: left top;
@@ -105,7 +125,8 @@ OptionList:focus {
 }
 
 DataTable {
-    width: 90;
+    width: 100%;
+    max-width: 90;
     height: 16;
     border: round #39ff14;
     background: #0b1220;
@@ -129,7 +150,8 @@ DataTable {
 }
 
 #menu-footer {
-    width: 80;
+    width: 100%;
+    max-width: 80;
     height: 1;
     color: #7dd3fc;
     content-align: center middle;
@@ -148,11 +170,24 @@ DataTable {
     content-align: center middle;
 }
 
-#instructions-body {
-    width: 90;
-    height: 16;
+#instructions-scroll {
+    width: 100%;
+    max-width: 90;
+    height: 1fr;
     border: round #4dd0e1;
     padding: 1 2;
+}
+
+#instructions-body {
+    width: 100%;
+    height: auto;
+}
+
+#leave-question {
+    width: 80;
+    height: 1;
+    color: #d8fff4;
+    content-align: center middle;
 }
 
 Button {

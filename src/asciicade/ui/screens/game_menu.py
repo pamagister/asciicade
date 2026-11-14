@@ -83,7 +83,7 @@ class GameMenuScreen(Screen[None]):
                     id="menu-list",
                 ),
                 Static("", id="menu-footer"),
-                classes="menu-screen",
+                classes="menu-pane",
             ),
             Static("", id="game-info-panel"),
             id="game-menu-root",
@@ -147,27 +147,36 @@ class GameMenuScreen(Screen[None]):
             self._toggle_option(option_id.removeprefix("option:"))
         self._update_footer()
 
-    def on_key(self, event: events.Key) -> None:
-        """Handle left/right navigation for option values."""
+    async def on_key(self, event: events.Key) -> None:
+        """Handle option values and left-to-back navigation."""
         option_list = self.query_one(OptionList)
         option = option_list.highlighted_option
-        if option is None or option.id is None or not option.id.startswith("option:"):
+        if option is None or option.id is None:
             return
-        key = option.id.removeprefix("option:")
-        if event.key in ("left", "h"):
-            self._change_option(key, -1)
+        if option.id.startswith("option:"):
+            key = option.id.removeprefix("option:")
+            if event.key in ("left", "h"):
+                self._change_option(key, -1)
+                event.stop()
+                event.prevent_default()
+            elif event.key in ("right", "l"):
+                self._change_option(key, 1)
+                event.stop()
+                event.prevent_default()
+            return
+        if event.key == "left":
             event.stop()
             event.prevent_default()
-        elif event.key in ("right", "l"):
-            self._change_option(key, 1)
-            event.stop()
-            event.prevent_default()
+            await self.action_back()
 
     def action_toggle_option(self) -> None:
-        """Toggle or cycle the value of the highlighted option."""
+        """Toggle an option or activate a menu entry with Space."""
         option_list = self.query_one(OptionList)
         option = option_list.highlighted_option
-        if option is None or option.id is None or not option.id.startswith("option:"):
+        if option is None or option.id is None:
+            return
+        if not option.id.startswith("option:"):
+            self.action_confirm()
             return
         self._toggle_option(option.id.removeprefix("option:"))
         self._update_footer()
@@ -208,13 +217,13 @@ class GameMenuScreen(Screen[None]):
             footer.update("Esc back")
             return
         if option.id == "play":
-            footer.update("Enter/→ start · Esc back")
+            footer.update("Enter/Space start · Esc back")
         elif option.id == "instructions":
-            footer.update("Enter/→ show instructions · Esc back")
+            footer.update("Enter/Space show · Esc back")
         elif option.id == _OPTION_SEPARATOR_ID:
             footer.update("↓/↑ navigate · Esc back")
         elif option.id.startswith("option:"):
-            footer.update("Space/Enter toggle · ←/→ change · Esc back")
+            footer.update("Space/Enter cycle · ←/→ change · Esc")
         else:
             footer.update("Esc back")
 

@@ -63,6 +63,10 @@ class Snake:
         """Buffer a requested direction for a future tick."""
         self.pending.append(direction)
 
+    def clear_pending(self) -> None:
+        """Discard all buffered direction requests."""
+        self.pending.clear()
+
     def consume_direction(self) -> Direction:
         """Apply the next valid buffered direction.
 

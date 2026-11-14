@@ -13,6 +13,7 @@ class MenuScreen(Screen[None]):
     BINDINGS = [
         Binding("right", "confirm", "Select", show=False),
         Binding("left", "back", "Back", show=False),
+        Binding("space", "confirm", "Select", show=False),
     ]
 
     def action_confirm(self) -> None:

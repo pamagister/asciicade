@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import replace
 
 from rich.text import Text
+from textual import events
 from textual.app import ComposeResult
 from textual.binding import Binding
 from textual.containers import Horizontal, Vertical
@@ -14,6 +15,7 @@ from textual.widgets.option_list import Option
 
 from asciicade.core.player import PlayerColor, PlayerProfile
 from asciicade.persistence.players import PlayerRepository
+from asciicade.ui.widgets import ActionButton, handle_button_row_key
 
 
 class CreatePlayerScreen(Screen[PlayerProfile | None]):
@@ -51,10 +53,11 @@ class CreatePlayerScreen(Screen[PlayerProfile | None]):
             ),
             Static("", id="create-status"),
             Horizontal(
-                Button("Save" if editing else "Create", id="create", variant="primary"),
-                Button("Cancel", id="cancel"),
+                ActionButton("Save" if editing else "Create", id="create", variant="primary"),
+                ActionButton("Cancel", id="cancel"),
                 id="create-actions",
             ),
+            Static("Enter save · Tab next field · Esc cancel", id="menu-footer"),
             classes="menu-screen modal-screen",
         )
 
@@ -66,6 +69,10 @@ class CreatePlayerScreen(Screen[PlayerProfile | None]):
         name_input.focus()
         self._highlight_color()
         self._update_status()
+
+    def on_key(self, event: events.Key) -> None:
+        """Move focus between dialog buttons with the arrow keys."""
+        handle_button_row_key(self, event)
 
     def on_input_submitted(self, event: Input.Submitted) -> None:
         """Create or save when Enter is pressed in the name field."""

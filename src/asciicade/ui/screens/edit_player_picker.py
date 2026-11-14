@@ -22,6 +22,7 @@ class EditPlayerPickerScreen(Screen[PlayerProfile | None]):
     BINDINGS = [
         Binding("right", "confirm", "Select", show=False),
         Binding("left", "back", "Back", show=False),
+        Binding("space", "confirm", "Select", show=False),
     ]
 
     def __init__(self, context: AppContext) -> None:
@@ -35,7 +36,7 @@ class EditPlayerPickerScreen(Screen[PlayerProfile | None]):
             Static("EDIT PLAYER", id="screen-title"),
             Static("Choose a profile to edit.", id="player-selection-status"),
             OptionList(id="edit-player-list"),
-            Static("Enter/→ edit · ←/Esc back", id="menu-footer"),
+            Static("Enter/Space edit · ←/Esc back", id="menu-footer"),
             classes="menu-screen",
         )
 

@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+from textual import events
 from textual.app import ComposeResult
+from textual.binding import Binding
 from textual.containers import Horizontal, Vertical
 from textual.screen import Screen
 from textual.widgets import Button, Static
@@ -13,12 +15,15 @@ from asciicade.core.player import GuestPlayer, PlayerProfile
 from asciicade.core.registry import GameRegistration
 from asciicade.core.results import GameResult
 from asciicade.ui.context import AppContext
-from asciicade.ui.navigation import go_to_main_menu
+from asciicade.ui.navigation import go_to_game_menu, go_to_main_menu
 from asciicade.ui.screens.leaderboard import LeaderboardScreen
+from asciicade.ui.widgets import ActionButton, handle_button_row_key
 
 
 class GameOverScreen(Screen[None]):
     """Show the final result and next actions."""
+
+    BINDINGS = [Binding("escape", "back", "Back", show=False)]
 
     def __init__(
         self,
@@ -45,17 +50,33 @@ class GameOverScreen(Screen[None]):
             Static("GAME OVER", id="game-over-title"),
             Static(self._summary(), id="game-over-summary"),
             Horizontal(
-                Button("Play again", id="play-again", variant="primary"),
-                Button("Main menu", id="main-menu"),
-                Button("High scores", id="high-scores"),
+                ActionButton("Play again", id="play-again", variant="primary"),
+                ActionButton("Main menu", id="main-menu"),
+                ActionButton("High scores", id="high-scores"),
                 id="game-over-actions",
             ),
+            Static("←/→ move · Enter/Space select · Esc game menu", id="menu-footer"),
             classes="menu-screen",
         )
 
     def on_mount(self) -> None:
         """Focus the first action."""
-        self.query_one(Button).focus()
+        self.query_one("#play-again", ActionButton).focus()
+
+    def on_key(self, event: events.Key) -> None:
+        """Move focus between result actions with the arrow keys."""
+        handle_button_row_key(self, event)
+
+    def action_back(self) -> None:
+        """Return to the game menu."""
+        go_to_game_menu(
+            self.app,
+            self._app_context,
+            self._registration,
+            self._mode,
+            self._players,
+            self._options,
+        )
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         """Handle the selected action."""

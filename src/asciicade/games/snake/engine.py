@@ -190,6 +190,11 @@ class SnakeEngine:
             if snake.alive:
                 snake.queue_direction(direction)
 
+    def clear_pending(self) -> None:
+        """Discard all buffered direction requests."""
+        for snake in self._snakes:
+            snake.clear_pending()
+
     def tick(self) -> None:
         """Advance the game by one deterministic tick."""
         if self._finished or not self._snakes:

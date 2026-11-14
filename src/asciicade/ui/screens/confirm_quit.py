@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
+from textual import events
 from textual.app import ComposeResult
 from textual.binding import Binding
 from textual.containers import Horizontal, Vertical
 from textual.screen import Screen
 from textual.widgets import Button, Static
+
+from asciicade.ui.widgets import ActionButton, handle_button_row_key
 
 
 class ConfirmQuitScreen(Screen[None]):
@@ -22,16 +25,21 @@ class ConfirmQuitScreen(Screen[None]):
         yield Vertical(
             Static("Quit Asciicade?", id="confirm-title"),
             Horizontal(
-                Button("Quit", id="quit", variant="error"),
-                Button("Cancel", id="cancel", variant="primary"),
+                ActionButton("Quit", id="quit", variant="error"),
+                ActionButton("Cancel", id="cancel", variant="primary"),
                 id="confirm-actions",
             ),
+            Static("←/→ move · Enter/Space select · Esc cancel", id="menu-footer"),
             classes="menu-screen modal-screen",
         )
 
     def on_mount(self) -> None:
         """Focus the safe option."""
-        self.query_one("#cancel", Button).focus()
+        self.query_one("#cancel", ActionButton).focus()
+
+    def on_key(self, event: events.Key) -> None:
+        """Move focus between dialog buttons with the arrow keys."""
+        handle_button_row_key(self, event)
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         """Handle the dialog buttons."""

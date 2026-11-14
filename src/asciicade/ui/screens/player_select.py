@@ -31,6 +31,7 @@ class PlayerSelectScreen(MenuScreen):
     BINDINGS = [
         *MenuScreen.BINDINGS,
         Binding("e", "edit_profile", "Edit profile", show=False),
+        Binding("backspace", "undo_selection", "Undo", show=False),
     ]
 
     def __init__(self, context: AppContext, mode: GameMode) -> None:
@@ -117,6 +118,14 @@ class PlayerSelectScreen(MenuScreen):
         if len(self._selected) == self._required:
             self._start_game()
 
+    def action_undo_selection(self) -> None:
+        """Remove the most recently selected player."""
+        if not self._selected:
+            return
+        removed = self._selected.pop()
+        preferred_id = removed.id if isinstance(removed, PlayerProfile) else None
+        self._refresh(preferred_id)
+
     def _on_profile_created(self, profile: PlayerProfile | None) -> None:
         """Add a newly created profile to the selection."""
         if profile is not None:
@@ -124,7 +133,7 @@ class PlayerSelectScreen(MenuScreen):
 
     def _on_profile_edited(self, profile: PlayerProfile | None) -> None:
         """Refresh after an edit dialog closes."""
-        self._refresh()
+        self._refresh(profile.id if profile is not None else None)
 
     def _available_profiles(self) -> list[PlayerProfile]:
         """Return profiles that are not already selected."""
@@ -135,7 +144,7 @@ class PlayerSelectScreen(MenuScreen):
             if player_identity(profile) not in identities
         ]
 
-    def _refresh(self) -> None:
+    def _refresh(self, preferred_id: UUID | None = None) -> None:
         """Rebuild the option list and status text."""
         option_list = self.query_one(OptionList)
         option_list.clear_options()
@@ -153,13 +162,17 @@ class PlayerSelectScreen(MenuScreen):
                 )
             )
 
-        option_list.highlighted = self._default_index(option_list)
+        option_list.highlighted = self._default_index(option_list, preferred_id)
         option_list.focus()
         self._update_texts()
         self._update_footer()
 
-    def _default_index(self, option_list: OptionList) -> int:
-        """Prefer the first existing profile, otherwise the guest entry."""
+    def _default_index(self, option_list: OptionList, preferred_id: UUID | None = None) -> int:
+        """Prefer a specific profile, then the first profile, otherwise guest."""
+        if preferred_id is not None:
+            for index, option in enumerate(option_list.options):
+                if option.id == f"profile:{preferred_id}":
+                    return index
         for index, option in enumerate(option_list.options):
             if option.id is not None and option.id.startswith("profile:"):
                 return index
@@ -175,7 +188,14 @@ class PlayerSelectScreen(MenuScreen):
             status.update(f"Players: {names}.")
         else:
             title.update(f"SELECT PLAYER {len(self._selected) + 1} OF {self._required}")
-            status.update("Choose a profile, create a player, or play as a guest.")
+            if self._selected:
+                names = ", ".join(player.name for player in self._selected)
+                status.update(
+                    f"Selected: {names}. "
+                    f"Choose player {len(self._selected) + 1} of {self._required}."
+                )
+            else:
+                status.update("Choose a profile, create a player, or play as a guest.")
 
     def _update_footer(self, option: Option | None = None) -> None:
         """Show the actions available for the current highlight."""
@@ -183,9 +203,11 @@ class PlayerSelectScreen(MenuScreen):
             option = self.query_one(OptionList).highlighted_option
         footer = self.query_one("#menu-footer", Static)
         if option is not None and option.id is not None and option.id.startswith("profile:"):
-            footer.update("Enter/→ start · E edit profile · ←/Esc back")
+            footer.update("Enter/Space select · E edit · Backspace undo · ←/Esc back")
+        elif self._selected:
+            footer.update("Enter/Space select · Backspace undo · ←/Esc back")
         else:
-            footer.update("Enter/→ select · ←/Esc back")
+            footer.update("Enter/Space select · ←/Esc back")
 
     def _start_game(self) -> None:
         """Validate the selection and start the game."""
