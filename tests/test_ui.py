@@ -108,7 +108,8 @@ def test_play_navigates_to_snake_game(tmp_path: Path) -> None:
             await pilot.pause()
             assert isinstance(app.screen, GameSelectScreen)
 
-            # Select the highlighted game to open its menu.
+            # Pong sorts before Snake; move down to select Snake.
+            await pilot.press("down")
             await pilot.press("enter")
             await pilot.pause()
             assert isinstance(app.screen, GameMenuScreen)
@@ -276,6 +277,7 @@ def test_snake_uses_player_color(tmp_path: Path) -> None:
             await pilot.pause()
             assert isinstance(app.screen, GameSelectScreen)
 
+            await pilot.press("down")
             await pilot.press("enter")
             await pilot.pause()
             assert isinstance(app.screen, GameMenuScreen)
@@ -453,6 +455,7 @@ def test_create_player_dialog_creates_profile_and_starts(tmp_path: Path) -> None
             await pilot.pause()
             assert isinstance(app.screen, GameSelectScreen)
 
+            await pilot.press("down")
             await pilot.press("enter")
             await pilot.pause()
             assert isinstance(app.screen, GameMenuScreen)
@@ -536,6 +539,7 @@ def test_two_player_flow_selects_two_profiles(tmp_path: Path) -> None:
             await pilot.pause()
             assert isinstance(app.screen, GameSelectScreen)
 
+            await pilot.press("down")
             await pilot.press("enter")
             await pilot.pause()
             assert isinstance(app.screen, GameMenuScreen)
@@ -561,6 +565,10 @@ def test_main_menu_high_scores_navigation(tmp_path: Path) -> None:
             await pilot.press("down")
             await pilot.press("enter")
             await pilot.pause()
+            assert isinstance(app.screen, GameSelectScreen)
+
+            await pilot.press("enter")
+            await pilot.pause()
             assert isinstance(app.screen, LeaderboardScreen)
 
     asyncio.run(scenario())
@@ -574,6 +582,10 @@ def test_main_menu_match_history_navigation(tmp_path: Path) -> None:
             await pilot.press("down")
             await pilot.press("down")
             await pilot.press("down")
+            await pilot.press("enter")
+            await pilot.pause()
+            assert isinstance(app.screen, GameSelectScreen)
+
             await pilot.press("enter")
             await pilot.pause()
             assert isinstance(app.screen, MatchHistoryScreen)
@@ -590,6 +602,10 @@ def test_main_menu_instructions_navigation(tmp_path: Path) -> None:
             await pilot.press("down")
             await pilot.press("down")
             await pilot.press("down")
+            await pilot.press("enter")
+            await pilot.pause()
+            assert isinstance(app.screen, GameSelectScreen)
+
             await pilot.press("enter")
             await pilot.pause()
             assert isinstance(app.screen, InstructionsScreen)

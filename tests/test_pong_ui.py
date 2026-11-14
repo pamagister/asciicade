@@ -6,6 +6,7 @@ import asyncio
 from pathlib import Path
 
 from textual.pilot import Pilot
+from textual.widgets import OptionList
 
 from asciicade.core.game import GameMode
 from asciicade.core.options import GameOptions
@@ -19,7 +20,9 @@ from asciicade.persistence import (
     SettingsRepository,
 )
 from asciicade.ui.app import AsciicadeApp
+from asciicade.ui.screens.game_menu import GameMenuScreen
 from asciicade.ui.screens.game_over import GameOverScreen
+from asciicade.ui.screens.game_select import GameSelectScreen
 from asciicade.ui.screens.leave_game import LeaveGameScreen
 from asciicade.ui.screens.pong_game import PongGameScreen
 from asciicade.ui.widgets import ActionButton
@@ -267,5 +270,69 @@ def test_pong_screen_renders_at_80_by_24(tmp_path: Path) -> None:
             rendered = str(screen.render_arena())
             assert "PONG — SINGLE-PLAYER" in rendered
             assert max(len(line) for line in rendered.splitlines()) <= 80
+
+    asyncio.run(scenario())
+
+
+def test_play_navigates_to_pong_game(tmp_path: Path) -> None:
+    async def scenario() -> None:
+        app = make_app(tmp_path)
+        async with app.run_test(size=(100, 30)) as pilot:
+            await pilot.pause()
+            await pilot.press("enter")
+            await pilot.pause()
+            await pilot.press("enter")
+            await pilot.pause()
+            assert isinstance(app.screen, GameSelectScreen)
+
+            option_ids = [option.id for option in app.screen.query_one(OptionList).options]
+            assert "game:pong" in option_ids
+            assert "game:snake" in option_ids
+
+            await pilot.press("enter")
+            await pilot.pause()
+            assert isinstance(app.screen, GameMenuScreen)
+
+            await pilot.press("enter")
+            await pilot.pause()
+            assert isinstance(app.screen, PongGameScreen)
+
+    asyncio.run(scenario())
+
+
+def test_game_menu_starts_pong_with_selected_options(tmp_path: Path) -> None:
+    async def scenario() -> None:
+        app = make_app(tmp_path)
+        async with app.run_test(size=(100, 30)) as pilot:
+            await pilot.pause()
+            registration = app.context.registry.get("pong")
+            app.push_screen(
+                GameMenuScreen(
+                    app.context,
+                    registration,
+                    GameMode.SINGLE_PLAYER,
+                    (GuestPlayer(1),),
+                )
+            )
+            await pilot.pause()
+
+            option_list = app.screen.query_one(OptionList)
+            option_list.highlighted = 3
+            option_list.focus()
+            await pilot.pause()
+            await pilot.press("right")
+            await pilot.pause()
+            assert app.screen._options.value_for("score_limit") == "15"
+
+            option_list.highlighted = 0
+            option_list.focus()
+            await pilot.pause()
+            await pilot.press("enter")
+            await pilot.pause()
+
+            assert isinstance(app.screen, PongGameScreen)
+            screen = app.screen
+            screen._timer.stop()
+            assert screen._game.config.score_limit == 15
 
     asyncio.run(scenario())
