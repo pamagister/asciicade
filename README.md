@@ -22,6 +22,15 @@ match history.
 
 ## Terminal preview
 
+```{toctree}
+:caption: Contents:
+:maxdepth: 2
+
+games/snake
+develop/architecture
+funding/funding
+```
+
 Main menu:
 
 ```text
