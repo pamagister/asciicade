@@ -275,36 +275,18 @@ class GameMenuScreen(Screen[None]):
             return
 
     def _refresh_option_list(self) -> None:
-        """Rewrite the option entries with their current values."""
+        """Update the option entries in place with their current values."""
+        if self._registration.metadata.options is None:
+            return
         option_list = self.query_one(OptionList)
-        # Remember the currently edited option so the cursor stays on it.
-        current_option = option_list.highlighted_option
-        current_key = (
-            current_option.id.removeprefix("option:")
-            if current_option is not None
-            and current_option.id is not None
-            and current_option.id.startswith("option:")
-            else None
-        )
-        options: list[Option] = [
-            Option("Play", id="play"),
-            Option("Instructions", id="instructions"),
-            Option(_OPTION_SEPARATOR_ID, id=_OPTION_SEPARATOR_ID, disabled=True),
-        ]
-        if self._registration.metadata.options is not None:
-            for key in self._option_keys:
-                definition = self._find_definition(key)
-                if definition is None:
-                    continue
-                current = self._options.value_for(key)
-                options.append(Option(self._format_option(definition, current), id=f"option:{key}"))
-        option_list.clear_options()
-        option_list.add_options(options)
-        # Restore the cursor on the previously edited option, falling back to Play.
-        if current_key is not None and current_key in self._option_keys:
-            option_list.highlighted = 3 + self._option_keys.index(current_key)
-        else:
-            option_list.highlighted = 0
+        for index, key in enumerate(self._option_keys):
+            definition = self._find_definition(key)
+            if definition is None:
+                continue
+            current = self._options.value_for(key)
+            option_list.replace_option_prompt_at_index(
+                3 + index, self._format_option(definition, current)
+            )
         option_list.focus()
 
     def _find_definition(self, key: str) -> BooleanOptionDefinition | ChoiceOptionDefinition | None:
