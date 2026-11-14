@@ -44,14 +44,14 @@ Snake arena:
 SNAKE — SINGLE-PLAYER
 Guest 1: 3
 
-████████████████████████████████████████████████
-█                                              █
-█        ██████████                            █
-█        ██      ██                            █
-█        ██      ██                            █
-█        ██      ████████████  **              █
-█                                              █
-████████████████████████████████████████████████
+██████████████████████████████████████████████████
+██                                              ██
+██        ██████████                            ██
+██        ██      ██                            ██
+██        ██      ██                            ██
+██        ██      ████████████  **              ██
+██                                              ██
+██████████████████████████████████████████████████
 ```
 
 ## Installation
@@ -136,8 +136,9 @@ choose from 16 terminal colors, including the eight normal and eight bright/neon
 variants. Each logical arena cell is rendered as two horizontal characters, so the
 playfield stays visually square in terminals where characters are about twice as
 tall as they are wide. The arena wall and every snake segment use solid block
-characters; the selected player color distinguishes the snakes, and the head is
-emphasized in bold rather than with a number marker.
+characters, with side walls as wide as one arena cell. The selected player color
+distinguishes the snakes, and the head is emphasized in bold rather than with a
+number marker.
 
 ## Player profiles, colors and high scores
 

@@ -236,11 +236,11 @@ def test_arena_cells_are_two_characters_wide(tmp_path: Path) -> None:
             border = next(line for line in lines if line.startswith("█") and set(line) == {"█"})
             row = next(line for line in lines if line.startswith("█") and set(line) != {"█"})
 
-            assert len(border) == screen._game.snapshot.width * 2 + 2
-            assert len(row) == screen._game.snapshot.width * 2 + 2
+            assert len(border) == screen._game.snapshot.width * 2 + 4
+            assert len(row) == screen._game.snapshot.width * 2 + 4
             assert set(border) == {"█"}
-            assert row.startswith("█")
-            assert row.endswith("█")
+            assert row.startswith("██")
+            assert row.endswith("██")
             assert "11" not in rendered
             assert "22" not in rendered
             assert "██" in rendered

@@ -170,14 +170,15 @@ class SnakeGameScreen(Screen[None]):
         if snapshot.food is not None:
             cells[snapshot.food] = ("*" * _CELL_WIDTH, "bold yellow")
 
-        border = "█" * (snapshot.width * _CELL_WIDTH + 2)
+        wall = "█" * _CELL_WIDTH
+        border = wall * (snapshot.width + 2)
         text.append(f"{border}\n", style="bright_black")
         for y in range(snapshot.height):
-            text.append("█", style="bright_black")
+            text.append(wall, style="bright_black")
             for x in range(snapshot.width):
                 char, style = cells.get(Position(x, y), (" " * _CELL_WIDTH, ""))
                 text.append(char, style=style)
-            text.append("█\n", style="bright_black")
+            text.append(f"{wall}\n", style="bright_black")
         text.append(f"{border}\n", style="bright_black")
 
         if self._paused:
