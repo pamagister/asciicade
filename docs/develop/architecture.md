@@ -1,4 +1,4 @@
-# Architektur
+# Architecture
 
 Asciicade separates game logic, persistence and the terminal UI.
 

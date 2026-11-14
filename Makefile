@@ -102,12 +102,21 @@ release:          ## Tag and push a release. Publishing runs in GitHub Actions.
 syncdocs:         ## Synchronize generated documentation.
 	@echo "sync documentation ..."
 	@uv run ./scripts/update_readme.py
+	@uv run ./scripts/render_logo.py
+
+.PHONY: logo
+logo:             ## Render logo and favicon PNGs from their SVG sources.
+	@uv run ./scripts/render_logo.py
 
 .PHONY: docs
 docs:             ## Build the documentation.
 	$(MAKE) syncdocs
 	@echo "building documentation ..."
-	@uv run --group docs mkdocs build
+	@uv run --group docs sphinx-build -W --keep-going -b html docs site
+
+.PHONY: linkcheck
+linkcheck:        ## Check external documentation links.
+	@uv run --group docs sphinx-build -b linkcheck docs site/linkcheck
 
 .PHONY: tree
 tree:             ## Show the project tree (excluding ignored folders).

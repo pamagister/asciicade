@@ -1,5 +1,9 @@
-/* docs/_static/custom.css */
-.wy-nav-content {
+/* Documentation content width for the Sphinx Book Theme. */
+.bd-article-container {
     max-width: 1000px;
-    margin: 0 auto;
+}
+
+/* Keep wide terminal previews readable on narrow screens. */
+.bd-content pre {
+    overflow-x: auto;
 }

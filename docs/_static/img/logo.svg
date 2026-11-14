@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="asciicade-logo-title asciicade-logo-desc">
+  <title id="asciicade-logo-title">Asciicade logo</title>
+  <desc id="asciicade-logo-desc">A neon arcade joystick with a glowing yellow ball on a dark rounded square.</desc>
+
+  <defs>
+    <linearGradient id="asciicade-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1020"/>
+      <stop offset="0.55" stop-color="#111a33"/>
+      <stop offset="1" stop-color="#1b1030"/>
+    </linearGradient>
+
+    <linearGradient id="asciicade-rim" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#39f6ff"/>
+      <stop offset="0.5" stop-color="#7c5cff"/>
+      <stop offset="1" stop-color="#ff2e88"/>
+    </linearGradient>
+
+    <linearGradient id="asciicade-base" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3b82f6"/>
+      <stop offset="1" stop-color="#1d3a8a"/>
+    </linearGradient>
+
+    <radialGradient id="asciicade-ball" cx="0.35" cy="0.3" r="0.8">
+      <stop offset="0" stop-color="#fff7cc"/>
+      <stop offset="0.35" stop-color="#ffd230"/>
+      <stop offset="1" stop-color="#ff9f1c"/>
+    </radialGradient>
+
+    <linearGradient id="asciicade-shaft" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#0f172a"/>
+      <stop offset="0.5" stop-color="#334155"/>
+      <stop offset="1" stop-color="#0f172a"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="8" y="8" width="496" height="496" rx="104" fill="url(#asciicade-bg)"/>
+  <rect x="16" y="16" width="480" height="480" rx="96" fill="none" stroke="url(#asciicade-rim)" stroke-width="8"/>
+
+  <g opacity="0.12" stroke="#39f6ff" stroke-width="2">
+    <path d="M64 160H448M64 256H448M64 352H448M160 64V448M256 64V448M352 64V448"/>
+  </g>
+
+  <circle cx="256" cy="176" r="90" fill="#ffd230" opacity="0.06"/>
+  <circle cx="256" cy="176" r="76" fill="#ffd230" opacity="0.10"/>
+
+  <rect x="238" y="198" width="36" height="154" rx="18" fill="url(#asciicade-shaft)" stroke="#39f6ff" stroke-width="6"/>
+  <circle cx="256" cy="176" r="64" fill="url(#asciicade-ball)" stroke="#ffd230" stroke-width="6"/>
+  <circle cx="234" cy="154" r="16" fill="#fff7cc" opacity="0.85"/>
+
+  <path d="M132 372 Q132 332 172 332 H340 Q380 332 380 372 L400 428 Q404 452 380 452 H132 Q108 452 112 428 Z" fill="url(#asciicade-base)" stroke="#39f6ff" stroke-width="6"/>
+  <path d="M150 360 H362" stroke="#93c5fd" stroke-width="6" stroke-linecap="round" opacity="0.55"/>
+
+  <path d="M226 414 L256 356 L286 414 M238 394 H274" fill="none" stroke="#0b1020" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

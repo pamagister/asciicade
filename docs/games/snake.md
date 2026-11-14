@@ -35,7 +35,7 @@ leave-game dialog to open the game menu, return to the main menu or stay. Q open
 the quit confirmation and exits the application when confirmed. On the game-over
 screen, the arrow keys move between actions, Enter or Space selects one, and
 Escape returns to the game menu. The full, game-independent control list is on
-the [landing page](../index.md#controls).
+the [using guide](../usage/index.md#controls).
 
 Snake rendering uses solid block characters: the wall, every snake segment and
 side walls that are one arena cell wide. The head is emphasized in bold rather
