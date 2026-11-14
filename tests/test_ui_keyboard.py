@@ -10,7 +10,7 @@ from textual.widgets import DataTable, OptionList, Static
 
 from asciicade.core.game import GameMode
 from asciicade.core.input import Direction
-from asciicade.core.player import GuestPlayer
+from asciicade.core.player import GuestPlayer, PlayerColor
 from asciicade.games.snake import Position
 from asciicade.persistence import (
     Database,
@@ -20,6 +20,7 @@ from asciicade.persistence import (
 )
 from asciicade.ui.app import AsciicadeApp
 from asciicade.ui.screens.confirm_quit import ConfirmQuitScreen
+from asciicade.ui.screens.create_player import CreatePlayerScreen
 from asciicade.ui.screens.game_menu import GameMenuScreen
 from asciicade.ui.screens.game_over import GameOverScreen
 from asciicade.ui.screens.game_select import GameSelectScreen
@@ -509,5 +510,25 @@ def test_q_opens_quit_confirmation_and_escape_cancels(tmp_path: Path) -> None:
             await pilot.press("escape")
             await pilot.pause()
             assert isinstance(app.screen, SnakeGameScreen)
+
+    asyncio.run(scenario())
+
+
+def test_create_player_space_selects_color(tmp_path: Path) -> None:
+    async def scenario() -> None:
+        app = make_app(tmp_path)
+        async with app.run_test(size=(100, 30)) as pilot:
+            await pilot.pause()
+            app.push_screen(CreatePlayerScreen(app.context.players))
+            await pilot.pause()
+
+            color_list = app.screen.query_one("#color-list", OptionList)
+            color_list.highlighted = 3
+            color_list.focus()
+            await pilot.pause()
+
+            await pilot.press("space")
+            await pilot.pause()
+            assert app.screen._color is PlayerColor.YELLOW
 
     asyncio.run(scenario())

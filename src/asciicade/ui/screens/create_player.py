@@ -21,7 +21,10 @@ from asciicade.ui.widgets import ActionButton, handle_button_row_key
 class CreatePlayerScreen(Screen[PlayerProfile | None]):
     """Collect a name and color, then create or update a profile."""
 
-    BINDINGS = [Binding("escape", "cancel", "Cancel", show=False)]
+    BINDINGS = [
+        Binding("escape", "cancel", "Cancel", show=False),
+        Binding("space", "select_color", "Select color", show=False),
+    ]
 
     def __init__(
         self,
@@ -57,7 +60,7 @@ class CreatePlayerScreen(Screen[PlayerProfile | None]):
                 ActionButton("Cancel", id="cancel"),
                 id="create-actions",
             ),
-            Static("Enter save · Tab next field · Esc cancel", id="menu-footer"),
+            Static("Enter save · Space select · Tab next field · Esc cancel", id="menu-footer"),
             classes="menu-screen modal-screen",
         )
 
@@ -73,6 +76,12 @@ class CreatePlayerScreen(Screen[PlayerProfile | None]):
     def on_key(self, event: events.Key) -> None:
         """Move focus between dialog buttons with the arrow keys."""
         handle_button_row_key(self, event)
+
+    def action_select_color(self) -> None:
+        """Select the highlighted color when the color list has focus."""
+        option_list = self.query_one("#color-list", OptionList)
+        if option_list.has_focus:
+            option_list.action_select()
 
     def on_input_submitted(self, event: Input.Submitted) -> None:
         """Create or save when Enter is pressed in the name field."""
