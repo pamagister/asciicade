@@ -41,6 +41,10 @@ Prefer `gh` for GitHub issues, pull requests, and repository operations when app
 - `docs/index.md` is the source for `README.md`. Never edit `README.md` directly.
 - After changing `docs/index.md`, run `make syncdocs` when appropriate.
 - Check existing generation scripts before editing generated files.
+- Keyboard controls are documented centrally in `docs/index.md` under "Controls"
+  (menus, dialogs and gameplay for Player 1 and Player 2, incl. Action A/B).
+  Game docs only list controls when they deviate from this default; keep in-game
+  instructions to a single control hint per screen.
 
 ## Agent workflow routing
 
