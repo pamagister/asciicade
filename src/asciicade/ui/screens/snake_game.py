@@ -165,28 +165,20 @@ class SnakeGameScreen(Screen[None]):
         for player, snake in zip(self._players, snapshot.snakes):
             color = player_color(player).value
             for index, position in enumerate(snake.body):
-                if index == 0:
-                    cells[position] = (
-                        str(snake.player_index) * _CELL_WIDTH,
-                        f"bold {color}",
-                    )
-                else:
-                    cells[position] = (
-                        ("█" if snake.player_index == 1 else "▓") * _CELL_WIDTH,
-                        color,
-                    )
+                style = f"bold {color}" if index == 0 else color
+                cells[position] = ("█" * _CELL_WIDTH, style)
         if snapshot.food is not None:
             cells[snapshot.food] = ("*" * _CELL_WIDTH, "bold yellow")
 
-        border = "-" * (snapshot.width * _CELL_WIDTH)
-        text.append(f"+{border}+\n", style="bright_black")
+        border = "█" * (snapshot.width * _CELL_WIDTH + 2)
+        text.append(f"{border}\n", style="bright_black")
         for y in range(snapshot.height):
-            text.append("|", style="bright_black")
+            text.append("█", style="bright_black")
             for x in range(snapshot.width):
                 char, style = cells.get(Position(x, y), (" " * _CELL_WIDTH, ""))
                 text.append(char, style=style)
-            text.append("|\n", style="bright_black")
-        text.append(f"+{border}+\n", style="bright_black")
+            text.append("█\n", style="bright_black")
+        text.append(f"{border}\n", style="bright_black")
 
         if self._paused:
             text.append("\nPAUSED — Escape to resume\n", style="bold yellow")

@@ -200,6 +200,9 @@ def test_snake_screen_supports_two_players(tmp_path: Path) -> None:
             text = str(screen.render_arena())
             assert "Guest 1" in text
             assert "Guest 2" in text
+            assert "11" not in text
+            assert "22" not in text
+            assert "▓" not in text
 
             await pilot.press("w")
             await pilot.pause()
@@ -230,12 +233,16 @@ def test_arena_cells_are_two_characters_wide(tmp_path: Path) -> None:
 
             rendered = str(screen.render_arena())
             lines = rendered.splitlines()
-            border = next(line for line in lines if line.startswith("+"))
-            row = next(line for line in lines if line.startswith("|"))
+            border = next(line for line in lines if line.startswith("█") and set(line) == {"█"})
+            row = next(line for line in lines if line.startswith("█") and set(line) != {"█"})
 
             assert len(border) == screen._game.snapshot.width * 2 + 2
             assert len(row) == screen._game.snapshot.width * 2 + 2
-            assert "11" in rendered
+            assert set(border) == {"█"}
+            assert row.startswith("█")
+            assert row.endswith("█")
+            assert "11" not in rendered
+            assert "22" not in rendered
             assert "██" in rendered
             assert "**" in rendered
 
