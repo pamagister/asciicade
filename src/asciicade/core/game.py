@@ -22,6 +22,9 @@ class GameMode(StrEnum):
     MULTIPLAYER = "multiplayer"
 
 
+MAX_CONTROLS_HINT_LENGTH = 80
+
+
 @dataclass(frozen=True, slots=True)
 class GameDocs:
     """Single source of truth for a game's documentation.
@@ -32,23 +35,29 @@ class GameDocs:
 
     Attributes:
         summary: Short description used in game lists and page summaries.
-        long_description: Markdown body shown under the page title.
         single_player: Markdown body for the single-player section.
+        controls_short: One-line control hint for the game menu and the gameplay
+            footer.
+        controls_short_multiplayer: Optional one-line hint for two-player mode;
+            falls back to ``controls_short``.
         multiplayer: Markdown body for the two-player section; required when the
             game declares :attr:`GameMode.MULTIPLAYER`.
-        controls_short: Short control hint used for the in-game instructions.
-        controls_long: Longer control explanation for the docs page.
+        controls_long: Longer control explanation for the instructions screen
+            and the docs page.
+        long_description: Optional Markdown body shown under the page title;
+            falls back to ``summary``.
         sections: Extra titled Markdown sections, e.g. scoring rules. A body may
             contain a ``{options}`` placeholder that is replaced by the options
             table rendered from the game's option registry.
     """
 
     summary: str
-    long_description: str
     single_player: str
     controls_short: str
     multiplayer: str | None = None
+    controls_short_multiplayer: str | None = None
     controls_long: str | None = None
+    long_description: str | None = None
     sections: tuple[tuple[str, str], ...] = ()
 
     def __post_init__(self) -> None:
@@ -57,8 +66,30 @@ class GameDocs:
             raise ValueError("Game docs summary must not be empty.")
         if not self.single_player.strip():
             raise ValueError("Game docs must describe the single-player mode.")
-        if not self.controls_short.strip():
-            raise ValueError("Game docs must describe the short controls.")
+        _validate_controls_hint("controls_short", self.controls_short)
+        if self.controls_short_multiplayer is not None:
+            _validate_controls_hint("controls_short_multiplayer", self.controls_short_multiplayer)
+
+    def controls_hint(self, mode: GameMode) -> str:
+        """Return the one-line control hint for the given game mode."""
+        if mode is GameMode.MULTIPLAYER and self.controls_short_multiplayer:
+            return self.controls_short_multiplayer
+        return self.controls_short
+
+    @property
+    def page_description(self) -> str:
+        """Return the description shown on the generated docs page."""
+        return self.long_description or self.summary
+
+
+def _validate_controls_hint(name: str, value: str) -> None:
+    """Validate a one-line controls hint."""
+    if not value.strip():
+        raise ValueError(f"Game docs {name} must not be empty.")
+    if "\n" in value or "\r" in value:
+        raise ValueError(f"Game docs {name} must be a single line.")
+    if len(value) > MAX_CONTROLS_HINT_LENGTH:
+        raise ValueError(f"Game docs {name} must be at most {MAX_CONTROLS_HINT_LENGTH} characters.")
 
 
 @dataclass(frozen=True, slots=True)
@@ -67,7 +98,6 @@ class GameMetadata:
 
     identifier: str
     name: str
-    description: str
     modes: tuple[GameMode, ...]
     docs: GameDocs
     options: GameOptionRegistry | None = None
@@ -97,7 +127,7 @@ class GameMetadata:
             parts.append(f"Single player:\n{self.docs.single_player}")
         if self.docs.multiplayer:
             parts.append(f"Two players:\n{self.docs.multiplayer}")
-        parts.append(self.docs.controls_short)
+        parts.append(self.docs.controls_long or self.docs.controls_short)
         return "\n\n".join(part.strip() for part in parts if part.strip())
 
 

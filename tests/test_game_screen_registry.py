@@ -39,13 +39,11 @@ def _registration(identifier: str) -> GameRegistration:
     metadata = GameMetadata(
         identifier=identifier,
         name=identifier.title(),
-        description="A test game.",
         modes=(GameMode.SINGLE_PLAYER,),
         docs=GameDocs(
             summary="Test game.",
-            long_description="Test game.",
             single_player="Single player body.",
-            controls_short="Test instructions.",
+            controls_short="Arrows/WASD move · Esc/P pause",
         ),
     )
     return GameRegistration(metadata, lambda: cast(object, None))

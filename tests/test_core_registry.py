@@ -55,7 +55,6 @@ def _metadata(identifier: str, name: str) -> GameMetadata:
     return GameMetadata(
         identifier=identifier,
         name=name,
-        description="A test game.",
         modes=(GameMode.SINGLE_PLAYER,),
         docs=_docs(),
     )
@@ -65,19 +64,18 @@ def _docs() -> GameDocs:
     """Return minimal valid docs for a test game."""
     return GameDocs(
         summary="Test game.",
-        long_description="Test game.",
         single_player="Single player body.",
-        controls_short="Test instructions.",
+        controls_short="Arrows/WASD move · Esc/P pause",
     )
 
 
 def test_metadata_requires_identifier_name_and_modes() -> None:
     with pytest.raises(ValueError, match="identifier"):
-        GameMetadata("", "Game", "d", (GameMode.SINGLE_PLAYER,), _docs())
+        GameMetadata("", "Game", (GameMode.SINGLE_PLAYER,), _docs())
     with pytest.raises(ValueError, match="name"):
-        GameMetadata("id", "  ", "d", (GameMode.SINGLE_PLAYER,), _docs())
+        GameMetadata("id", "  ", (GameMode.SINGLE_PLAYER,), _docs())
     with pytest.raises(ValueError, match="at least one mode"):
-        GameMetadata("id", "Game", "d", (), _docs())
+        GameMetadata("id", "Game", (), _docs())
 
 
 def test_metadata_rejects_duplicate_modes() -> None:
@@ -85,7 +83,6 @@ def test_metadata_rejects_duplicate_modes() -> None:
         GameMetadata(
             "id",
             "Game",
-            "d",
             (GameMode.SINGLE_PLAYER, GameMode.SINGLE_PLAYER),
             _docs(),
         )
@@ -96,13 +93,11 @@ def test_metadata_requires_multiplayer_docs_for_multiplayer_games() -> None:
         GameMetadata(
             "id",
             "Game",
-            "d",
             (GameMode.MULTIPLAYER,),
             GameDocs(
                 summary="s",
-                long_description="d",
                 single_player="sp",
-                controls_short="c",
+                controls_short="Press Escape to pause.",
             ),
         )
 
@@ -111,20 +106,77 @@ def test_metadata_instructions_are_derived_from_docs() -> None:
     metadata = GameMetadata(
         "id",
         "Game",
-        "d",
         (GameMode.SINGLE_PLAYER, GameMode.MULTIPLAYER),
         GameDocs(
             summary="Objective: win.",
-            long_description="d",
             single_player="Do the single-player thing.",
             multiplayer="Do the two-player thing.",
             controls_short="Press Escape to pause.",
+            controls_long="Press Escape or P to pause during a game.",
         ),
     )
     assert "Objective: win." in metadata.instructions
     assert "Single player:\nDo the single-player thing." in metadata.instructions
     assert "Two players:\nDo the two-player thing." in metadata.instructions
-    assert "Press Escape to pause." in metadata.instructions
+    assert "Press Escape or P to pause during a game." in metadata.instructions
+    assert "Press Escape to pause." not in metadata.instructions
+
+
+def test_docs_controls_hint_uses_mode_specific_hint() -> None:
+    docs = GameDocs(
+        summary="s",
+        single_player="sp",
+        controls_short="Short hint.",
+        controls_short_multiplayer="Two-player hint.",
+    )
+
+    assert docs.controls_hint(GameMode.SINGLE_PLAYER) == "Short hint."
+    assert docs.controls_hint(GameMode.MULTIPLAYER) == "Two-player hint."
+
+
+def test_docs_controls_hint_falls_back_to_short_hint() -> None:
+    docs = GameDocs(summary="s", single_player="sp", controls_short="Short hint.")
+
+    assert docs.controls_hint(GameMode.MULTIPLAYER) == "Short hint."
+
+
+def test_docs_page_description_falls_back_to_summary() -> None:
+    docs = GameDocs(summary="Summary.", single_player="sp", controls_short="Hint.")
+
+    assert docs.page_description == "Summary."
+
+    with_long = GameDocs(
+        summary="Summary.",
+        single_player="sp",
+        controls_short="Hint.",
+        long_description="Long description.",
+    )
+    assert with_long.page_description == "Long description."
+
+
+def test_docs_controls_hint_must_be_single_line() -> None:
+    with pytest.raises(ValueError, match="single line"):
+        GameDocs(
+            summary="s",
+            single_player="sp",
+            controls_short="First line.\nSecond line.",
+        )
+    with pytest.raises(ValueError, match="single line"):
+        GameDocs(
+            summary="s",
+            single_player="sp",
+            controls_short="Hint.",
+            controls_short_multiplayer="First line.\nSecond line.",
+        )
+
+
+def test_docs_controls_hint_has_a_length_limit() -> None:
+    with pytest.raises(ValueError, match="at most"):
+        GameDocs(
+            summary="s",
+            single_player="sp",
+            controls_short="x" * 81,
+        )
 
 
 def test_registry_registers_and_retrieves_games() -> None:

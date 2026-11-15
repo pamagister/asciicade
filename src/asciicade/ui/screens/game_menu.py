@@ -81,7 +81,7 @@ class GameMenuScreen(Screen[None]):
         yield Horizontal(
             Vertical(
                 Static(metadata.name.upper(), id="screen-title"),
-                Static(metadata.description, id="game-description"),
+                Static(metadata.docs.summary, id="game-description"),
                 OptionList(
                     Option("Play", id="play"),
                     Option("Instructions", id="instructions"),

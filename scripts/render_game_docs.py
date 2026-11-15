@@ -26,8 +26,6 @@ INDEX_FILE = Path("docs/index.md")
 INDEX_START_MARKER = "<!-- games:start -->"
 INDEX_END_MARKER = "<!-- games:end -->"
 
-CONTROLS_LINK = "[controls page](../index.md#controls)"
-
 
 def _normalize(body: str) -> str:
     """Return the body as flowing Markdown.
@@ -133,7 +131,7 @@ def render_page(registration: GameRegistration) -> str:
     """Render one game's documentation page as Markdown."""
     metadata = registration.metadata
     docs = metadata.docs
-    parts = [f"# {metadata.name}", _normalize(docs.long_description)]
+    parts = [f"# {metadata.name}", _normalize(docs.page_description)]
 
     if GameMode.SINGLE_PLAYER in metadata.modes:
         parts += ["## Single player", _normalize(docs.single_player)]
@@ -147,10 +145,7 @@ def render_page(registration: GameRegistration) -> str:
     if docs.controls_long:
         parts += ["## Controls", _normalize(docs.controls_long)]
     else:
-        parts += [
-            "## Controls",
-            f"See the {CONTROLS_LINK} for the game-independent controls.",
-        ]
+        parts += ["## Controls", f"**Short:** {docs.controls_short}"]
 
     return _join_blocks(parts) + "\n"
 

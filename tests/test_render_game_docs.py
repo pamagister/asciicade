@@ -26,14 +26,12 @@ def _metadata(
     return GameMetadata(
         identifier=identifier,
         name=identifier.title(),
-        description="A demo game.",
         modes=modes,
         docs=docs
         or GameDocs(
             summary="Demo summary.",
-            long_description="Long demo description.",
             single_player="- Do the single-player thing.",
-            controls_short="Press Escape to pause.",
+            controls_short="Arrows/WASD move · Esc/P pause",
         ),
         options=options,
     )

@@ -120,13 +120,11 @@ def test_game_metadata_rejects_duplicate_option_keys() -> None:
         GameMetadata(
             identifier="snake",
             name="Snake",
-            description="desc",
             modes=(GameMode.SINGLE_PLAYER,),
             docs=GameDocs(
                 summary="s",
-                long_description="d",
                 single_player="sp",
-                controls_short="instructions",
+                controls_short="Arrows/WASD move · Esc/P pause",
             ),
             options=GameOptionRegistry(
                 definitions=(

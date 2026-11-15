@@ -112,7 +112,7 @@ class GameSelectScreen(MenuScreen):
         option = option_list.highlighted_option
         if option is not None and option.id is not None and option.id.startswith("game:"):
             registration = self._app_context.registry.get(option.id.removeprefix("game:"))
-            description.update(registration.metadata.description)
+            description.update(registration.metadata.docs.summary)
         else:
             description.update("")
 
