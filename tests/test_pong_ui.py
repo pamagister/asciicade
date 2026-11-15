@@ -7,6 +7,7 @@ import time
 from pathlib import Path
 
 import pytest
+from rich.text import Text
 from textual import events
 from textual.pilot import Pilot
 from textual.widgets import OptionList
@@ -56,6 +57,14 @@ def make_app(tmp_path: Path) -> AsciicadeApp:
 def make_registration() -> GameRegistration:
     """Return a registration for Pong without changing the default registry."""
     return GameRegistration(PongGame.metadata, PongGame)
+
+
+def _style_at(text: Text, offset: int) -> str | None:
+    """Return the style covering a character offset in a rendered row."""
+    for span in text.spans:
+        if span.start <= offset < span.end:
+            return str(span.style)
+    return None
 
 
 async def push_pong(
@@ -128,6 +137,30 @@ def test_pong_screen_uses_player_color(tmp_path: Path) -> None:
             rendered = screen.render_arena()
             styles = {str(span.style) for span in rendered.spans}
             assert any("red" in style for style in styles)
+
+    asyncio.run(scenario())
+
+
+def test_pong_renders_player_one_on_the_right(tmp_path: Path) -> None:
+    async def scenario() -> None:
+        app = make_app(tmp_path)
+        async with app.run_test(size=(100, 30)) as pilot:
+            await pilot.pause()
+            screen = await push_pong(
+                app,
+                pilot,
+                mode=GameMode.MULTIPLAYER,
+                players=(GuestPlayer(1), GuestPlayer(2)),
+            )
+            screen._timer.stop()
+
+            snapshot = screen._game.snapshot
+            row = screen._render_row(snapshot, 8)
+            left_style = _style_at(row, 1)
+            right_style = _style_at(row, snapshot.width - 2)
+
+            assert "cyan" in (left_style or "")
+            assert "green" in (right_style or "")
 
     asyncio.run(scenario())
 
@@ -208,7 +241,7 @@ def test_pong_game_over_records_result_and_replays(tmp_path: Path) -> None:
                 options=GameOptions((("score_limit", "1"), ("difficulty", "Normal"))),
             )
             screen._timer.stop()
-            screen._game._ball = Ball(57, 16, 0.5, 0, 0.5)
+            screen._game._ball = Ball(-1, 16, -0.5, 0, 0.5)
             screen._game._serve_countdown = 0
 
             screen._on_tick()
@@ -239,7 +272,7 @@ def test_pong_cpu_win_is_labelled_on_game_over(tmp_path: Path) -> None:
                 options=GameOptions((("score_limit", "1"), ("difficulty", "Normal"))),
             )
             screen._timer.stop()
-            screen._game._ball = Ball(-1, 16, -0.5, 0, 0.5)
+            screen._game._ball = Ball(57, 16, 0.5, 0, 0.5)
             screen._game._serve_countdown = 0
 
             screen._on_tick()

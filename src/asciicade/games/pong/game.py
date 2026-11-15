@@ -12,8 +12,8 @@ PONG_SUMMARY = (
 )
 
 PONG_SINGLE_PLAYER = (
-    "- You control the left paddle with the arrow keys or WASD.\n"
-    "- The computer controls the right paddle.\n"
+    "- You control the right paddle with the arrow keys or WASD.\n"
+    "- The computer controls the left paddle.\n"
     "- Move your paddle to return the ball. Hitting nearer the paddle edge produces a steeper "
     "return\n"
     "  angle.\n"
@@ -22,8 +22,8 @@ PONG_SINGLE_PLAYER = (
 )
 
 PONG_MULTIPLAYER = (
-    "- Player 1 uses the arrow keys.\n"
-    "- Player 2 uses W and S.\n"
+    "- Player 1 uses the arrow keys and plays on the right side.\n"
+    "- Player 2 uses W and S and plays on the left side.\n"
     "- Both players share the same keyboard and playfield.\n"
     "- The same paddle and ball physics apply.\n"
     "- The first player to the score limit wins."

@@ -157,13 +157,13 @@ class PongEngine:
         self._mode = mode
         self._players = tuple(players)
         self._paddles = [
-            Paddle(1, 1.0, self.config.field_height / 2, self.config.paddle_height),
             Paddle(
-                2,
+                1,
                 float(self.config.width - 2),
                 self.config.field_height / 2,
                 self.config.paddle_height,
             ),
+            Paddle(2, 1.0, self.config.field_height / 2, self.config.paddle_height),
         ]
         self._scores = [0, 0]
         self._finished = False
@@ -214,7 +214,7 @@ class PongEngine:
         """Move the computer paddle toward the ball with a capped speed."""
         paddle = self._paddles[1]
         ball = self._ball
-        target = ball.y if ball.vx > 0 else self.config.field_height / 2
+        target = ball.y if ball.vx < 0 else self.config.field_height / 2
         difference = target - paddle.y
         if abs(difference) <= self.config.cpu_deadzone:
             return
@@ -249,15 +249,15 @@ class PongEngine:
                 self._collide_with_right_paddle(previous_x)
 
             if ball.x + self.config.ball_radius < 0:
-                self._score_point(1)
+                self._score_point(0)
                 return
             if ball.x - self.config.ball_radius > self.config.width:
-                self._score_point(0)
+                self._score_point(1)
                 return
 
     def _collide_with_left_paddle(self, previous_x: float) -> None:
         """Reflect the ball when it crosses the left paddle."""
-        paddle = self._paddles[0]
+        paddle = self._paddles[1]
         plane = paddle.x + 1.0 + self.config.ball_radius
         ball = self._ball
         if previous_x < plane or ball.x > plane:
@@ -269,7 +269,7 @@ class PongEngine:
 
     def _collide_with_right_paddle(self, previous_x: float) -> None:
         """Reflect the ball when it crosses the right paddle."""
-        paddle = self._paddles[1]
+        paddle = self._paddles[0]
         plane = paddle.x - self.config.ball_radius
         ball = self._ball
         if previous_x > plane or ball.x < plane:
@@ -319,7 +319,7 @@ class PongEngine:
         ball.y = self.config.field_height / 2
         ball.speed = self.config.base_ball_speed
         angle = self._rng.uniform(-self.config.serve_angle, self.config.serve_angle)
-        direction = -1.0 if toward_index == 0 else 1.0
+        direction = 1.0 if toward_index == 0 else -1.0
         ball.vx = direction * ball.speed * math.cos(angle)
         ball.vy = ball.speed * math.sin(angle)
         self._serve_countdown = self.config.serve_delay_ticks

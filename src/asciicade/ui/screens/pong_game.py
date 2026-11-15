@@ -406,7 +406,7 @@ class PongGameScreen(Screen[None]):
 
         for player in snapshot.players:
             color = self._player_color(player.player_index)
-            x = 1 if player.player_index == 1 else snapshot.width - 2
+            x = snapshot.width - 2 if player.player_index == 1 else 1
             top = player.y - player.height / 2
             bottom = player.y + player.height / 2
             for subrow in range(snapshot.height * 2):

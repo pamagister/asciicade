@@ -5,8 +5,8 @@ paddle, use the paddle edges to aim, and be first to reach the score limit.
 
 ## Single player
 
-- You control the left paddle with the arrow keys or WASD.
-- The computer controls the right paddle.
+- You control the right paddle with the arrow keys or WASD.
+- The computer controls the left paddle.
 - Move your paddle to return the ball. Hitting nearer the paddle edge produces a
   steeper return angle.
 - The computer tracks the ball with a capped speed, so it is challenging but
@@ -15,8 +15,8 @@ paddle, use the paddle edges to aim, and be first to reach the score limit.
 
 ## Two players
 
-- Player 1 uses the arrow keys.
-- Player 2 uses W and S.
+- Player 1 uses the arrow keys and plays on the right side.
+- Player 2 uses W and S and plays on the left side.
 - Both players share the same keyboard and playfield.
 - The same paddle and ball physics apply.
 - The first player to the score limit wins.

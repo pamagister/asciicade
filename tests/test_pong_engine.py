@@ -111,6 +111,18 @@ def test_paddles_clamp_inside_the_field() -> None:
     assert paddle.y == engine.config.field_height - paddle.height / 2
 
 
+def test_player_one_plays_on_the_right_side() -> None:
+    engine = make_engine(
+        GameMode.MULTIPLAYER,
+        players=(GuestPlayer(1), GuestPlayer(2)),
+    )
+
+    assert engine._paddles[0].player_index == 1
+    assert engine._paddles[0].x == engine.config.width - 2
+    assert engine._paddles[1].player_index == 2
+    assert engine._paddles[1].x == 1
+
+
 def test_ball_bounces_off_the_top_wall() -> None:
     engine = make_engine()
     place_ball(engine, x=10, y=0.6, vx=0.1, vy=-0.2, speed=0.223606797749979)
@@ -185,8 +197,8 @@ def test_ball_scoring_resets_for_next_serve() -> None:
     place_ball(engine, x=-1, y=16, vx=-0.5, vy=0, speed=0.5)
     engine.tick()
 
-    assert engine.snapshot.players[1].score == 1
-    assert engine.snapshot.players[0].score == 0
+    assert engine.snapshot.players[0].score == 1
+    assert engine.snapshot.players[1].score == 0
     assert engine.snapshot.ball.x == 28
     assert engine.snapshot.serving
     assert engine._ball.vx < 0
@@ -195,7 +207,7 @@ def test_ball_scoring_resets_for_next_serve() -> None:
 def test_first_to_score_limit_finishes_single_player_match() -> None:
     engine = make_engine(options=GameOptions((("score_limit", "1"), ("difficulty", "Normal"))))
 
-    place_ball(engine, x=57, y=16, vx=0.5, vy=0, speed=0.5)
+    place_ball(engine, x=-1, y=16, vx=-0.5, vy=0, speed=0.5)
     engine.tick()
 
     assert engine.is_finished
@@ -209,7 +221,7 @@ def test_first_to_score_limit_finishes_single_player_match() -> None:
 def test_cpu_win_is_a_loss_for_the_human_result() -> None:
     engine = make_engine(options=GameOptions((("score_limit", "1"), ("difficulty", "Normal"))))
 
-    place_ball(engine, x=-1, y=16, vx=-0.5, vy=0, speed=0.5)
+    place_ball(engine, x=57, y=16, vx=0.5, vy=0, speed=0.5)
     engine.tick()
 
     result = engine.result
@@ -230,20 +242,20 @@ def test_multiplayer_result_records_winner() -> None:
 
     result = engine.result
     assert result is not None
-    assert result.winner_name == "Guest 2"
-    assert result.player_results[0].outcome is MatchOutcome.LOSS
-    assert result.player_results[1].outcome is MatchOutcome.WIN
-    assert result.player_results[1].score == 1
+    assert result.winner_name == "Guest 1"
+    assert result.player_results[0].outcome is MatchOutcome.WIN
+    assert result.player_results[1].outcome is MatchOutcome.LOSS
+    assert result.player_results[0].score == 1
 
 
 def test_computer_paddle_tracks_the_ball_and_recenters() -> None:
     engine = make_engine()
-    place_ball(engine, x=20, y=24, vx=0.1, vy=0, speed=0.1)
+    place_ball(engine, x=20, y=24, vx=-0.1, vy=0, speed=0.1)
 
     engine.tick()
     assert engine.snapshot.players[1].y > 16
 
-    place_ball(engine, x=20, y=24, vx=-0.1, vy=0, speed=0.1)
+    place_ball(engine, x=20, y=24, vx=0.1, vy=0, speed=0.1)
     engine.tick()
     assert engine.snapshot.players[1].y < 24
 
@@ -279,7 +291,7 @@ def test_profile_players_are_reflected_in_result() -> None:
         options=GameOptions((("score_limit", "1"), ("difficulty", "Normal"))),
     )
 
-    place_ball(engine, x=57, y=16, vx=0.5, vy=0, speed=0.5)
+    place_ball(engine, x=-1, y=16, vx=-0.5, vy=0, speed=0.5)
     engine.tick()
 
     result = engine.result
