@@ -2,6 +2,14 @@
 
 # Asciicade
 
+[![Github CI Status](https://github.com/pamagister/asciicade/actions/workflows/main.yml/badge.svg)](https://github.com/pamagister/asciicade/actions)
+[![GitHub release](https://img.shields.io/github/v/release/pamagister/asciicade)](https://github.com/pamagister/asciicade/releases)
+[![Read the Docs](https://readthedocs.org/projects/asciicade/badge/?version=stable)](https://asciicade.readthedocs.io/en/stable/)
+[![License](https://img.shields.io/github/license/pamagister/asciicade)](https://github.com/pamagister/asciicade/blob/main/LICENSE)
+[![GitHub issues](https://img.shields.io/github/issues/pamagister/asciicade)](https://github.com/pamagister/asciicade/issues)
+[![PyPI](https://img.shields.io/pypi/v/asciicade)](https://pypi.org/project/asciicade/)
+[![Downloads](https://pepy.tech/badge/asciicade)](https://pepy.tech/project/asciicade/)
+
 Asciicade is a polished, extensible arcade game collection for Linux terminals.
 
 ## Features
