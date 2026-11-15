@@ -195,19 +195,6 @@ Set `XDG_DATA_HOME` to change the base directory.
 - [Development](develop/development.md) — setup, tests, documentation and releases.
 - [Funding](funding/funding.md) — ways to support the project.
 
-```{toctree}
-:hidden:
-:caption: Documentation
-:maxdepth: 2
-
-games/blockfall
-games/snake
-games/pong
-develop/architecture
-develop/development
-funding/funding
-```
-
 ## License
 
 Asciicade is released under the Unlicense (public domain). See [LICENSE](https://github.com/pamagister/asciicade/blob/main/LICENSE).

@@ -49,5 +49,3 @@ jobs:
         run: git diff --exit-code -- README.md docs/_static/img/logo.png docs/_static/img/favicon.png
       - name: Build documentation
         run: make docs
-      - name: Check external links
-        run: make linkcheck

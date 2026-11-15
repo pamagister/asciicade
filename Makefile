@@ -123,11 +123,7 @@ docs:             ## Build the documentation.
 	$(MAKE) syncdocs
 	@echo "building documentation ..."
 	@rm -rf site
-	@uv run --group docs sphinx-build -W --keep-going -b html docs site
-
-.PHONY: linkcheck
-linkcheck:        ## Check external documentation links.
-	@uv run --group docs sphinx-build -b linkcheck docs site/linkcheck
+	@uv run --group docs mkdocs build --strict
 
 .PHONY: tree
 tree:             ## Show the project tree (excluding ignored folders).

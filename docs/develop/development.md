@@ -20,8 +20,7 @@ uv sync --all-groups
 | `make build` | Build the source distribution and wheel |
 | `make validate` | Build and run `twine check` |
 | `make precommit` | Format, lint and test |
-| `make docs` | Build the Sphinx documentation |
-| `make linkcheck` | Check external documentation links |
+| `make docs` | Build the MkDocs documentation |
 
 Run a single test file:
 
@@ -37,9 +36,10 @@ uv run pytest tests/test_snake_engine.py -v
 make syncdocs
 ```
 
-The documentation is built with Sphinx and the
-[Sphinx Book Theme](https://sphinx-book-theme.readthedocs.io/). `make docs` treats warnings as
-errors, so broken internal links and missing pages fail the build.
+The documentation is built with [MkDocs](https://www.mkdocs.org/) and the
+[Read the Docs theme](https://www.mkdocs.org/user-guide/configuration/#readthedocs).
+`make docs` builds with `mkdocs build --strict`, so warnings such as broken
+internal links and pages missing from the navigation fail the build.
 
 Releases are created by tagging a commit:
 
