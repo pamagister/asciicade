@@ -14,6 +14,7 @@ from asciicade.core.options import (
     GameOptionRegistry,
 )
 from asciicade.core.registry import GameRegistration
+from asciicade.games import build_default_registry
 
 
 def _metadata(
@@ -72,6 +73,15 @@ def test_render_page_omits_multiplayer_section_for_single_player_game() -> None:
     registration = _registration(_metadata())
     page = renderer.render_page(registration)
     assert "## Two players" not in page
+    assert "## Gameplay preview" not in page
+
+
+def test_render_page_includes_gameplay_preview_for_builtin_games() -> None:
+    for registration in build_default_registry().all():
+        page = renderer.render_page(registration)
+        assert "## Gameplay preview" in page
+        assert "```text" in page
+        assert registration.metadata.name.upper() in page
 
 
 def test_render_page_uses_quick_controls_without_long_text() -> None:

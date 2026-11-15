@@ -3,6 +3,32 @@
 Classic arcade Snake for one or two local players. Eat food, grow longer and
 avoid crashing into walls or your own body.
 
+## Gameplay preview
+
+```text
+SNAKE — SINGLE-PLAYER
+Guest 1: 0
+████████████████████████████████████████████████████████████████
+██                                                            ██
+██                                                            ██
+██                        ◖◗                                  ██
+██                                                            ██
+██                                                            ██
+██                                                            ██
+██                                                            ██
+██                          ██████                            ██
+██                                                            ██
+██                                                            ██
+██                                                            ██
+██                                                            ██
+██                                                            ██
+██                                                            ██
+██                                                            ██
+████████████████████████████████████████████████████████████████
+
+Arrows/WASD move · Esc/P pause · Q quit
+```
+
 ## Single player
 
 - The snake moves continuously on the grid.

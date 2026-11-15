@@ -4,6 +4,35 @@ Classic falling-block puzzle for one or two local players. Arrange tetrominoes
 into complete horizontal lines, clear them before the stack reaches the top and
 survive as the pieces fall faster.
 
+## Gameplay preview
+
+```text
+BLOCKFALL — SINGLE-PLAYER
+╔════════════════════╗  P1
+║        ████        ║  Guest 1
+║        ████        ║  ARROWS / WASD
+║                    ║  Score 0
+║                    ║  Lines 0
+║                    ║  Level 1
+║                    ║
+║                    ║  Next
+║                    ║  ████
+║                    ║    ████
+║                    ║
+║                    ║  SCORING (x level)
+║                    ║  1 line   100
+║                    ║  2 lines  300
+║                    ║  3 lines  500
+║                    ║  4 lines  800
+║                    ║
+║                    ║
+║                    ║
+║        ░░░░        ║
+║        ░░░░        ║
+╚════════════════════╝
+Arrows/WASD move · Space/Ctrl/AltGr rotate · Down soft drop · Esc/P pause
+```
+
 ## Single player
 
 - Move the active piece with the arrow keys or WASD.

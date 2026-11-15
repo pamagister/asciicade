@@ -3,6 +3,34 @@
 Classic arcade Pong for one or two local players. Return the ball with your
 paddle, use the paddle edges to aim, and be first to reach the score limit.
 
+## Gameplay preview
+
+```text
+PONG — SINGLE-PLAYER
+Guest 1: 0    CPU: 0
+First to 11
+╔════════════════════════════════════════════════════════╗
+║                            ▀                           ║
+║                            ▀                           ║
+║                            ▀                           ║
+║                            ▀                           ║
+║                            ▀                           ║
+║                            ▀                           ║
+║ ▄                          ▀                         ▄ ║
+║ █                          █                         █ ║
+║ █                          ▀                         █ ║
+║ ▀                          ▀                         ▀ ║
+║                            ▀                           ║
+║                            ▀                           ║
+║                            ▀                           ║
+║                            ▀                           ║
+║                            ▀                           ║
+║                            ▀                           ║
+╚════════════════════════════════════════════════════════╝
+
+Arrows/WASD move · Esc/P pause · Q quit
+```
+
 ## Single player
 
 - You control the right paddle with the arrow keys or WASD.

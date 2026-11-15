@@ -20,6 +20,7 @@ from asciicade.core.game import GameDocs, GameMode
 from asciicade.core.options import BooleanOptionDefinition, ChoiceOptionDefinition
 from asciicade.core.registry import GameRegistration
 from asciicade.games import build_default_registry
+from asciicade.ui.preview import render_game_preview
 
 GAMES_DIR = Path("docs/games")
 INDEX_FILE = Path("docs/index.md")
@@ -132,6 +133,10 @@ def render_page(registration: GameRegistration) -> str:
     metadata = registration.metadata
     docs = metadata.docs
     parts = [f"# {metadata.name}", _normalize(docs.page_description)]
+
+    preview = render_game_preview(registration)
+    if preview:
+        parts += ["## Gameplay preview", f"```text\n{preview}\n```"]
 
     if GameMode.SINGLE_PLAYER in metadata.modes:
         parts += ["## Single player", _normalize(docs.single_player)]

@@ -33,7 +33,10 @@ To add a game:
 3. Declare a `GameMetadata` instance with an identifier, name, supported modes,
    the `GameDocs` instance and optional game options.
 4. Register the game in `asciicade.games.build_default_registry`.
-5. Add a game-specific Textual screen for rendering and input.
+5. Add a game-specific Textual screen for rendering and input. The docs
+   generator reuses the screen's `render_arena()` method to produce a
+   deterministic ASCII gameplay preview; no separate preview renderer is
+   needed.
 6. Run `make syncdocs` to regenerate `docs/games/<id>.md` and the game list in
    `docs/index.md`. Do not write generated documentation by hand.
 
