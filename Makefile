@@ -80,7 +80,7 @@ validate: build   ## Check the built distributions.
 	uv run twine check dist/*
 
 .PHONY: release
-release:          ## Tag and push a release. Publishing runs in GitHub Actions.
+release:          ## Tag and push a release. CI sets the version from the tag and publishes.
 	$(MAKE) precommit
 	@echo "WARNING: This operation will create a version tag and push it to GitHub."
 
@@ -92,9 +92,19 @@ release:          ## Tag and push a release. Publishing runs in GitHub Actions.
 
 	read -e -i "$$NEXT_PATCH_VERSION" -p "Enter the new release tag (e.g., 0.1.0, 1.0.0): " NEW_TAG
 
-	echo "Creating git tag : $${NEW_TAG}"
+	@if ! printf '%s' "$$NEW_TAG" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$$'; then \
+		echo "ERROR: invalid tag '$${NEW_TAG}'. Use MAJOR.MINOR.PATCH."; \
+		exit 1; \
+	fi
+
+	@if git rev-parse -q --verify "refs/tags/$${NEW_TAG}" >/dev/null; then \
+		echo "ERROR: tag $${NEW_TAG} already exists."; \
+		exit 1; \
+	fi
+
+	@echo "Creating git tag : $${NEW_TAG}"
 	git tag "$${NEW_TAG}"
-	git push -u origin HEAD --tags
+	git push origin "$${NEW_TAG}"
 
 	echo "GitHub Actions will build, validate and publish the release."
 

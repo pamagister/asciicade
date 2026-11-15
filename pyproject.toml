@@ -1,6 +1,6 @@
 [project]
 name = "asciicade"
-version = "0.1.0"
+dynamic = ["version"]
 description = "A polished, extensible arcade game collection for Linux terminals."
 authors = [
     {name = "pamagister"}
@@ -56,6 +56,9 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
+
+[tool.setuptools.dynamic]
+version = {attr = "asciicade.__version__"}
 
 [tool.setuptools.packages.find]
 where = ["src"]

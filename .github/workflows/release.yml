@@ -48,6 +48,8 @@ jobs:
         uses: ./.github/actions/setup-environment
         with:
           python-version: '3.11'
+      - name: Set package version from tag
+        run: python scripts/set_version.py "${GITHUB_REF_NAME#v}"
       - name: Build distributions
         run: make build
       - name: Validate distributions
