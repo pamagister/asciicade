@@ -161,3 +161,7 @@ def test_normalize_key_resolves_action_button_aliases() -> None:
     assert normalize_key("AltGr") == "iso_level3_shift"
     assert normalize_key("right_ctrl") == "control"
     assert normalize_key("shift") == "shift"
+    # Kitty reports standalone modifier keys with left_/right_ functional names.
+    assert normalize_key("left_shift") == "shift"
+    assert normalize_key("left_control") == "control"
+    assert normalize_key("right_control") == "control"

@@ -7,8 +7,8 @@ survive as the pieces fall faster.
 ## Single player
 
 - Move the active piece with the arrow keys or WASD.
-- Rotate clockwise with Space (or Shift) and counterclockwise with AltGr (or
-  Ctrl).
+- Rotate clockwise with Space, Shift, Up or W and counterclockwise with AltGr or
+  Ctrl.
 - Press Down or S to move down one row. Hold the key to soft drop continuously.
 - Complete a horizontal line to clear it. Clearing several lines at once awards
   more points.
@@ -18,9 +18,10 @@ survive as the pieces fall faster.
 
 ## Two players
 
-- Player 1 uses the arrow keys, Space (clockwise) and AltGr (counterclockwise).
-- Player 2 uses A and D to move, S to soft drop, Ctrl (clockwise) and Shift
-  (counterclockwise). Player 2 plays on the left board.
+- Player 1 uses the arrow keys, Space or Up (clockwise) and AltGr
+  (counterclockwise).
+- Player 2 uses A and D to move, S to soft drop, Shift or W (counterclockwise)
+  and Ctrl (clockwise). Player 2 plays on the left board.
 - Both players play at the same time on separate 10x20 boards.
 - The first player to top out loses and the other player wins. If both players
   top out on the same tick, the match is a draw.
@@ -81,6 +82,8 @@ a given random seed.
 ## Controls
 
 Player 1 uses the arrow keys by default. Player 2 uses W/A/S/D. In single-player
-mode, WASD is accepted as an alternative to the arrow keys. Escape or P pauses
-or resumes during a game. The full, game-independent control list is on the
-[controls page](../index.md#controls).
+mode, WASD is accepted as an alternative to the arrow keys. Up (Player 1) and W
+(Player 2) rotate the active piece in addition to the action keys; this is a
+portable alternative when Shift, Ctrl or AltGr are not reported by the terminal.
+Escape or P pauses or resumes during a game. The full, game-independent control
+list is on the [controls page](../index.md#controls).

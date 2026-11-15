@@ -69,8 +69,11 @@ _KEY_ALIASES: dict[str, str] = {
     "alt_gr": "iso_level3_shift",
     "right_alt": "iso_level3_shift",
     "right_shift": "shift",
+    "left_shift": "shift",
     "right_ctrl": "control",
+    "right_control": "control",
     "left_ctrl": "control",
+    "left_control": "control",
     "ctrl": "control",
     "shift": "shift",
 }

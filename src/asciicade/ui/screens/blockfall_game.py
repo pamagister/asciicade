@@ -56,8 +56,8 @@ _SOFT_DROP_HOLD_DELAY = 0.08
 _SOFT_DROP_REPEAT_INTERVAL = 0.04
 _KEY_HOLD_TIMEOUT = 0.3
 
-_SINGLE_PLAYER_FOOTER = "Arrows/WASD move · Space/AltGr rotate · Down soft drop · Esc/P pause"
-_TWO_PLAYER_FOOTER = "P1 Arrows+Space/AltGr · P2 WASD+Ctrl/Shift · Esc/P pause"
+_SINGLE_PLAYER_FOOTER = "Arrows/WASD move · Space/AltGr/Up/W rotate · Down soft drop · Esc/P pause"
+_TWO_PLAYER_FOOTER = "P1 Arrows+Space/AltGr/Up · P2 WASD+Ctrl/Shift/W · Esc/P pause"
 
 
 class BlockfallGameScreen(Screen[None]):
@@ -143,6 +143,10 @@ class BlockfallGameScreen(Screen[None]):
         input_event = self._input_map.resolve(event.key)
         if input_event is None:
             return
+        # Up/W have no vertical-movement role in Blockfall; reuse them to rotate
+        # in the player's primary (Action A) direction.
+        if input_event.action is InputAction.UP:
+            input_event = InputEvent(InputAction.ACTION_A, player=input_event.player)
         if input_event.action not in {
             InputAction.LEFT,
             InputAction.RIGHT,

@@ -282,6 +282,72 @@ def test_blockfall_two_player_controls_are_separate(tmp_path: Path) -> None:
     asyncio.run(scenario())
 
 
+def test_blockfall_single_player_up_and_w_rotate(tmp_path: Path) -> None:
+    async def scenario() -> None:
+        app = make_app(tmp_path)
+        async with app.run_test(size=(80, 24)) as pilot:
+            await pilot.pause()
+            screen = await push_blockfall(app, pilot)
+            screen._timer.stop()
+            state = screen._game._states[0]
+            assert state.active is not None
+            start_rotation = state.active.rotation
+
+            # Up and W have no vertical role in Blockfall, so they rotate.
+            await pilot.press("up")
+            assert state.active is not None
+            assert state.active.rotation == (start_rotation + 1) % 4
+
+            await pilot.press("w")
+            assert state.active is not None
+            assert state.active.rotation == (start_rotation + 2) % 4
+
+    asyncio.run(scenario())
+
+
+def test_blockfall_two_player_modifier_rotation_keys(tmp_path: Path) -> None:
+    async def scenario() -> None:
+        app = make_app(tmp_path)
+        async with app.run_test(size=(80, 24)) as pilot:
+            await pilot.pause()
+            screen = await push_blockfall(
+                app,
+                pilot,
+                mode=GameMode.MULTIPLAYER,
+                players=(GuestPlayer(1), GuestPlayer(2)),
+            )
+            screen._timer.stop()
+            first = screen._game._states[0]
+            second = screen._game._states[1]
+            assert first.active is not None
+            assert second.active is not None
+            first_start = first.active.rotation
+            second_start = second.active.rotation
+
+            # Kitty reports standalone modifier keys as left_/right_ functional
+            # names; they must still resolve to Player 2's action bindings.
+            screen.on_key(events.Key("left_shift", None))
+            screen.on_key(events.Key("left_control", None))
+            assert first.active is not None
+            assert second.active is not None
+            # left_shift is Action A (-1) and left_control is Action B (+1) for P2.
+            assert second.active.rotation == second_start
+            assert first.active.rotation == first_start
+
+            screen.on_key(events.Key("right_control", None))
+            assert second.active is not None
+            assert second.active.rotation == (second_start + 1) % 4
+
+            # W rotates Player 2 (Action A, -1) and leaves Player 1 untouched.
+            await pilot.press("w")
+            assert first.active is not None
+            assert second.active is not None
+            assert first.active.rotation == first_start
+            assert second.active.rotation == second_start
+
+    asyncio.run(scenario())
+
+
 def test_blockfall_soft_drop_hold_repeats_and_release_stops(tmp_path: Path) -> None:
     async def scenario() -> None:
         app = make_app(tmp_path)

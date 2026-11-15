@@ -148,11 +148,13 @@ Blockfall uses Action A and Action B for rotation. Player 1 rotates clockwise
 with Space (Action A) and counterclockwise with AltGr (Action B). Player 2
 rotates clockwise with Ctrl (Action B) and counterclockwise with Shift
 (Action A). In single-player mode, Space or Shift rotates clockwise and AltGr or
-Ctrl rotates counterclockwise.
+Ctrl rotates counterclockwise. As a portable alternative, the Up arrow (Player 1)
+and W (Player 2) also rotate the active piece; in Blockfall they do not move the
+piece vertically.
 
 Standalone AltGr, Shift and Ctrl key presses are only reported reliably by
-terminals with Kitty keyboard protocol support. On other terminals, use Space
-for Action A as the portable alternative.
+terminals with Kitty keyboard protocol support. On other terminals, use Space or
+Up (Player 1) and W (Player 2) as portable rotation keys.
 
 ### Player profiles, colors and saved data
 

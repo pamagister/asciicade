@@ -18,7 +18,7 @@ BLOCKFALL_SUMMARY = (
 
 BLOCKFALL_SINGLE_PLAYER = (
     "- Move the active piece with the arrow keys or WASD.\n"
-    "- Rotate clockwise with Space (or Shift) and counterclockwise with AltGr (or Ctrl).\n"
+    "- Rotate clockwise with Space, Shift, Up or W and counterclockwise with AltGr or Ctrl.\n"
     "- Press Down or S to move down one row. Hold the key to soft drop continuously.\n"
     "- Complete a horizontal line to clear it. Clearing several lines at once awards more points.\n"
     "- The level rises every 10 cleared lines and gravity becomes faster.\n"
@@ -27,9 +27,9 @@ BLOCKFALL_SINGLE_PLAYER = (
 )
 
 BLOCKFALL_MULTIPLAYER = (
-    "- Player 1 uses the arrow keys, Space (clockwise) and AltGr (counterclockwise).\n"
-    "- Player 2 uses A and D to move, S to soft drop, Ctrl (clockwise) and Shift "
-    "(counterclockwise).\n"
+    "- Player 1 uses the arrow keys, Space or Up (clockwise) and AltGr (counterclockwise).\n"
+    "- Player 2 uses A and D to move, S to soft drop, Shift or W (counterclockwise) and Ctrl "
+    "(clockwise).\n"
     "  Player 2 plays on the left board.\n"
     "- Both players play at the same time on separate 10x20 boards.\n"
     "- The first player to top out loses and the other player wins. If both players top out on "
@@ -42,6 +42,7 @@ BLOCKFALL_CONTROLS_SHORT = (
     "Player 1 uses the arrow keys by default. Player 2 uses W/A/S/D. In single-player mode, WASD "
     "is\n"
     "accepted as an alternative to the arrow keys.\n"
+    "Up (Player 1) and W (Player 2) rotate the active piece in addition to the action keys.\n"
     "Escape or P pauses or resumes during a game. See the general controls for leave-game and "
     "quit\n"
     "keys."
@@ -51,6 +52,8 @@ BLOCKFALL_CONTROLS_LONG = (
     "Player 1 uses the arrow keys by default. Player 2 uses W/A/S/D. In single-player mode, WASD "
     "is\n"
     "accepted as an alternative to the arrow keys.\n"
+    "Up (Player 1) and W (Player 2) rotate the active piece in addition to the action keys; this "
+    "is a portable alternative when Shift, Ctrl or AltGr are not reported by the terminal.\n"
     "Escape or P pauses or resumes during a game. The full, game-independent control list is on "
     "the\n"
     "[controls page](../index.md#controls)."
