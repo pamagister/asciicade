@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from asciicade.games.pong.engine import PongEngine
-from asciicade.games.pong.game import PONG_INSTRUCTIONS, PONG_OPTIONS, PongGame
+from asciicade.games.pong.game import PONG_OPTIONS, PongGame
 from asciicade.games.pong.models import (
     Ball,
     Paddle,
@@ -16,7 +16,6 @@ from asciicade.games.pong.models import (
 )
 
 __all__ = [
-    "PONG_INSTRUCTIONS",
     "PONG_OPTIONS",
     "Ball",
     "Paddle",

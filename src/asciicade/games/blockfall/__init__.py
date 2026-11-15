@@ -3,11 +3,7 @@
 from __future__ import annotations
 
 from asciicade.games.blockfall.engine import BlockfallEngine
-from asciicade.games.blockfall.game import (
-    BLOCKFALL_INSTRUCTIONS,
-    BLOCKFALL_OPTIONS,
-    BlockfallGame,
-)
+from asciicade.games.blockfall.game import BLOCKFALL_OPTIONS, BlockfallGame
 from asciicade.games.blockfall.models import (
     BOX_SIZES,
     ROTATIONS,
@@ -34,7 +30,6 @@ from asciicade.games.blockfall.rules import (
 )
 
 __all__ = [
-    "BLOCKFALL_INSTRUCTIONS",
     "BLOCKFALL_OPTIONS",
     "BOX_SIZES",
     "ROTATIONS",

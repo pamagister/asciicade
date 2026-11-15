@@ -7,7 +7,7 @@ from typing import cast
 
 import pytest
 
-from asciicade.core.game import GameMetadata, GameMode
+from asciicade.core.game import GameDocs, GameMetadata, GameMode
 from asciicade.core.options import GameOptions
 from asciicade.core.player import GuestPlayer
 from asciicade.core.registry import GameRegistration
@@ -41,7 +41,12 @@ def _registration(identifier: str) -> GameRegistration:
         name=identifier.title(),
         description="A test game.",
         modes=(GameMode.SINGLE_PLAYER,),
-        instructions="Test instructions.",
+        docs=GameDocs(
+            summary="Test game.",
+            long_description="Test game.",
+            single_player="Single player body.",
+            controls_short="Test instructions.",
+        ),
     )
     return GameRegistration(metadata, lambda: cast(object, None))
 

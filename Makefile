@@ -111,6 +111,7 @@ release:          ## Tag and push a release. CI sets the version from the tag an
 .PHONY: syncdocs
 syncdocs:         ## Synchronize generated documentation.
 	@echo "sync documentation ..."
+	@uv run ./scripts/render_game_docs.py
 	@uv run ./scripts/update_readme.py
 	@uv run ./scripts/render_logo.py
 

@@ -101,5 +101,5 @@ warn_return_any = true
 strict_equality = true
 
 [tool.pytest.ini_options]
-pythonpath = ["src"]
+pythonpath = ["src", "."]
 testpaths = ["tests"]

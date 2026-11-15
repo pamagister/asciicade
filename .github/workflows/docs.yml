@@ -6,7 +6,9 @@ on:
     paths:
       - "docs/**"
       - "README.md"
+      - "src/asciicade/**"
       - "scripts/update_readme.py"
+      - "scripts/render_game_docs.py"
       - "scripts/render_logo.py"
       - "Makefile"
       - "pyproject.toml"
@@ -17,7 +19,9 @@ on:
     paths:
       - "docs/**"
       - "README.md"
+      - "src/asciicade/**"
       - "scripts/update_readme.py"
+      - "scripts/render_game_docs.py"
       - "scripts/render_logo.py"
       - "Makefile"
       - "pyproject.toml"
@@ -46,6 +50,6 @@ jobs:
       - name: Sync generated documentation
         run: make syncdocs
       - name: Verify generated files are committed
-        run: git diff --exit-code -- README.md docs/_static/img/logo.png docs/_static/img/favicon.png
+        run: git diff --exit-code -- README.md docs/ docs/_static/img/logo.png docs/_static/img/favicon.png
       - name: Build documentation
         run: make docs

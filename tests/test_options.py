@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from asciicade.core.game import GameMetadata, GameMode
+from asciicade.core.game import GameDocs, GameMetadata, GameMode
 from asciicade.core.options import (
     BooleanOptionDefinition,
     ChoiceOptionDefinition,
@@ -122,7 +122,12 @@ def test_game_metadata_rejects_duplicate_option_keys() -> None:
             name="Snake",
             description="desc",
             modes=(GameMode.SINGLE_PLAYER,),
-            instructions="instructions",
+            docs=GameDocs(
+                summary="s",
+                long_description="d",
+                single_player="sp",
+                controls_short="instructions",
+            ),
             options=GameOptionRegistry(
                 definitions=(
                     ChoiceOptionDefinition(

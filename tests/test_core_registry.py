@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 
 import pytest
 
-from asciicade.core.game import GameMetadata, GameMode
+from asciicade.core.game import GameDocs, GameMetadata, GameMode
 from asciicade.core.input import InputEvent
 from asciicade.core.player import Player
 from asciicade.core.registry import (
@@ -57,17 +57,27 @@ def _metadata(identifier: str, name: str) -> GameMetadata:
         name=name,
         description="A test game.",
         modes=(GameMode.SINGLE_PLAYER,),
-        instructions="Test instructions.",
+        docs=_docs(),
+    )
+
+
+def _docs() -> GameDocs:
+    """Return minimal valid docs for a test game."""
+    return GameDocs(
+        summary="Test game.",
+        long_description="Test game.",
+        single_player="Single player body.",
+        controls_short="Test instructions.",
     )
 
 
 def test_metadata_requires_identifier_name_and_modes() -> None:
     with pytest.raises(ValueError, match="identifier"):
-        GameMetadata("", "Game", "d", (GameMode.SINGLE_PLAYER,), "i")
+        GameMetadata("", "Game", "d", (GameMode.SINGLE_PLAYER,), _docs())
     with pytest.raises(ValueError, match="name"):
-        GameMetadata("id", "  ", "d", (GameMode.SINGLE_PLAYER,), "i")
+        GameMetadata("id", "  ", "d", (GameMode.SINGLE_PLAYER,), _docs())
     with pytest.raises(ValueError, match="at least one mode"):
-        GameMetadata("id", "Game", "d", (), "i")
+        GameMetadata("id", "Game", "d", (), _docs())
 
 
 def test_metadata_rejects_duplicate_modes() -> None:
@@ -77,8 +87,44 @@ def test_metadata_rejects_duplicate_modes() -> None:
             "Game",
             "d",
             (GameMode.SINGLE_PLAYER, GameMode.SINGLE_PLAYER),
-            "i",
+            _docs(),
         )
+
+
+def test_metadata_requires_multiplayer_docs_for_multiplayer_games() -> None:
+    with pytest.raises(ValueError, match="two-player"):
+        GameMetadata(
+            "id",
+            "Game",
+            "d",
+            (GameMode.MULTIPLAYER,),
+            GameDocs(
+                summary="s",
+                long_description="d",
+                single_player="sp",
+                controls_short="c",
+            ),
+        )
+
+
+def test_metadata_instructions_are_derived_from_docs() -> None:
+    metadata = GameMetadata(
+        "id",
+        "Game",
+        "d",
+        (GameMode.SINGLE_PLAYER, GameMode.MULTIPLAYER),
+        GameDocs(
+            summary="Objective: win.",
+            long_description="d",
+            single_player="Do the single-player thing.",
+            multiplayer="Do the two-player thing.",
+            controls_short="Press Escape to pause.",
+        ),
+    )
+    assert "Objective: win." in metadata.instructions
+    assert "Single player:\nDo the single-player thing." in metadata.instructions
+    assert "Two players:\nDo the two-player thing." in metadata.instructions
+    assert "Press Escape to pause." in metadata.instructions
 
 
 def test_registry_registers_and_retrieves_games() -> None:

@@ -407,7 +407,7 @@ def test_instructions_screen_shows_game_instructions(tmp_path: Path) -> None:
             await pilot.pause()
 
             body = app.screen.query_one("#instructions-body", Static)
-            assert "Objective" in str(body.content)
+            assert "Classic arcade Snake" in str(body.content)
 
     asyncio.run(scenario())
 

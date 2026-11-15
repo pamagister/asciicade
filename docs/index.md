@@ -179,15 +179,11 @@ Set `XDG_DATA_HOME` to change the base directory.
 
 ## Games
 
-- [Snake](games/snake.md) — classic arcade Snake for one or two local players;
-  eat food, grow longer and avoid crashing, with adjustable difficulty and
-  wrap-around walls.
-- [Pong](games/pong.md) — classic arcade Pong for one or two local players;
-  aim with the paddle edges, use half-block rendering and choose the score limit
-  and difficulty.
-- [Blockfall](games/blockfall.md) — classic falling-block puzzle for one or two
-  local players; arrange tetrominoes into lines, use wall kicks and a ghost
-  piece, and choose the start level.
+<!-- games:start -->
+- [Blockfall](games/blockfall.md) — Classic falling-block puzzle for one or two local players. Arrange tetrominoes into complete horizontal lines, clear them before the stack reaches the top and survive as the pieces fall faster.
+- [Pong](games/pong.md) — Classic arcade Pong for one or two local players. Return the ball with your paddle, use the paddle edges to aim, and be first to reach the score limit.
+- [Snake](games/snake.md) — Classic arcade Snake for one or two local players. Eat food, grow longer and avoid crashing into walls or your own body.
+<!-- games:end -->
 
 ## Documentation
 

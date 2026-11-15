@@ -23,6 +23,45 @@ class GameMode(StrEnum):
 
 
 @dataclass(frozen=True, slots=True)
+class GameDocs:
+    """Single source of truth for a game's documentation.
+
+    All Markdown bodies use a small, fixed subset: paragraphs and ``-`` bullet
+    lists. The docs pages under ``docs/games/`` and the in-game instructions are
+    rendered from these fields.
+
+    Attributes:
+        summary: Short description used in game lists and page summaries.
+        long_description: Markdown body shown under the page title.
+        single_player: Markdown body for the single-player section.
+        multiplayer: Markdown body for the two-player section; required when the
+            game declares :attr:`GameMode.MULTIPLAYER`.
+        controls_short: Short control hint used for the in-game instructions.
+        controls_long: Longer control explanation for the docs page.
+        sections: Extra titled Markdown sections, e.g. scoring rules. A body may
+            contain a ``{options}`` placeholder that is replaced by the options
+            table rendered from the game's option registry.
+    """
+
+    summary: str
+    long_description: str
+    single_player: str
+    controls_short: str
+    multiplayer: str | None = None
+    controls_long: str | None = None
+    sections: tuple[tuple[str, str], ...] = ()
+
+    def __post_init__(self) -> None:
+        """Validate the documentation fields."""
+        if not self.summary.strip():
+            raise ValueError("Game docs summary must not be empty.")
+        if not self.single_player.strip():
+            raise ValueError("Game docs must describe the single-player mode.")
+        if not self.controls_short.strip():
+            raise ValueError("Game docs must describe the short controls.")
+
+
+@dataclass(frozen=True, slots=True)
 class GameMetadata:
     """Static metadata describing a game."""
 
@@ -30,7 +69,7 @@ class GameMetadata:
     name: str
     description: str
     modes: tuple[GameMode, ...]
-    instructions: str
+    docs: GameDocs
     options: GameOptionRegistry | None = None
 
     def __post_init__(self) -> None:
@@ -43,10 +82,23 @@ class GameMetadata:
             raise ValueError("A game must declare at least one mode.")
         if len(set(self.modes)) != len(self.modes):
             raise ValueError("Game modes must be unique.")
+        if GameMode.MULTIPLAYER in self.modes and not self.docs.multiplayer:
+            raise ValueError("Multiplayer games must document the two-player mode.")
         if self.options is not None:
             keys = [definition.key for definition in self.options.definitions]
             if len(set(keys)) != len(keys):
                 raise ValueError("Option keys must be unique.")
+
+    @property
+    def instructions(self) -> str:
+        """Return the in-game instructions derived from the documentation."""
+        parts = [self.docs.summary]
+        if self.docs.single_player:
+            parts.append(f"Single player:\n{self.docs.single_player}")
+        if self.docs.multiplayer:
+            parts.append(f"Two players:\n{self.docs.multiplayer}")
+        parts.append(self.docs.controls_short)
+        return "\n\n".join(part.strip() for part in parts if part.strip())
 
 
 class Game(Protocol):

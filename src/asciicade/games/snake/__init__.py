@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from asciicade.games.snake.engine import SnakeEngine
-from asciicade.games.snake.game import SNAKE_INSTRUCTIONS, SnakeGame
+from asciicade.games.snake.game import SnakeGame
 from asciicade.games.snake.models import (
     Arena,
     FoodView,
@@ -21,7 +21,6 @@ from asciicade.games.snake.rules import (
 )
 
 __all__ = [
-    "SNAKE_INSTRUCTIONS",
     "Arena",
     "FoodView",
     "Position",
