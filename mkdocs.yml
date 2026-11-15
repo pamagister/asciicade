@@ -3,6 +3,7 @@ site_url: !ENV READTHEDOCS_CANONICAL_URL
 site_description: A polished, extensible arcade game collection for Linux terminals.
 repo_url: https://github.com/pamagister/asciicade
 repo_name: GitHub
+edit_uri: edit/main/docs/
 
 # See also:
 #  https://squidfunk.github.io/mkdocs-material/
