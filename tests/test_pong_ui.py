@@ -110,6 +110,9 @@ def test_pong_screen_renders_field_scores_and_half_blocks(tmp_path: Path) -> Non
             assert "╚" in rendered
             assert "║" in rendered
             assert any(character in rendered for character in ("▀", "▄", "█"))
+            assert (
+                make_registration().metadata.docs.controls_hint(GameMode.SINGLE_PLAYER) in rendered
+            )
             assert max(len(line) for line in lines) <= 80
 
     asyncio.run(scenario())
@@ -161,6 +164,8 @@ def test_pong_renders_player_one_on_the_right(tmp_path: Path) -> None:
 
             assert "cyan" in (left_style or "")
             assert "green" in (right_style or "")
+            rendered = str(screen.render_arena())
+            assert make_registration().metadata.docs.controls_hint(GameMode.MULTIPLAYER) in rendered
 
     asyncio.run(scenario())
 

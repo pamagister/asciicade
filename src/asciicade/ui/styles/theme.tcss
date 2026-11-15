@@ -82,6 +82,14 @@ OptionList:focus {
     padding: 1 2;
 }
 
+#game-controls {
+    width: 60;
+    height: auto;
+    color: #8bd3c7;
+    content-align: left top;
+    padding: 0 2;
+}
+
 #empty-state {
     width: 100%;
     max-width: 60;

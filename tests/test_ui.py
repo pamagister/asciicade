@@ -175,6 +175,9 @@ def test_snake_screen_renders_and_handles_input(tmp_path: Path) -> None:
             screen._timer.stop()
 
             assert "SNAKE" in str(screen.render_arena())
+            assert registration.metadata.docs.controls_hint(GameMode.SINGLE_PLAYER) in str(
+                screen.render_arena()
+            )
 
             await pilot.press("up")
             head_before = screen._game.snapshot.snakes[0].body[0]
@@ -216,6 +219,7 @@ def test_snake_screen_supports_two_players(tmp_path: Path) -> None:
             assert "11" not in text
             assert "22" not in text
             assert "▓" not in text
+            assert registration.metadata.docs.controls_hint(GameMode.MULTIPLAYER) in text
 
             await pilot.press("w")
             screen._on_tick()
@@ -634,6 +638,75 @@ def test_confirm_quit_can_be_cancelled(tmp_path: Path) -> None:
 
             await pilot.press("escape")
             assert isinstance(app.screen, MainMenuScreen)
+
+    asyncio.run(scenario())
+
+
+def test_game_select_shows_highlighted_game_summary(tmp_path: Path) -> None:
+    async def scenario() -> None:
+        app = make_app(tmp_path)
+        async with app.run_test(size=(100, 30)) as pilot:
+            await pilot.pause()
+            app.push_screen(
+                GameSelectScreen(
+                    app.context,
+                    "play",
+                    mode=GameMode.SINGLE_PLAYER,
+                )
+            )
+            await pilot.pause()
+
+            registration = app.context.registry.get("blockfall")
+            description = app.screen.query_one("#game-description", Static)
+            assert str(description.content) == registration.metadata.docs.summary
+
+    asyncio.run(scenario())
+
+
+def test_game_menu_shows_summary_and_single_player_controls(tmp_path: Path) -> None:
+    async def scenario() -> None:
+        app = make_app(tmp_path)
+        async with app.run_test(size=(100, 30)) as pilot:
+            await pilot.pause()
+            registration = app.context.registry.get("snake")
+            app.push_screen(
+                GameMenuScreen(
+                    app.context,
+                    registration,
+                    GameMode.SINGLE_PLAYER,
+                    (GuestPlayer(1),),
+                )
+            )
+            await pilot.pause()
+
+            assert str(app.screen.query_one("#game-description", Static).content) == (
+                registration.metadata.docs.summary
+            )
+            assert str(app.screen.query_one("#game-controls", Static).content) == (
+                registration.metadata.docs.controls_hint(GameMode.SINGLE_PLAYER)
+            )
+
+    asyncio.run(scenario())
+
+
+def test_game_menu_shows_two_player_controls_for_multiplayer(tmp_path: Path) -> None:
+    async def scenario() -> None:
+        app = make_app(tmp_path)
+        async with app.run_test(size=(100, 30)) as pilot:
+            await pilot.pause()
+            registration = app.context.registry.get("blockfall")
+            app.push_screen(
+                GameMenuScreen(
+                    app.context,
+                    registration,
+                    GameMode.MULTIPLAYER,
+                    (GuestPlayer(1), GuestPlayer(2)),
+                )
+            )
+            await pilot.pause()
+
+            controls = app.screen.query_one("#game-controls", Static)
+            assert str(controls.content) == (registration.metadata.docs.controls_short_multiplayer)
 
     asyncio.run(scenario())
 

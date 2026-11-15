@@ -82,6 +82,10 @@ class GameMenuScreen(Screen[None]):
             Vertical(
                 Static(metadata.name.upper(), id="screen-title"),
                 Static(metadata.docs.summary, id="game-description"),
+                Static(
+                    metadata.docs.controls_hint(self._mode),
+                    id="game-controls",
+                ),
                 OptionList(
                     Option("Play", id="play"),
                     Option("Instructions", id="instructions"),

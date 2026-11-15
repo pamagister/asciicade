@@ -56,9 +56,6 @@ _SOFT_DROP_HOLD_DELAY = 0.08
 _SOFT_DROP_REPEAT_INTERVAL = 0.04
 _KEY_HOLD_TIMEOUT = 0.3
 
-_SINGLE_PLAYER_FOOTER = "Arrows/WASD move · Space/AltGr/Up/W rotate · Down soft drop · Esc/P pause"
-_TWO_PLAYER_FOOTER = "P1 Arrows+Space/AltGr/Up · P2 WASD+Ctrl/Shift/W · Esc/P pause"
-
 
 class BlockfallGameScreen(Screen[None]):
     """Render and drive a Blockfall session."""
@@ -491,9 +488,7 @@ class BlockfallGameScreen(Screen[None]):
             return "GAME OVER"
         if self._paused:
             return "PAUSED — Esc/P resume · Enter leave · Q quit"
-        if self._mode is GameMode.SINGLE_PLAYER:
-            return _SINGLE_PLAYER_FOOTER
-        return _TWO_PLAYER_FOOTER
+        return self._registration.metadata.docs.controls_hint(self._mode)
 
     def _footer_style(self) -> str:
         """Return the footer style for the current state."""

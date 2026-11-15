@@ -360,14 +360,9 @@ class PongGameScreen(Screen[None]):
                 "\nPAUSED — Esc/P resume · Enter leave · Q quit\n",
                 style="bold yellow",
             )
-        elif self._mode is GameMode.SINGLE_PLAYER:
-            text.append(
-                "\nArrows/WASD move · Esc/P pause · Q quit\n",
-                style="white",
-            )
         else:
             text.append(
-                "\nP1 Arrows · P2 W/S · Esc/P pause · Q quit\n",
+                f"\n{self._registration.metadata.docs.controls_hint(self._mode)}\n",
                 style="white",
             )
         return text

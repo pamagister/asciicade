@@ -271,7 +271,7 @@ class SnakeGameScreen(Screen[None]):
             )
         else:
             text.append(
-                "\nArrows/WASD move · Esc/P pause · Q quit\n",
+                f"\n{self._registration.metadata.docs.controls_hint(self._mode)}\n",
                 style="white",
             )
         if self._finished:

@@ -98,6 +98,7 @@ def test_blockfall_screen_renders_board_and_info(tmp_path: Path) -> None:
             assert "╚" in plain
             assert "║" in plain
             assert "██" in plain
+            assert make_registration().metadata.docs.controls_hint(GameMode.SINGLE_PLAYER) in plain
             assert len(lines) <= 24
             assert max(len(line) for line in lines) <= 80
 
@@ -180,6 +181,7 @@ def test_blockfall_two_player_layout_puts_player_two_left(tmp_path: Path) -> Non
             assert plain.count("╚") == 2
             assert plain.index("P2") < plain.index("P1")
             assert plain.index("P2") < plain.index("╔")
+            assert make_registration().metadata.docs.controls_hint(GameMode.MULTIPLAYER) in plain
             assert plain.rindex("P1") > plain.rindex("╚")
 
             snapshot = screen._game.snapshot
