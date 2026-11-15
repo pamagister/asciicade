@@ -68,3 +68,25 @@ Load the shared and supporting skills as needed:
 
 - When implementing a new game, consider docs/develop/architecture.md
 - also consider the gameplay controls in docs/index.md
+
+## Game UI conventions
+
+These conventions apply to every game screen and are easy to regress. Apply them
+to new games and preserve them when changing existing ones.
+
+- **Render each grid cell two characters wide.** Terminal cells are roughly
+  twice as tall as they are wide, so a logical cell must be rendered as two
+  horizontal block characters (`_CELL_WIDTH = 2`, e.g. `██`, `░░` or two
+  spaces) to keep a board visually square. Every width-dependent layout must
+  derive from that constant: board borders span `2 * board.width` characters,
+  empty cells in previews are two characters wide, and column widths are
+  measured in rendered characters. Using a single space for an empty cell
+  shifts rows that begin with an empty cell and misaligns the top/bottom
+  border. Reference: `src/asciicade/ui/screens/blockfall_game.py` and the fixes
+  in commits `60c5751` (border width) and `7244e53` (next-piece preview).
+- **Player 1 always plays on the right.** Player 1 uses the arrow keys and sits
+  on the right side of a shared keyboard, so in two-player mode Player 1 owns
+  the right field/board and Player 2 (W/A/S/D) owns the left. Keep the engine,
+  the renderer and the game documentation consistent with this. Reference:
+  Pong commit `be68f50`; Blockfall `_render_middle` places Player 2's board on
+  the left and Player 1's on the right.
