@@ -15,6 +15,7 @@ from textual.widgets.option_list import Option
 
 from asciicade.core.player import PlayerColor, PlayerProfile
 from asciicade.persistence.players import PlayerRepository
+from asciicade.ui.audio import SoundEffect, play_ui_sound
 from asciicade.ui.widgets import ActionButton, handle_button_row_key
 
 
@@ -83,10 +84,13 @@ class CreatePlayerScreen(Screen[PlayerProfile | None]):
         """Move focus between dialog buttons with the arrow keys."""
         color_list = self.query_one("#color-list", OptionList)
         if color_list.has_focus and event.key in ("up", "down", "w", "s"):
+            previous = color_list.highlighted
             if event.key in ("up", "w"):
                 color_list.action_cursor_up()
             else:
                 color_list.action_cursor_down()
+            if color_list.highlighted != previous:
+                play_ui_sound(self.app, SoundEffect.UI_MOVE)
             event.stop()
             event.prevent_default()
             return
@@ -101,6 +105,7 @@ class CreatePlayerScreen(Screen[PlayerProfile | None]):
     def on_input_submitted(self, event: Input.Submitted) -> None:
         """Create or save when Enter is pressed in the name field."""
         event.stop()
+        play_ui_sound(self.app, SoundEffect.UI_SELECT)
         self._submit()
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
@@ -115,6 +120,7 @@ class CreatePlayerScreen(Screen[PlayerProfile | None]):
         option_id = event.option.id
         if option_id is None or not option_id.startswith("color:"):
             return
+        play_ui_sound(self.app, SoundEffect.UI_SELECT)
         self._color = PlayerColor(option_id.removeprefix("color:"))
         self._highlight_color()
         self._update_status()

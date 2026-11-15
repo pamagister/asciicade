@@ -18,14 +18,31 @@ _FALLBACK_PLAYERS = ("paplay", "pw-play")
 
 
 class SoundEffect(StrEnum):
-    """Sound effects shipped with the application."""
+    """Semantic sound events used by the user interface."""
 
-    PADDLE_HIT = "click"
-    FOOD_EATEN = "collect"
-    LINE_CLEAR = "blob"
-    MULTI_LINE_CLEAR = "bonus"
-    POINT_SCORED = "coin"
+    PADDLE_HIT = "paddle-hit"
+    FOOD_EATEN = "food-eaten"
+    LINE_CLEAR = "line-clear"
+    MULTI_LINE_CLEAR = "multi-line-clear"
+    POINT_SCORED = "point-scored"
     GAME_OVER = "game-over"
+    UI_MOVE = "ui-move"
+    UI_SELECT = "ui-select"
+    UI_TOGGLE = "ui-toggle"
+
+
+_SOUND_FILES: dict[SoundEffect, str] = {
+    # Pong paddle hits and single-line Blockfall clears share one effect.
+    SoundEffect.PADDLE_HIT: "arcade-blob.mp3",
+    SoundEffect.FOOD_EATEN: "arcade-collect.mp3",
+    SoundEffect.LINE_CLEAR: "arcade-blob.mp3",
+    SoundEffect.MULTI_LINE_CLEAR: "arcade-bonus.mp3",
+    SoundEffect.POINT_SCORED: "arcade-coin.mp3",
+    SoundEffect.GAME_OVER: "arcade-game-over.mp3",
+    SoundEffect.UI_MOVE: "ui-click.mp3",
+    SoundEffect.UI_SELECT: "ui-menu-select.mp3",
+    SoundEffect.UI_TOGGLE: "ui-toggle-switch.mp3",
+}
 
 
 class AudioProcess(Protocol):
@@ -96,15 +113,23 @@ class AudioPlayer:
 
 def sound_path(effect: SoundEffect) -> Path | None:
     """Return the packaged file for a sound effect, if it exists."""
+    filename = _SOUND_FILES[effect]
     try:
         resource = importlib.resources.files("asciicade").joinpath(
             *_SOUND_DIRECTORY,
-            f"{effect.value}.mp3",
+            filename,
         )
     except (ModuleNotFoundError, TypeError):
         return None
     path = Path(str(resource))
     return path if path.is_file() else None
+
+
+def play_ui_sound(app: object, effect: SoundEffect) -> None:
+    """Play a UI sound on an application that exposes ``play_ui_sound``."""
+    player = getattr(app, "play_ui_sound", None)
+    if callable(player):
+        player(effect)
 
 
 def _sound_enabled_by_environment() -> bool:

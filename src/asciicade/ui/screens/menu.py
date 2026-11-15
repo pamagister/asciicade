@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+from textual import events
 from textual.binding import Binding
 from textual.screen import Screen
 from textual.widgets import OptionList
+
+from asciicade.ui.audio import SoundEffect, play_ui_sound
 
 
 class MenuScreen(Screen[None]):
@@ -21,6 +24,13 @@ class MenuScreen(Screen[None]):
         Binding("s", "cursor_down", "Move down", show=False),
         Binding("space", "confirm", "Select", show=False),
     ]
+
+    def on_key(self, event: events.Key) -> None:
+        """Play navigation sounds for menu keys handled by the focused list."""
+        if event.key in ("up", "down", "w", "s"):
+            play_ui_sound(self.app, SoundEffect.UI_MOVE)
+        elif event.key in ("enter", "space", "right", "d"):
+            play_ui_sound(self.app, SoundEffect.UI_SELECT)
 
     def action_confirm(self) -> None:
         """Select the currently highlighted option."""

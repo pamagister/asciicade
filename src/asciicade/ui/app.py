@@ -15,7 +15,7 @@ from asciicade.persistence import (
     SettingsRepository,
     database_path,
 )
-from asciicade.ui.audio import AudioPlayer
+from asciicade.ui.audio import AudioPlayer, SoundEffect
 from asciicade.ui.context import AppContext
 from asciicade.ui.keyboard import AsciicadeLinuxDriver
 from asciicade.ui.screens.confirm_quit import ConfirmQuitScreen
@@ -66,6 +66,11 @@ class AsciicadeApp(App[None]):
         if self._app_context is None:
             raise RuntimeError("Application context is not initialized.")
         return self._app_context
+
+    def play_ui_sound(self, effect: SoundEffect) -> None:
+        """Play a UI sound effect when the application context is available."""
+        if self._app_context is not None:
+            self._app_context.audio.play(effect)
 
     def on_mount(self) -> None:
         """Initialize persistence and show the main menu."""

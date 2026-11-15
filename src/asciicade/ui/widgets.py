@@ -2,10 +2,14 @@
 
 from __future__ import annotations
 
+from typing import Self
+
 from textual import events
 from textual.binding import Binding
 from textual.screen import Screen
 from textual.widgets import Button
+
+from asciicade.ui.audio import SoundEffect, play_ui_sound
 
 
 class ActionButton(Button):
@@ -15,6 +19,13 @@ class ActionButton(Button):
         Binding("enter", "press", "Press", show=False),
         Binding("space", "press", "Press", show=False),
     ]
+
+    def press(self) -> Self:
+        """Play the selection sound and activate the button."""
+        if self.disabled or not self.display:
+            return self
+        play_ui_sound(self.app, SoundEffect.UI_SELECT)
+        return super().press()
 
 
 def move_button_focus(screen: Screen, step: int) -> None:
@@ -28,6 +39,8 @@ def move_button_focus(screen: Screen, step: int) -> None:
         index = 0 if step > 0 else len(buttons) - 1
     else:
         index = (index + step) % len(buttons)
+    if buttons[index] is not focused:
+        play_ui_sound(screen.app, SoundEffect.UI_MOVE)
     buttons[index].focus()
 
 

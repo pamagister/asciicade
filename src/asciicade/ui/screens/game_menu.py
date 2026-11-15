@@ -18,6 +18,7 @@ from asciicade.core.options import (
 )
 from asciicade.core.player import GuestPlayer, PlayerProfile
 from asciicade.core.registry import GameRegistration
+from asciicade.ui.audio import SoundEffect, play_ui_sound
 from asciicade.ui.context import AppContext
 from asciicade.ui.screens.instructions import InstructionsScreen
 
@@ -142,6 +143,8 @@ class GameMenuScreen(Screen[None]):
         option_id = event.option.id
         if option_id is None:
             return
+        if option_id in ("play", "instructions"):
+            play_ui_sound(self.app, SoundEffect.UI_SELECT)
         if option_id == "play":
             self._start_game()
         elif option_id == "instructions":
@@ -155,6 +158,8 @@ class GameMenuScreen(Screen[None]):
 
     async def on_key(self, event: events.Key) -> None:
         """Handle option values and left-to-back navigation."""
+        if event.key in ("up", "down", "w", "s"):
+            play_ui_sound(self.app, SoundEffect.UI_MOVE)
         option_list = self.query_one(OptionList)
         option = option_list.highlighted_option
         if option is None or option.id is None:
@@ -201,6 +206,7 @@ class GameMenuScreen(Screen[None]):
             else:
                 next_value = "on" if current == "off" else "off"
             self._options = self._options.with_value(key, next_value)
+            play_ui_sound(self.app, SoundEffect.UI_TOGGLE)
             self._refresh_option_list()
             self._update_footer()
             self._update_info_panel(self.query_one(OptionList).highlighted_option)
@@ -287,6 +293,7 @@ class GameMenuScreen(Screen[None]):
             else:
                 next_value = "on" if current == "off" else "off"
             self._options = self._options.with_value(key, next_value)
+            play_ui_sound(self.app, SoundEffect.UI_TOGGLE)
             self._refresh_option_list()
             self._update_footer()
             self._update_info_panel(self.query_one(OptionList).highlighted_option)

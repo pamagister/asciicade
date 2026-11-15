@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from uuid import UUID
 
+from textual import events
 from textual.app import ComposeResult
 from textual.binding import Binding
 from textual.containers import Vertical
@@ -12,6 +13,7 @@ from textual.widgets import OptionList, Static
 from textual.widgets.option_list import Option
 
 from asciicade.core.player import PlayerProfile
+from asciicade.ui.audio import SoundEffect, play_ui_sound
 from asciicade.ui.context import AppContext
 from asciicade.ui.screens.create_player import CreatePlayerScreen
 
@@ -49,6 +51,13 @@ class EditPlayerPickerScreen(Screen[PlayerProfile | None]):
     def on_mount(self) -> None:
         """Populate the picker."""
         self._refresh()
+
+    def on_key(self, event: events.Key) -> None:
+        """Play navigation sounds for the focused profile list."""
+        if event.key in ("up", "down", "w", "s"):
+            play_ui_sound(self.app, SoundEffect.UI_MOVE)
+        elif event.key in ("enter", "space", "right", "d"):
+            play_ui_sound(self.app, SoundEffect.UI_SELECT)
 
     def on_option_list_option_selected(self, event: OptionList.OptionSelected) -> None:
         """Open the selected profile for editing."""
