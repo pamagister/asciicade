@@ -446,7 +446,11 @@ class BlockfallGameScreen(Screen[None]):
             lines.append(Text())
             return lines
 
-        grid = [[" "] * 4 for _ in range(2)]
+        # Each logical cell renders as two block characters (_CELL_WIDTH), so
+        # empty cells must also be two characters wide. Using a single space
+        # here shifts rows that start with empty cells half a cell to the
+        # left (most visible on the skew/parallelogram pieces).
+        grid = [[_EMPTY] * 4 for _ in range(2)]
         for cell in ROTATIONS[kind][0]:
             x = cell.x
             y = cell.y - 1 if kind is PieceKind.I else cell.y

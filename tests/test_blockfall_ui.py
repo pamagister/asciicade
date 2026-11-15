@@ -421,6 +421,38 @@ def test_blockfall_ghost_and_next_preview_can_be_disabled(tmp_path: Path) -> Non
     asyncio.run(scenario())
 
 
+def test_blockfall_next_preview_cells_are_double_width(tmp_path: Path) -> None:
+    """Every preview cell must render as two characters so rows stay aligned.
+
+    Each logical cell is _CELL_WIDTH (two) block characters wide. Empty cells
+    must therefore also be two characters wide; otherwise rows that begin with
+    an empty cell shift half a cell to the left, which is most visible on the
+    skew/parallelogram pieces (S and Z).
+    """
+
+    async def scenario() -> None:
+        app = make_app(tmp_path)
+        async with app.run_test(size=(80, 24)) as pilot:
+            await pilot.pause()
+            screen = await push_blockfall(app, pilot)
+            screen._timer.stop()
+
+        for kind in PieceKind:
+            lines = screen._next_lines(kind)
+            assert lines[0].plain == "Next"
+            rows = [line.plain for line in lines[1:3]]
+            # Four cells of two characters each.
+            assert all(len(row) == 8 for row in rows), rows
+
+        # The S piece (parallelogram) top row starts at cell 1 and must not be
+        # shifted left by the missing space of the leading empty cell.
+        s_lines = screen._next_lines(PieceKind.S)
+        assert s_lines[1].plain == "  ████  "
+        assert s_lines[2].plain == "████    "
+
+    asyncio.run(scenario())
+
+
 def test_blockfall_game_menu_starts_with_selected_options(tmp_path: Path) -> None:
     async def scenario() -> None:
         app = make_app(tmp_path)

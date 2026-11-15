@@ -39,7 +39,7 @@ rejected.
 Escape or P pauses or resumes during a game. The full, game-independent control
 list is on the [controls page](../index.md#controls).
 
-Snake rendering uses solid block characters: the wall, every snake segment and
+Snake rendering uses solid block characters: the wall, 
 side walls that are one arena cell wide. Food is drawn as a ball made of the
 left and right halves of a filled circle (`◖◗`). Player-owned food uses the
 player color, while shared food is white. The head is emphasized in bold rather
