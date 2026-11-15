@@ -64,6 +64,7 @@ def test_render_page_contains_sections_in_order() -> None:
     assert "## Scoring" in page
     assert page.index("## Single player") < page.index("## Two players")
     assert page.index("## Two players") < page.index("## Scoring")
+    assert "**Quick:** Esc pauses." in page
     assert page.endswith("See the controls page.\n")
 
 
@@ -71,6 +72,20 @@ def test_render_page_omits_multiplayer_section_for_single_player_game() -> None:
     registration = _registration(_metadata())
     page = renderer.render_page(registration)
     assert "## Two players" not in page
+
+
+def test_render_page_uses_quick_controls_without_long_text() -> None:
+    registration = _registration(
+        _metadata(
+            docs=GameDocs(
+                summary="s",
+                single_player="sp",
+                controls_short="Quick hint.",
+            )
+        )
+    )
+    page = renderer.render_page(registration)
+    assert "**Quick:** Quick hint." in page
 
 
 def test_render_page_renders_options_table_from_registry() -> None:

@@ -45,6 +45,8 @@ terminals where characters are about twice as tall as they are wide.
 
 ## Controls
 
+**Quick:** Arrows/WASD move · Esc/P pause · Q quit
+
 Player 1 uses the arrow keys by default. Player 2 uses W/A/S/D. In single-player
 mode, WASD is accepted as an alternative to the arrow keys. Direction changes
 are buffered and applied on the next game tick. Immediate 180-degree reversals

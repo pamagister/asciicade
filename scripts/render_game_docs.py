@@ -143,9 +143,13 @@ def render_page(registration: GameRegistration) -> str:
         parts += [sections]
 
     if docs.controls_long:
-        parts += ["## Controls", _normalize(docs.controls_long)]
+        parts += [
+            "## Controls",
+            f"**Quick:** {docs.controls_short}",
+            _normalize(docs.controls_long),
+        ]
     else:
-        parts += ["## Controls", f"**Short:** {docs.controls_short}"]
+        parts += ["## Controls", f"**Quick:** {docs.controls_short}"]
 
     return _join_blocks(parts) + "\n"
 

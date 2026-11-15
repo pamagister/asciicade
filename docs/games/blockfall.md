@@ -81,6 +81,8 @@ a given random seed.
 
 ## Controls
 
+**Quick:** Arrows/WASD move · Space/Ctrl/AltGr rotate · Down soft drop · Esc/P pause
+
 Player 1 uses the arrow keys by default. Player 2 uses W/A/S/D. In single-player
 mode, WASD is accepted as an alternative to the arrow keys. Up (Player 1) and W
 (Player 2) rotate the active piece in addition to the action keys; this is a

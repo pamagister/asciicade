@@ -47,6 +47,8 @@ two-player mode the arrow keys belong to Player 1 and W/S to Player 2.
 
 ## Controls
 
+**Quick:** Arrows/WASD move · Esc/P pause · Q quit
+
 Tap a direction key to move the paddle one half-block. Hold it longer than 0.1
 seconds to move continuously; releasing the key stops movement immediately.
 Hold-to-move uses Kitty keyboard release events when the terminal supports them.
